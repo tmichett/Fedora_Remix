@@ -20,52 +20,29 @@ endif::[]
 :imagesdir: ./images/
 
 
-=== <SECTION TITLE>
+=== Getting Started
 
 Section Info Here
 
 
+.Initial Configuration
 
-.Example Code box for CLI
+* *User for Ansible*: ansible
+* *Password for Ansible User*: ansiblepassword
+* User in sudoers.d file to become root without prompting for password
+
+.*/etc/sudoers.d/ansible* File
 [source,bash]
 ----
-[student@workstation ~]$ sudo yum module install container-tools
-----
 
-.Example Code box for YAML
-[source,yaml]
-----
----
-- name: Deploy HTTPD Server Demo
-  hosts: server
-  collections:
-
-  tasks:
-
-## Start and Run the HTTPD Container
-    - name:  Start the Apache Container
-      podman_container:
 ----
 
 
-.*LAB/Exercise: Hands-On Activity Example*
-====
+==== Preparing Environment
 
-. Download a container image.
-.. Registry: *registry.access.redhat.com*
-.. Image: *ubi7*
-
-. Run the container
-====
+In order to prepare the environment, you will need a system running with Fedora already installed from the LiveCD and it will also need to have sufficient disk space to download REPO files, create the repository, and house the DVD ISO that is being created.
 
 
-
-
-==== <Section_Sub_Intro_Here>
-
-I am an image. Image directory in the chapter files is a symbolic link to the main "images" directory.
-
-image::RH_Discord_Logo.png[title="Example Image Caption", align="center"]
 
 
 <<<

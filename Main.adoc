@@ -1,6 +1,6 @@
 = {subject}
-:subject: <Subject for cover goes here>
-:description:  <Description for cover goes here>
+:subject: Creating a Fedora Remix
+:description:  Customizing a Classroom Build Environment
 Travis Michette <tmichett@redhat.com>
 :doctype: book
 :customer:  GLS
