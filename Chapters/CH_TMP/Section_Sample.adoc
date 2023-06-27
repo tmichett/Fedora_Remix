@@ -1,0 +1,65 @@
+:pygments-style: tango
+:source-highlighter: pygments
+:toc:
+:toclevels: 7
+:sectnums:
+:sectnumlevels: 6
+:numbered:
+:chapter-label:
+:icons: font
+ifndef::env-github[:icons: font]
+ifdef::env-github[]
+:status:
+:outfilesuffix: .adoc
+:caution-caption: :fire:
+:important-caption: :exclamation:
+:note-caption: :paperclip:
+:tip-caption: :bulb:
+:warning-caption: :warning:
+endif::[]
+:imagesdir: ./images/
+
+
+=== <SECTION TITLE>
+
+Section Info Here
+
+
+.Example Code box for CLI
+[source,bash]
+----
+[student@workstation ~]$ sudo yum module install container-tools
+----
+
+.Example Code box for YAML
+[source,yaml]
+----
+---
+- name: Deploy HTTPD Server Demo
+  hosts: server
+  collections:
+
+  tasks:
+
+## Start and Run the HTTPD Container
+    - name:  Start the Apache Container
+      podman_container:
+----
+
+
+.*LAB/Exercise: Hands-On Activity Example*
+====
+
+. Download a container image.
+.. Registry: *registry.access.redhat.com*
+.. Image: *ubi7*
+
+. Run the container
+====
+
+
+
+
+==== <Section_Sub_Intro_Here>
+
+<<<

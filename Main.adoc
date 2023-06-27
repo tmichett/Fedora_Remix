@@ -1,0 +1,66 @@
+= {subject}
+:subject: <Subject for cover goes here>
+:description:  <Description for cover goes here>
+Travis Michette <tmichett@redhat.com>
+:doctype: book
+:customer:  GLS
+:listing-caption: Listing
+:toc:
+:toclevels: 7
+:sectnums:
+:sectnumlevels: 6
+:numbered:
+:chapter-label:
+:pdf-page-size: LETTER
+:icons: font
+:imagesdir: images/
+// The IF Statements don't always work. So must comment out and uncomment based on ePub or PDF
+// Title-Page-Background is for PDF
+// Front-Cover-Image is for ePub
+//:front-cover-image: image:Training_Cover.png[align="top left"]
+:title-page-background-image: image:Training_Cover.png[pdfwidth=8.0in,position=top left]
+
+
+// Initial Settings for PDFs
+ifdef::backend-pdf[]
+:title-page-background-image: image:Training_Cover.png[pdfwidth=8.0in,position=top left]
+:pygments-style: tango
+:source-highlighter: pygments
+endif::[]
+
+// Initial Settings for Github
+ifdef::env-github[]
+:status:
+:outfilesuffix: .adoc
+:caution-caption: :fire:
+:important-caption: :exclamation:
+:note-caption: :paperclip:
+:tip-caption: :bulb:
+:warning-caption: :warning:
+endif::[]
+:revnumber: 1.0
+
+// Initial Settings for ePub
+ifdef::ebook-format-epub3[]
+:front-cover-image: image:Training_Cover.png[align="top left"]
+:title-page-background-image: image:Training_Cover.png[pdfwidth=8.0in,position=top left]
+:pygments-style: tango
+:source-highlighter: pygments
+endif::[]
+
+
+
+
+// Introduction Section goes below here
+
+//:sectnums!:
+//include::Introduction.adoc[]
+
+:sectnums:
+include::Chapter1.adoc[]
+
+
+// Appendix Section below here
+
+//[appendix]
+//include::AppendixA.adoc[]

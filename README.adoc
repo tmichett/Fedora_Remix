@@ -1,0 +1,41 @@
+
+:icons: font
+ifdef::backend-pdf[]
+:title-page-background-image: image:images/Training_Cover.png[pdfwidth=8.0in,align=center]
+:pygments-style: tango
+:source-highlighter: pygments
+endif::[]
+ifndef::env-github[:icons: font]
+ifdef::env-github[]
+:status:
+:outfilesuffix: .adoc
+:caution-caption: :fire:
+:important-caption: :exclamation:
+:note-caption: :paperclip:
+:tip-caption: :bulb:
+:warning-caption: :warning:
+endif::[]
+
+= ASCIIDoc Template
+
+Initial template files for creating the ASCIIDoc books and HTML rendering for Github/Gitlab.
+
+
+.Image Directory
+[IMPORTANT]
+======
+The Main *image* directory is a Symbolic Link in each of the Chapter directories. A script *Setup_Document_Template.sh* has been created to create all the Chapter.adoc skeletons as well as the folder structure duplicating the symbolic links and the Chapter Section content layout. This script should be run prior to creating any items.
+======
+
+
+.Creating PDF with Theme
+[source,bash]
+----
+asciidoctor-pdf  -a pdf-theme=themes/tm-gls-redhat-theme.yml Main.adoc
+----
+
+.Cleaning Up the Template
+[WARNING]
+======
+Ideally when using this repository, the newly created document repository only has the top layer "/" directory, the *Chapters* directory, the *themes* and *fonts* directory, and finally the *images* directory. All other directories may be discarded and removed once the project has been cloned/forked/etc.
+======
