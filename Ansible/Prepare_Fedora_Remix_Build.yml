@@ -1,0 +1,49 @@
+---
+- name: Setup System for Remix Creation and Building
+  hosts: localhost
+  vars:
+    remix_packages:
+      - vim
+      - livecd-tools
+      - spin-kickstarts
+      - sshfs
+    remix_directories:
+      - /livecd-creator/FedoraRemix
+      - /livecd-creator/package-cache
+
+### Play to get system ready for creating Fedora Remixes
+### Designed to be run from localhost
+
+
+  tasks:
+
+
+## Create Directories
+
+    - name: Install Packages for UCF Building
+      ansible.builtin.yum:
+        name: "{{ remix_packages }}"
+        state: latest
+      become: true
+
+    - name: Create the Remix Directories
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: directory
+        mode: '0755'
+      loop: "{{ remix_directories }}"
+      become: true
+
+## Copy Kickstart files
+
+    - name: Copy Base Kickstart
+      ansible.builtin.copy:
+        src: /usr/share/spin-kickstarts/fedora-live-base.ks
+        dest: /livecd-creator/FedoraRemix/
+      become: true
+
+    - name: Copy Kickstart to use for Custom
+      ansible.builtin.copy:
+        src: /usr/share/spin-kickstarts/fedora-live-workstation.ks
+        dest: /livecd-creator/FedoraRemix/FedoraRemix.ks
+      become: true

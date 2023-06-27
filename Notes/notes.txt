@@ -1,0 +1,9 @@
+[root@fedora FedoraRemix]# vim fedora-live-base.ks
+[root@fedora FedoraRemix]# ./Remix_Buid_Script.sh
+/usr/lib/python3.11/site-packages/pykickstart/commands/partition.py:448: KickstartParseWarning: A partition with the mountpoint / has already been defined.
+  warnings.warn(_("A partition with the mountpoint %s has already been defined.") % pd.mountpoint, KickstartParseWarning)
+No match for group package "python3-dnf-plugin-system-upgrade"
+No match for group package "gstreamer1-plugin-openh264"
+No match for group package "device-mapper-multipath"
+No match for group package "gfs2-utils"
+No match for group package "fcoe-utils"

@@ -42,7 +42,91 @@ Section Info Here
 
 In order to prepare the environment, you will need a system running with Fedora already installed from the LiveCD and it will also need to have sufficient disk space to download REPO files, create the repository, and house the DVD ISO that is being created.
 
+.Required Items for Build Environment
+
+* Same version of Fedora as Remix
+* Same system architecture as Remix
+* SELinux in *permissive* Mode
+* Packages
+** livecd-tools
+** spin-kickstarts
+* Lots of disk space
+
+.Default Kickstart files
+[TIP]
+======
+The default kickstart files are installed in */usr/share/spin-kickstarts*.
+
+.Initial Kickstart Files
+[source,bash]
+----
+fedora-cinnamon-common.ks         fedora-live-kde-base.ks
+fedora-cloud-base-gcp.ks          fedora-live-kde.ks
+fedora-cloud-base.ks              fedora-live-lxde.ks
+fedora-cloud-base-vagrant.ks      fedora-live-lxqt.ks
+fedora-comp-neuro-common.ks       fedora-live-mate_compiz.ks
+fedora-container-base.ks          fedora-live-minimization.ks
+fedora-container-base-minimal.ks  fedora-live-python-classroom.ks
+fedora-container-common.ks        fedora-live-robotics.ks
+fedora-design-suite-common.ks     fedora-live-scientific_kde.ks
+fedora-disk-base.ks               fedora-live-security.ks
+fedora-disk-kde.ks                fedora-live-soas.ks
+fedora-disk-minimal.ks            fedora-live-workstation.ks
+fedora-disk-python-classroom.ks   fedora-live-xfce.ks
+fedora-disk-server.ks             fedora-lxde-common.ks
+fedora-disk-soas.ks               fedora-lxqt-common.ks
+fedora-disk-workstation.ks        fedora-mate-common.ks
+fedora-disk-xbase.ks              fedora-minimal-common.ks
+fedora-disk-xfce.ks               fedora-modular-arm-server.ks
+fedora-eln-container-base.ks      fedora-modular-disk-minimal.ks
+fedora-eln-guest.ks               fedora-neuro-gnome-common.ks
+fedora-i3-common.ks               fedora-python-classroom-common.ks
+fedora-iot.ks                     fedora-python-classroom-gnome-common.ks
+fedora-kde-common.ks              fedora-python-classroom-vagrant.ks
+fedora-kde-minimization.ks        fedora-repo.ks
+fedora-live-astronomy_kde.ks      fedora-repo-not-rawhide.ks
+fedora-live-base.ks               fedora-repo-rawhide.ks
+fedora-live-cinnamon.ks           fedora-scientific-common.ks
+fedora-live-comp_neuro.ks         fedora-scientific-vagrant.ks
+fedora-live-design_suite.ks       fedora-soas-common.ks
+fedora-live-games.ks              fedora-workstation-common.ks
+fedora-live-i3.ks                 fedora-xfce-common.ks
+fedora-live-jam_kde.ks            snippets
+----
+
+The one Fedora starts with is *fedora-live-base.ks*.
+======
+
+==== Create Build and Package Cache Directories and Copy Kickstarts
+
+A build and cache directory should be created and you should copy kickstart files to your build directory.
+
+.Create Build Directory
+[source,bash]
+----
+mkdir -p /livecd-creator/{FedoraRemix,package-cache}
+----
+
+.Copy the Base KS and the Desired Custom KS to the *FedoraRemix* directory
+[source,bash]
+----
+cp /usr/share/spin-kickstarts/fedora-live-base.ks /livecd-creator/FedoraRemix/
+
+cp /usr/share/spin-kickstarts/fedora-repo.ks /livecd-creator/FedoraRemix/
+
+cp /usr/share/spin-kickstarts/fedora-workstation-common.ks /livecd-creator/FedoraRemix/
+
+cp /usr/share/spin-kickstarts/fedora-repo-not-rawhide.ks /livecd-creator/FedoraRemix/
+
+cp /usr/share/spin-kickstarts/fedora-live-workstation.ks /livecd-creator/FedoraRemix/FedoraRemix.ks
+----
+
+.Customizing Repositories
+[IMPORTANT]
+======
+Modify and update the ** with the correct repositories to use. Comment out the *RAWHIDE* and use the repos for the version of Fedora you are Remixing.
 
 
+======
 
 <<<
