@@ -1,0 +1,37 @@
+---
+- name: Setup System for Remix File Hosting
+  hosts: localhost
+
+### Play to get system ready for creating Fedora Remixes
+### Designed to be run from localhost
+
+
+  tasks:
+
+
+## Create Directories
+
+    - name: Install Packages for UCF Building
+      ansible.builtin.yum:
+        name: httpd
+        state: latest
+      become: true
+
+    - name: Enable HTTPD Service
+      ansible.builtin.systemd:
+        name: httpd
+        enabled: true
+        state: started
+      become: true
+
+    - name: Copy Files to Web Directory
+      ansible.posix.synchronize:
+        src: ./files
+        dest: /var/www/html
+      become: true
+
+    - name: Copy Boot Theme to Web Directory
+      ansible.posix.synchronize:
+        src: ./files/boot/tm-fedora-remix
+        dest: /var/www/html
+      become: true  
