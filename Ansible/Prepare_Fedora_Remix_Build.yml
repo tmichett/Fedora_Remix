@@ -42,8 +42,29 @@
         dest: /livecd-creator/FedoraRemix/
       become: true
 
-    - name: Copy Kickstart to use for Custom
+    - name: Create Repository Kickstart
+      ansible.builtin.copy:
+        content: |
+          %include fedora-repo-not-rawhide.ks
+        dest: /livecd-creator/FedoraRemix/fedora-repo.ks
+      become: true
+
+    - name: Copy Non-Rawhide Kickstart
+      ansible.builtin.copy:
+        src: /usr/share/spin-kickstarts/fedora-repo-not-rawhide.ks
+        dest: /livecd-creator/FedoraRemix/
+      become: true
+
+
+    - name: Copy Kickstart to use for Custom 
       ansible.builtin.copy:
         src: /usr/share/spin-kickstarts/fedora-live-workstation.ks
-        dest: /livecd-creator/FedoraRemix/FedoraRemix.ks
+        dest: /livecd-creator/FedoraRemix/FedoraRemix_Demo.ks
       become: true
+
+    - name: Copy Workstation Common Kickstart
+      ansible.builtin.copy:
+        src: /usr/share/spin-kickstarts/fedora-workstation-common.ks
+        dest: /livecd-creator/FedoraRemix/
+      become: true        
+
