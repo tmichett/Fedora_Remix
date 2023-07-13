@@ -17,13 +17,6 @@
         state: latest
       become: true
 
-    - name: Enable HTTPD Service
-      ansible.builtin.systemd:
-        name: httpd
-        enabled: true
-        state: started
-      become: true
-
     - name: Copy Files to Web Directory
       ansible.posix.synchronize:
         src: ./files
@@ -35,3 +28,16 @@
         src: ./files/boot/tm-fedora-remix
         dest: /var/www/html
       become: true  
+
+    - name: Create Apache Configuration
+      ansible.posix.synchronize:
+        src: ./files/httpd_index.conf
+        dest: /etc/httpd/conf.d/httpd_index.conf
+      become: true
+
+    - name: Enable HTTPD Service
+      ansible.builtin.systemd:
+        name: httpd
+        enabled: true
+        state: started
+      become: true
