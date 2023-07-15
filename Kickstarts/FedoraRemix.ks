@@ -9,10 +9,25 @@
 # by leaving a gpg-agent around holding /dev/null open.
 #
 #include snippets/packagekit-cached-metadata.ks
+%include FedoraRemixPackages.ks
 
-part / --size 7680
+
+
+part / --size 20680
+
+
+#%post --nochroot
+#if [ ! -e /mnt/sysimage/etc/resolf.conf ]; then
+#  cp -P /etc/resolv.conf $INSTALL_ROOT/etc/resolv.conf
+#fi
+#%end
+
 
 %post
+### Fix added for DNS and Network fixes in Post
+### https://anaconda-installer.readthedocs.io/en/latest/common-bugs.html#missing-etc-resolv-conf-for-post-scripts
+
+echo "nameserver 8.8.8.8" > /etc/resolv.conf
 
 cat >> /etc/rc.d/init.d/livesys << EOF
 
@@ -106,6 +121,12 @@ wget -O /etc/dconf/db/gdm.d/01-banner-message http://localhost/files/01-banner-m
 
 wget -O /etc/dconf/profile/gdm http://localhost/files/gdm_config
 
+wget -O /usr/share/pixmaps/bootloader/bootlogo_128.png http://localhost/files/bootlogo_128.png
+
+wget -O /usr/share/pixmaps/bootloader/bootlogo_256.png http://localhost/files/bootlogo_256.png
+
+wget -O /usr/share/anaconda/boot/splash.png http://localhost/tm-fedora-remix/logo.png
+
 dconf update
 
 wget -P /usr/share/plymouth/themes/ -r -nH -np -R "index.htm*" http://localhost/tm-fedora-remix/
@@ -117,5 +138,17 @@ cp /usr/share/plymouth/themes/tm-fedora-remix/logo.* /usr/share/plymouth/themes/
 /usr/sbin/plymouth-set-default-theme tm-fedora-remix -R
 
 dracut -f
+
+## Setup and Install Ansible and Ansible Navigator
+/usr/bin/pip3 install ansible-core ansible-navigator ansible-builder ansible
+
+## Install Flatpaks
+
+#/usr/bin/flatpak install flathub com.slack.Slack
+#/usr/bin/flatpak install flathub us.zoom.Zoom
+
+
+### Removal of network fix
+rm /etc/resolv.conf
 
 %end
