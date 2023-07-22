@@ -23,7 +23,7 @@ git-lfs
 python3-pip
 vim-enhanced
 dbus-x11
-google-chrome
+google-chrome-stable
 ImageMagick
 mock
 git
@@ -35,11 +35,17 @@ ntfs-3g
 wget
 fedora-remix-logos
 gh
+syslinux-perl
+yad
+pykickstart
+terminator
+sshuttle
 
 ## Image Editing and Manipulation
 inkscape
 gimp
 krita
+netpbm-progs
 
 ## Container Tools
 buildah
@@ -47,5 +53,8 @@ skopeo
 
 ## Telecon and Media
 obs-studio
+
+## Remove Tour
+-gnome-tour
 
 %end

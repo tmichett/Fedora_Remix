@@ -11,23 +11,41 @@
 #include snippets/packagekit-cached-metadata.ks
 %include FedoraRemixPackages.ks
 
-
+#network --device=link --bootproto=static --ip=192.168.15.15 --netmask=255.255.255.0 --gateway=192.168.15.1 --nameserver=192.168.15.1
 
 part / --size 20680
 
 
-#%post --nochroot
+
+%post --nochroot
 #if [ ! -e /mnt/sysimage/etc/resolf.conf ]; then
 #  cp -P /etc/resolv.conf $INSTALL_ROOT/etc/resolv.conf
 #fi
-#%end
+#%post --nochroot
+#cp -P /etc/resolv.conf "$INSTALL_ROOT"/etc/resolv.conf
+/usr/bin/pip3 install ansible-core ansible-navigator ansible-builder ansible # (issues with DNS in Post)
+
+## Install Flatpaks
+#/usr/bin/flatpak install flathub com.slack.Slack -y
+#/usr/bin/flatpak install flathub us.zoom.Zoom -y
+
+%end
 
 
 %post
 ### Fix added for DNS and Network fixes in Post
 ### https://anaconda-installer.readthedocs.io/en/latest/common-bugs.html#missing-etc-resolv-conf-for-post-scripts
 
-echo "nameserver 8.8.8.8" > /etc/resolv.conf
+#echo "nameserver 8.8.8.8" >> /etc/resolv.conf
+
+#echo "nameserver 8.8.8.8" >> $INSTALL_ROOT/etc/resolv.conf
+
+#/usr/bin/systemctl restart NetworkManager
+
+#/usr/bin/systemd-resolve --set-dns=192.168.15.1 --interface=eth0
+
+# network --device=link --bootproto=static --ip=192.168.15.15 --netmask=255.255.255.0 --gateway=192.168.15.1 --nameserver=192.168.15.1
+
 
 cat >> /etc/rc.d/init.d/livesys << EOF
 
@@ -139,16 +157,66 @@ cp /usr/share/plymouth/themes/tm-fedora-remix/logo.* /usr/share/plymouth/themes/
 
 dracut -f
 
+
+## Fix Networking
+
+#/usr/bin/mkdir /FedoraRemix
+#cat /etc/resolv.conf > /FedoraRemix/DNS.txt
+#/usr/sbin/ip a >> /FedoraRemix/DNS.txt
+#/usr/bin/systemd-resolve --status >> /FedoraRemix/DNS.txt
+#/usr/bin/resolvectl  >> /FedoraRemix/DNS.txt
+#/usr/bin/resolvectl
+
+#/usr/bin/nmcli con show
+
+
 ## Setup and Install Ansible and Ansible Navigator
-/usr/bin/pip3 install ansible-core ansible-navigator ansible-builder ansible
+/usr/bin/pip3 install ansible-core ansible-navigator ansible-builder ansible # (issues with DNS in Post)
+#wget -P /opt/ -r -nH -np -R "index.htm*" http://localhost/pip_packages/
+#wget -P /opt/ http://localhost/files/python_packages.txt
+#cd /opt/pip_packages
+#/usr/bin/pip3 install -r /opt/python_packages.txt
+
+
 
 ## Install Flatpaks
+#/usr/bin/flatpak install flathub com.slack.Slack -y
+#/usr/bin/flatpak install flathub us.zoom.Zoom -y
 
-#/usr/bin/flatpak install flathub com.slack.Slack
-#/usr/bin/flatpak install flathub us.zoom.Zoom
+## Customize Anaconda Installer
+cd /usr/share/anaconda/pixmaps
+rm sidebar-logo.png
+rm anaconda_header.png
+wget  http://localhost/files/boot/sidebar-logo.png
+wget  http://localhost/files/boot/anaconda_header.png
+cd /usr/share/anaconda/pixmaps/workstation/
+rm sidebar-logo.png
+wget  http://localhost/files/boot/sidebar-logo.png
+
+cd /usr/share/anaconda/boot
+rm splash.lss
+wget  http://localhost/files/boot/splash.lss
+
+
+## Customize Logos - General
+/usr/share/pixmaps/
+wget http://localhost/files/logos/fedora-logo-small.png
+wget http://localhost/files/logos/fedora-logo.png
+wget http://localhost/files/logos/fedora_logo_med.png
+
+## Customize Grub Boot Menu
+/usr/bin/mkdir /boot/grub2/images
+cd /etc/default
+wget  http://localhost/files/boot/grub
+cp /usr/share/plymouth/themes/tm-fedora-remix/watermark.* /boot/grub2/images
+mkdir /opt/FedoraRemix
+cd /opt/FedoraRemix/ 
+wget http://localhost/files/boot/grub
+/usr/sbin/grub2-mkconfig -o /boot/grub2/grub.cfg
+
 
 
 ### Removal of network fix
-rm /etc/resolv.conf
+#rm /etc/resolv.conf
 
 %end
