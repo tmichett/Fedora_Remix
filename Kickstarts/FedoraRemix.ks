@@ -153,19 +153,30 @@ cp /usr/share/plymouth/themes/tm-fedora-remix/watermark.* /usr/share/plymouth/th
 
 cp /usr/share/plymouth/themes/tm-fedora-remix/logo.* /usr/share/plymouth/themes/spinner/
 
+## Setting Theme
+
+echo "Setting Fedora Theme"
+
 /usr/sbin/plymouth-set-default-theme tm-fedora-remix -R
 
-dracut -f
+dracut -f --no-kernel
 
 
 ## Fix Networking
 
-#/usr/bin/mkdir /FedoraRemix
-#cat /etc/resolv.conf > /FedoraRemix/DNS.txt
-#/usr/sbin/ip a >> /FedoraRemix/DNS.txt
+echo "Attempting to setup DNS and configure networking"
+echo "nameserver 8.8.8.8" > /etc/resolv.conf
+/usr/bin/mkdir /FedoraRemix
+cat /etc/resolv.conf > /FedoraRemix/DNS.txt
+/usr/sbin/ip a >> /FedoraRemix/DNS.txt
+
 #/usr/bin/systemd-resolve --status >> /FedoraRemix/DNS.txt
 #/usr/bin/resolvectl  >> /FedoraRemix/DNS.txt
 #/usr/bin/resolvectl
+
+#echo "Restarting Network Manager" 
+
+#systemctl restart NetworkManager
 
 #/usr/bin/nmcli con show
 
@@ -180,10 +191,16 @@ dracut -f
 
 
 ## Install Flatpaks
-#/usr/bin/flatpak install flathub com.slack.Slack -y
-#/usr/bin/flatpak install flathub us.zoom.Zoom -y
+echo "Attempting to install flatpaks"
+/usr/bin/flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+
+/usr/bin/flatpak install flathub com.slack.Slack -y
+/usr/bin/flatpak install flathub us.zoom.Zoom -y
 
 ## Customize Anaconda Installer
+
+echo "Customizing Anaconda"
+
 cd /usr/share/anaconda/pixmaps
 rm sidebar-logo.png
 rm anaconda_header.png
@@ -205,6 +222,9 @@ wget http://localhost/files/logos/fedora-logo.png
 wget http://localhost/files/logos/fedora_logo_med.png
 
 ## Customize Grub Boot Menu
+
+echo "Attempting to customize GRUB"
+
 /usr/bin/mkdir /boot/grub2/images
 cd /etc/default
 wget  http://localhost/files/boot/grub
@@ -218,5 +238,17 @@ wget http://localhost/files/boot/grub
 
 ### Removal of network fix
 #rm /etc/resolv.conf
+
+## Setting up Firstboot
+## Copy resourcse and enable the service
+#systemctl enable firststart.service
+systemctl enable systemd-firstboot.service
+cd /etc/systemd/system 
+wget http://localhost/files/boot/fixgrub.service
+cd /opt/FedoraRemix/
+wget http://localhost/files/boot/fixgrub.sh
+chmod +x /opt/FedoraRemix/fixgrub.sh
+chmod 644  /etc/systemd/system/fixgrub.service
+systemctl enable fixgrub.service
 
 %end

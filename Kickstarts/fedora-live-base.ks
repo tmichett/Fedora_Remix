@@ -17,8 +17,8 @@ zerombr
 clearpart --all
 part / --size 5120 --fstype ext4
 services --enabled=NetworkManager,ModemManager --disabled=sshd
-# network --bootproto=dhcp --device=link --activate
-network --device=link --bootproto=static --ip=192.168.15.15 --netmask=255.255.255.0 --gateway=192.168.15.1 --nameserver=192.168.15.1 --activate
+#network --bootproto=dhcp --device=link --activate
+network --device=link --bootproto=static --ip=192.168.1.15 --netmask=255.255.255.0 --gateway=192.168.1.1 --nameserver=192.168.1.1 --activate
 
 rootpw --lock --iscrypted locked
 shutdown
