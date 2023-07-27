@@ -25,9 +25,9 @@
 
     - name: Copy Boot Theme to Web Directory
       ansible.posix.synchronize:
-       src: ./files/boot/tm-fedora-remix
-       dest: /var/www/html
-       become: true  
+        src: ./files/boot/tm-fedora-remix
+        dest: /var/www/html
+      become: true  
 
     - name: Create Apache Configuration
       ansible.posix.synchronize:
