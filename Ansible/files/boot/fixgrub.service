@@ -1,0 +1,10 @@
+[Unit]
+Description=FixGrub FirstBoot Script
+ConditionFirstBoot=yes
+
+[Service]
+Type=oneshot
+ExecStart=/opt/FedoraRemix/fixgrub.sh
+
+[Install]
+WantedBy=multi-user.target
