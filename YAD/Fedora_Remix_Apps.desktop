@@ -1,0 +1,12 @@
+#!/usr/bin/env xdg-open
+[Desktop Entry]
+Name=Fedora Remix Apps
+GenericName=Fedora Remix Apps
+X-GNOME-FullName=Fedora Remix Apps
+Exec=/opt/FedoraRemix/Fedora_Remix_Customize.sh
+Terminal=false
+Icon=preferences-system
+Type=Application
+StartupNotify=true
+Categories=GTK;GNOME;Utilities;
+Name[en_US]=Fedora Remix Apps
