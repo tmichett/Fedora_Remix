@@ -153,6 +153,11 @@ cp /usr/share/plymouth/themes/tm-fedora-remix/watermark.* /usr/share/plymouth/th
 
 cp /usr/share/plymouth/themes/tm-fedora-remix/logo.* /usr/share/plymouth/themes/spinner/
 
+## Setting up Customization Pieces
+wget -P /opt -r -nH -np -R "index.htm*" http://localhost/FedoraRemixCustomize
+
+
+
 ## Setting Theme
 
 echo "Setting Fedora Theme"
