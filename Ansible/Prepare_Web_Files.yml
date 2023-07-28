@@ -35,6 +35,13 @@
         dest: /etc/httpd/conf.d/httpd_index.conf
       become: true
 
+    - name: Create FedoraRemixCustomize Directory
+      ansible.builtin.git:
+        repo: https://github.com/tmichett/FedoraRemixCustomize.git
+        dest: /var/www/html/FedoraRemixCustomize
+      become: true
+
+
     - name: Enable HTTPD Service
       ansible.builtin.systemd:
         name: httpd
