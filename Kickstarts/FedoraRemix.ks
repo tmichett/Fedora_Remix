@@ -256,4 +256,9 @@ chmod +x /opt/FedoraRemix/fixgrub.sh
 chmod 644  /etc/systemd/system/fixgrub.service
 systemctl enable fixgrub.service
 
+## Enable Cockpit and SSHD
+echo "Enabling Cockpit and SSHD Services"
+systemctl enable cockpit.socket
+systemctl enable sshd.service
+
 %end

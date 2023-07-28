@@ -40,6 +40,9 @@ yad
 pykickstart
 terminator
 sshuttle
+cockpit*
+meson
+ninja-build
 
 ## Image Editing and Manipulation
 inkscape
