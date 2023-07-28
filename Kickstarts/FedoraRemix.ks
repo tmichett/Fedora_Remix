@@ -261,4 +261,19 @@ echo "Enabling Cockpit and SSHD Services"
 systemctl enable cockpit.socket
 systemctl enable sshd.service
 
+## Enable YAD Scripts and Looks
+cd /opt/FedoraRemix/
+wget -r -nH -np -R "index.htm*" http://localhost/scripts/
+cd /opt/FedoraRemix/scripts
+chmod +x *.sh
+mkdir /opt/FedoraRemix/logos
+wget -O /opt/FedoraRemix/logos/splash.png http://localhost/tm-fedora-remix/logo.png
+cd /opt/FedoraRemix
+wget http://localhost/Fedora_Remix_Apps.desktop
+wget http://localhost/Fedora_Remix_Customize.sh
+cp /opt/FedoraRemix/Fedora_Remix_Apps.desktop /usr/share/gnome/autostart/
+cp /opt/FedoraRemix/Fedora_Remix_Apps.desktop /usr/share/applications/
+chmod +x Fedora_Remix_Customize.sh
+
+
 %end

@@ -41,6 +41,21 @@
         dest: /var/www/html/FedoraRemixCustomize
       become: true
 
+    - name: Create and Synchronize Scripts Directory
+      ansible.posix.synchronize:
+        src: ../YAD/scripts
+        dest: /var/www/html/
+      become: true
+
+    - name: Copy YAD Files
+      ansible.posix.synchronize:
+        src: ../YAD/{{ item }}
+        dest: /var/www/html
+      become: true
+      loop: 
+        - Fedora_Remix_Apps.desktop
+        - Fedora_Remix_Customize.sh
+
 
     - name: Enable HTTPD Service
       ansible.builtin.systemd:
