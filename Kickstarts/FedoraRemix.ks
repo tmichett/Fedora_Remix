@@ -265,7 +265,9 @@ systemctl enable sshd.service
 cd /opt/FedoraRemix/
 wget -r -nH -np -R "index.htm*" http://localhost/scripts/
 cd /opt/FedoraRemix/scripts
+wget http://localhost/files/boot/fixgrub.sh
 chmod +x *.sh
+
 mkdir /opt/FedoraRemix/logos
 wget -O /opt/FedoraRemix/logos/splash.png http://localhost/tm-fedora-remix/logo.png
 cd /opt/FedoraRemix

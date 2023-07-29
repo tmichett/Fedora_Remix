@@ -1,2 +1,2 @@
 #!/bin/bash
-/opt/FedoraRemix/fixgrub.sh
+/opt/FedoraRemix/scripts/fixgrub.sh
