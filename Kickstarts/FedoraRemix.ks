@@ -275,5 +275,8 @@ cp /opt/FedoraRemix/Fedora_Remix_Apps.desktop /usr/share/gnome/autostart/
 cp /opt/FedoraRemix/Fedora_Remix_Apps.desktop /usr/share/applications/
 chmod +x Fedora_Remix_Customize.sh
 
+## Install Gnome-Tweaks and Prepare Packages
+cd /opt/FedoraRemixCustomize/
+ansible-playbook Deploy_Gnome_Tweaks.yml --connection=local > /FedoraRemix/Deploy_Gnome_Tweaks.log
 
 %end
