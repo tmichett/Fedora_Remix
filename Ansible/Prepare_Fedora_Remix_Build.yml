@@ -68,3 +68,9 @@
         dest: /livecd-creator/FedoraRemix/
       become: true        
 
+    - name: Build Script
+      ansible.builtin.copy:
+        src: ./Prepare_Fedora_Remix_Build.yml
+        dest: /livecd-creator/FedoraRemix/
+      become: true
+
