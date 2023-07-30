@@ -9,6 +9,6 @@ yad --title "Fedora Remix Desktop Customization Tool" --form --columns=3 --width
 --field="<b>7 - Customize Gnome for Root User</b>":fbtn "gnome-terminal -t 'Customize Gnome for Root User' -- sh -c 'sudo /opt/FedoraRemix/scripts/customize_gnome.sh'" \
 --field="<b>8 - Customize Grub Bootloaderr</b>":fbtn "gnome-terminal -t 'Customizing Grub' -- sh -c 'sudo /opt/FedoraRemix/scripts/customize_grub.sh'" \
 --field="<b>9 - Install Gnome Shell Extensions (will reboot when completed)</b>":fbtn "gnome-terminal -t 'Installing Shell Exentsions' -- sh -c '/opt/FedoraRemix/scripts/deploy_gnome_extensions.sh'" \
---field="<b>10 - Enable Gnome Shell Extensions for Desktop</b>":fbtn "gnome-terminal -t 'Enabling Desktop Icon Extensions' -- sh -c 'sudo /opt/FedoraRemix/scripts/enable_gnome_extensions.sh'" \
+--field="<b>10 - Enable Gnome Shell Extensions for Desktop</b>":fbtn "gnome-terminal -t 'Enabling Desktop Icon Extensions' -- sh -c '/opt/FedoraRemix/scripts/enable_gnome_extensions.sh'" \
 --field="<b>11 -Remove Fedora Remix Utilities from Automatic Startup</b>":fbtn "gnome-terminal -t 'Removing Automatic Tool Startup' -- sh -c 'sudo /opt/FedoraRemix/scripts/remove_yad_from_startup.sh'" \
 --button=Exit:1
