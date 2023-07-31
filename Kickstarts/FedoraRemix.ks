@@ -145,6 +145,8 @@ wget -O /usr/share/pixmaps/bootloader/bootlogo_256.png http://localhost/files/bo
 
 wget -O /usr/share/anaconda/boot/splash.png http://localhost/tm-fedora-remix/logo.png
 
+wget -O /etc/dconf/db/gdm.d/01-background http://localhost/files/01-background
+
 dconf update
 
 wget -P /usr/share/plymouth/themes/ -r -nH -np -R "index.htm*" http://localhost/tm-fedora-remix/
@@ -264,9 +266,11 @@ systemctl enable sshd.service
 ## Enable YAD Scripts and Looks
 cd /opt/FedoraRemix/
 wget -r -nH -np -R "index.htm*" http://localhost/scripts/
+wget http://localhost/files/Wallpaper.png
 cd /opt/FedoraRemix/scripts
 wget http://localhost/files/boot/fixgrub.sh
 chmod +x *.sh
+
 
 mkdir /opt/FedoraRemix/logos
 wget -O /opt/FedoraRemix/logos/splash.png http://localhost/tm-fedora-remix/logo.png
