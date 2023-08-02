@@ -32,6 +32,14 @@ part / --size 20680
 %end
 
 
+### Fix ISOLinux
+
+%post --nochroot
+touch "$LIVE_ROOT/isolinx/travis"
+
+%end
+
+
 %post
 ### Fix added for DNS and Network fixes in Post
 ### https://anaconda-installer.readthedocs.io/en/latest/common-bugs.html#missing-etc-resolv-conf-for-post-scripts
@@ -223,10 +231,19 @@ wget  http://localhost/files/boot/splash.lss
 
 
 ## Customize Logos - General
-/usr/share/pixmaps/
+cd /usr/share/pixmaps/
+rm fedora-logo*.png
+rm fedora_logo_med.png
 wget http://localhost/files/logos/fedora-logo-small.png
 wget http://localhost/files/logos/fedora-logo.png
 wget http://localhost/files/logos/fedora_logo_med.png
+
+cd /usr/share/fedora-logos/
+rm fedora*.svg
+wget http://localhost/files/logos/fedora_logo.svg
+wget http://localhost/files/logos/fedora_logo_darkbackground.svg
+wget http://localhost/files/logos/fedora_lightbackground.svg 
+wget http://localhost/files/logos/fedora_darkbackground.svg
 
 ## Customize Grub Boot Menu
 

@@ -211,7 +211,7 @@ touch /.liveimg-configured
 # https://bugzilla.redhat.com/show_bug.cgi?id=679486
 # the hostname must be something else than 'localhost'
 # https://bugzilla.redhat.com/show_bug.cgi?id=1370222
-hostnamectl set-hostname "localhost-live"
+hostnamectl set-hostname "localhost-fedoraremix-live"
 
 EOF
 
@@ -330,7 +330,8 @@ touch /etc/machine-id
 # For livecd-creator builds only (lorax/livemedia-creator handles this directly)
 if [ -n "$LIVE_ROOT" ]; then
     cp "$INSTALL_ROOT"/usr/share/licenses/*-release-common/* "$LIVE_ROOT/"
-
+    touch "$LIVE_ROOT/isolinux/travis"
+    wget -P "$LIVE_ROOT/isolinux" http://localhost/files/boot/splash.png
     # only installed on x86, x86_64
     if [ -f /usr/bin/livecd-iso-to-disk ]; then
         mkdir -p "$LIVE_ROOT/LiveOS"
