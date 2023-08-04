@@ -209,8 +209,8 @@ cat /etc/resolv.conf > /FedoraRemix/DNS.txt
 echo "Attempting to install flatpaks"
 /usr/bin/flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
 
-/usr/bin/flatpak install flathub com.slack.Slack -y
-/usr/bin/flatpak install flathub us.zoom.Zoom -y
+# /usr/bin/flatpak install flathub com.slack.Slack -y
+# /usr/bin/flatpak install flathub us.zoom.Zoom -y
 
 ## Customize Anaconda Installer
 
@@ -244,6 +244,12 @@ wget http://localhost/files/logos/fedora_logo.svg
 wget http://localhost/files/logos/fedora_logo_darkbackground.svg
 wget http://localhost/files/logos/fedora_lightbackground.svg 
 wget http://localhost/files/logos/fedora_darkbackground.svg
+
+## Customize Gnome Wallpaper
+cd /usr/share/backgrounds/f38/default/
+rm *.png
+wget http://localhost/files/f38-01-night.png
+wget http://localhost/files/f38-01-day.png
 
 ## Customize Grub Boot Menu
 
