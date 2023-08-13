@@ -60,4 +60,16 @@ obs-studio
 ## Remove Tour
 -gnome-tour
 
+## Kickstart and PXEBoot
+httpd
+bind
+bind-utils
+vsftpd
+createrepo
+tree 
+syslinux 
+tftp-server 
+dhcp-server
+firewalld
+
 %end
