@@ -5,7 +5,11 @@
 ### Play to get system ready for creating Fedora Remixes
 ### Designed to be run from localhost
 
-
+  vars:
+    fedora_boot_files:
+      - vmlinuz
+      - initrd.img
+    fedora_version: 38
   tasks:
 
 
@@ -40,6 +44,22 @@
         repo: https://github.com/tmichett/FedoraRemixCustomize.git
         dest: /var/www/html/FedoraRemixCustomize
       become: true
+
+
+## Create PXE Boot Files directory
+    - name: Create the Remix Directories for PXEBoot
+      ansible.builtin.file:
+        path: /var/www/html/FedoraRemixPXE
+        state: directory
+        mode: '0755'
+      become: true
+
+## Obtain Boot images for PXEBoot
+    - name: Download Boot Images for PXEBoot
+      ansible.builtin.get_url:
+        url:  https://download.fedoraproject.org/pub/fedora/linux/releases/{{ fedora_version }}/Server/x86_64/os/images/pxeboot/{{ item }}
+        dest: /var/www/html/FedoraRemixPXE/
+      loop: "{{ fedora_boot_files }}"
 
     - name: Create and Synchronize Scripts Directory
       ansible.posix.synchronize:

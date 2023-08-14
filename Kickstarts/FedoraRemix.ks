@@ -165,7 +165,7 @@ cp /usr/share/plymouth/themes/tm-fedora-remix/logo.* /usr/share/plymouth/themes/
 
 ## Setting up Customization Pieces
 wget -P /opt -r -nH -np -R "index.htm*" http://localhost/FedoraRemixCustomize
-
+wget -P /opt -r -nH -np -R "index.htm*" http://localhost/FedoraRemixPXE
 
 
 ## Setting Theme
