@@ -45,6 +45,12 @@
         dest: /var/www/html/FedoraRemixCustomize
       become: true
 
+    - name: Create FedoraRemixPXE Directory
+      ansible.builtin.git:
+        repo: https://github.com/tmichett/PXEServer.git
+        dest: /var/www/html/PXEServer
+      become: true
+
 
 ## Create PXE Boot Files directory
     - name: Create the Remix Directories for PXEBoot
