@@ -155,6 +155,10 @@ wget -O /usr/share/anaconda/boot/splash.png http://localhost/tm-fedora-remix/log
 
 wget -O /etc/dconf/db/gdm.d/01-background http://localhost/files/01-background
 
+wget -O /etc/dconf/db/gdm.d/01-disable-power-save http://localhost/files/01-disable-power-save
+
+wget -O /etc/dconf/db/local.d/01-disable-power-save http://localhost/files/01-disable-power-save
+
 dconf update
 
 wget -P /usr/share/plymouth/themes/ -r -nH -np -R "index.htm*" http://localhost/tm-fedora-remix/
