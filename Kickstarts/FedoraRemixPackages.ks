@@ -7,7 +7,6 @@
 #generic-release
 #generic-release-notes
 ## End Branding and Logos
-
 vim
 sshfs
 @Virtualization
@@ -60,16 +59,10 @@ obs-studio
 ## Remove Tour
 -gnome-tour
 
-## Kickstart and PXEBoot
-httpd
-bind
-bind-utils
-vsftpd
-createrepo
-tree 
-syslinux 
-tftp-server 
-dhcp-server
-firewalld
+## Course and Classroom Building DLE-DOIT
+python3-devel
+gcc
+
+
 
 %end
