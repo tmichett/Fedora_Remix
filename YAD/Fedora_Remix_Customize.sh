@@ -11,5 +11,6 @@ yad --title "Fedora Remix Desktop Customization Tool" --form --columns=3 --width
 --field="<b>9 - Install Gnome Shell Extensions (will reboot when completed)</b>":fbtn "gnome-terminal -t 'Installing Shell Exentsions' -- sh -c '/opt/FedoraRemix/scripts/deploy_gnome_extensions.sh'" \
 --field="<b>10 - Enable Gnome Shell Extensions for Desktop</b>":fbtn "gnome-terminal -t 'Enabling Desktop Icon Extensions' -- sh -c '/opt/FedoraRemix/scripts/enable_gnome_extensions.sh'" \
 --field="<b>11 -Remove Fedora Remix Utilities from Automatic Startup</b>":fbtn "gnome-terminal -t 'Removing Automatic Tool Startup' -- sh -c 'sudo /opt/FedoraRemix/scripts/remove_yad_from_startup.sh'" \
---field="<b>12 -Create PXEBoot Server</b>":fbtn "gnome-terminal -t 'Creating PXEBoot Server' -- sh -c 'sudo /opt/FedoraRemix/scripts/create_pxe_server.sh'" \
+--field="<b>12 -Set Ansible User Password</b>":fbtn "gnome-terminal -t 'Ansible User Password Setting' -- sh -c 'sudo /opt/FedoraRemix/scripts/ansible-user_passwd.sh'" \
+--field="<b>13 -Create PXEBoot Server</b>":fbtn "gnome-terminal -t 'Creating PXEBoot Server' -- sh -c 'sudo /opt/FedoraRemix/scripts/create_pxe_server.sh'" \
 --button=Exit:1
