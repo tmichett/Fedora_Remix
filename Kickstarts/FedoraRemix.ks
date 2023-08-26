@@ -313,7 +313,8 @@ cd /opt/FedoraRemixCustomize/
 ansible-playbook Deploy_Gnome_Tweaks.yml --connection=local > /FedoraRemix/Deploy_Gnome_Tweaks.log
 
 ## Create Ansible-User with Password and Add to Sudoers
-/usr/sbin/useradd ansible-user
+/usr/sbin/groupadd -g 700 ansible-user
+/usr/sbin/useradd -u 700 -g 700 -c "Ansible User" ansible-user
 echo "ansiblepass" | passwd ansible-user --stdin
 echo "ansible-user ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/ansible-user
 
