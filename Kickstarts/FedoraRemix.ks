@@ -318,4 +318,7 @@ ansible-playbook Deploy_Gnome_Tweaks.yml --connection=local > /FedoraRemix/Deplo
 echo "ansiblepass" | passwd ansible-user --stdin
 echo "ansible-user ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/ansible-user
 
+## Download and Install Calibre
+sudo -v && wget -nv -O- https://download.calibre-ebook.com/linux-installer.sh | sudo sh /dev/stdin
+
 %end

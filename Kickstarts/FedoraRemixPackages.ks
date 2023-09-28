@@ -64,5 +64,8 @@ python3-devel
 gcc
 
 
+## For Wifi and Networking
+@hardware-support
+
 
 %end
