@@ -48,6 +48,7 @@ inkscape
 gimp
 krita
 netpbm-progs
+scribus
 
 ## Container Tools
 buildah
@@ -63,9 +64,13 @@ obs-studio
 python3-devel
 gcc
 
+## Ansible Roles
+linux-system-roles
 
 ## For Wifi and Networking
 @hardware-support
-
+NetworkManager-wifi 
+iwlax2xx-firmware
+iwl*
 
 %end

@@ -216,6 +216,10 @@ echo "Attempting to install flatpaks"
 # /usr/bin/flatpak install flathub com.slack.Slack -y
 # /usr/bin/flatpak install flathub us.zoom.Zoom -y
 
+
+## Install Balena Etcher
+yum localinstall https://github.com/balena-io/etcher/releases/download/v1.18.11/balena-etcher-1.18.11.x86_64.rpm
+
 ## Customize Anaconda Installer
 
 echo "Customizing Anaconda"
