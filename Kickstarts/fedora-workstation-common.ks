@@ -6,7 +6,7 @@
 -@standard
 
 # Install workstation-product-environment to resolve RhBug:1891500
-@^workstation-product-environment
+#@^workstation-product-environment
 
 # Exclude unwanted packages from @anaconda-tools group
 -gfs2-utils
