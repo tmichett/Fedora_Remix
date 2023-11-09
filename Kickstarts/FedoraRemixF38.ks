@@ -254,12 +254,10 @@ wget http://localhost/files/logos/fedora_lightbackground.svg
 wget http://localhost/files/logos/fedora_darkbackground.svg
 
 ## Customize Gnome Wallpaper
-cd /usr/share/backgrounds/f39/default/
+cd /usr/share/backgrounds/f38/default/
 rm *.png
 wget http://localhost/files/f38-01-night.png
 wget http://localhost/files/f38-01-day.png
-mv f38-01-night.png f39-01-night.png
-mv f38-01-day.png f39-01-day.png
 
 ## Customize Grub Boot Menu
 
