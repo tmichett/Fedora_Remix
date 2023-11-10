@@ -159,6 +159,10 @@ wget -O /etc/dconf/db/gdm.d/01-disable-power-save http://localhost/files/01-disa
 
 wget -O /etc/dconf/db/local.d/01-disable-power-save http://localhost/files/01-disable-power-save
 
+wget -O /etc/dconf/db/local.d/01-enabled-extensions http://localhost/files/01-enabled-extensions
+
+wget -O /etc/dconf/db/local.d/01-wallpaper-logo http://localhost/files/01-wallpaper-logo
+
 dconf update
 
 wget -P /usr/share/plymouth/themes/ -r -nH -np -R "index.htm*" http://localhost/tm-fedora-remix/

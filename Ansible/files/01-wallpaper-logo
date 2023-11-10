@@ -1,0 +1,5 @@
+[org/fedorahosted/background-logo-extension]
+logo-always-visible=true
+logo-border=uint32 10
+logo-opacity=uint32 255
+logo-position='bottom-right'
