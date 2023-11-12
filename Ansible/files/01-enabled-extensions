@@ -1,4 +1,4 @@
 [org/gnome/shell]
 disabled-extensions=@as []
-enabled-extensions=['apps-menu@gnome-shell-extensions.gcampax.github.com', 'desktop-icons@gnome-shell-extensions.gcampax.github.com', 'places-menu@gnome-shell-extensions.gcampax.github.com', 'quiet-shortcuts@fourdan.gmail.com', 'window-list@gnome-shell-extensions.gcampax.github.com','background-logo@fedorahosted.org']
+enabled-extensions=['apps-menu@gnome-shell-extensions.gcampax.github.com', 'desktop-icons@gnome-shell-extensions.gcampax.github.com', 'places-menu@gnome-shell-extensions.gcampax.github.com', 'quiet-shortcuts@fourdan.gmail.com', 'window-list@gnome-shell-extensions.gcampax.github.com','background-logo@fedorahosted.org', 'ding@rastersoft.com']
 
