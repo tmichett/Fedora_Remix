@@ -344,8 +344,14 @@ ansible-playbook Enable_Gnome_Extensions.yml
 ## Customize Extensions for all Users 
 #!/bin/bash
 cd /opt/FedoraRemixCustomize/Files/extensions/
-rsync -avZ * /usr/share/gnome-shell/extensions/
+rsync -avz * /usr/share/gnome-shell/extensions/
 chown root:root -R /usr/share/gnome-shell/extensions/
-chmod 644  -R /usr/share/gnome-shell/extensions/
+chmod 755  -R /usr/share/gnome-shell/extensions
+
+## Enabled Desktop Icons
+
+
+## Update to Latest Packages
+dnf update -y
 
 %end

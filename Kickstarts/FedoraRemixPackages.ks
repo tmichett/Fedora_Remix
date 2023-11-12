@@ -73,4 +73,9 @@ NetworkManager-wifi
 iwlax2xx-firmware
 iwl*
 
+## Added packages that were removed in FC39 from default
+@Gnome-desktop
+libreoffice
+
+
 %end
