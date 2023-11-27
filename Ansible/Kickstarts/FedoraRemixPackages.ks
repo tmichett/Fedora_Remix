@@ -50,6 +50,9 @@ krita
 netpbm-progs
 scribus
 
+## Video Editing and Manipulation
+kdenlive
+
 ## Container Tools
 buildah
 skopeo
