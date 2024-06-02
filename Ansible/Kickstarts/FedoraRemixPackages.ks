@@ -75,8 +75,31 @@ linux-system-roles
 NetworkManager-wifi 
 iwlax2xx-firmware
 iwl*
+lsusb
+inxi
+lspci
 
-## Added packages that were removed in FC39 from default
+## Other Wifi Packages
+atheros-firmware
+b43-fwcutter
+b43-openfwwf
+brcmfmac-firmware
+iwlegacy-firmware
+iwlwifi-dvm-firmware
+iwlwifi-mvm-firmware
+libertas-firmware
+mt7xxx-firmware
+nxpwireless-firmware
+realtek-firmware
+tiwilink-firmware
+atmel-firmware
+zd1211-firmware
+
+# Web Browsers
+firefox
+chromium
+
+## Added packages that were removed in FC40 from default
 @Gnome-desktop
 libreoffice
 
