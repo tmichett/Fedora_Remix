@@ -23,7 +23,7 @@ part / --size 20680
 #fi
 #%post --nochroot
 #cp -P /etc/resolv.conf "$INSTALL_ROOT"/etc/resolv.conf
-/usr/bin/pip install ansible-core ansible-navigator ansible-builder ansible ansible-cdk# (issues with DNS in Post)
+/usr/bin/pip install ansible-core ansible-navigator ansible-builder ansible ansible-dev-tools ## Issues with ansible-cdk# (issues with DNS in Post)
 
 ## Install Flatpaks
 #/usr/bin/flatpak install flathub com.slack.Slack -y
@@ -205,7 +205,7 @@ cat /etc/resolv.conf > /FedoraRemix/DNS.txt
 
 
 ## Setup and Install Ansible and Ansible Navigator
-/usr/bin/pip install ansible-core ansible-navigator ansible-builder ansible ansible-cdk # (issues with DNS in Post)
+/usr/bin/pip install ansible-core ansible-navigator ansible-builder ansible ansible-dev-tools ## ansible-cdk # (issues with DNS in Post)
 #wget -P /opt/ -r -nH -np -R "index.htm*" http://localhost/pip_packages/
 #wget -P /opt/ http://localhost/files/python_packages.txt
 #cd /opt/pip_packages
@@ -258,15 +258,15 @@ wget http://localhost/files/logos/fedora_lightbackground.svg
 wget http://localhost/files/logos/fedora_darkbackground.svg
 
 ## Customize Gnome Wallpaper
-mkdir -p /usr/share/backgrounds/f39/default/
-cd /usr/share/backgrounds/f39/default/
+mkdir -p /usr/share/backgrounds/f40/default/
+cd /usr/share/backgrounds/f40/default/
 rm *.png
 wget http://localhost/files/f38-01-night.png
 wget http://localhost/files/f38-01-day.png
-mv f38-01-night.png f39-01-night.png
-mv f38-01-day.png f39-01-day.png
+mv f38-01-night.png f40-01-night.png
+mv f38-01-day.png f40-01-day.png
 mv /usr/share/backgrounds/gnome/adwaita-l.jpg /usr/share/backgrounds/gnome/adwaita-l.orig
-cp f39-01-day.png /usr/share/backgrounds/gnome/adwaita-l.jpg
+cp f40-01-day.png /usr/share/backgrounds/gnome/adwaita-l.jpg
 
 ## Customize Grub Boot Menu
 
@@ -341,6 +341,17 @@ USER="$(whoami)"
 cd /opt/FedoraRemixCustomize/
 ansible-playbook Enable_Gnome_Extensions.yml 
 
+## Customize Extensions for all Users 
+#!/bin/bash
+cd /opt/FedoraRemixCustomize/Files/extensions/
+rsync -avz * /usr/share/gnome-shell/extensions/
+chown root:root -R /usr/share/gnome-shell/extensions/
+chmod 755  -R /usr/share/gnome-shell/extensions
 
+## Enabled Desktop Icons
+
+
+## Update to Latest Packages
+dnf update -y
 
 %end

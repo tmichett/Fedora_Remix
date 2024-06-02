@@ -75,9 +75,9 @@ linux-system-roles
 NetworkManager-wifi 
 iwlax2xx-firmware
 iwl*
-lsusb
+usbutils ## provides lsusb
 inxi
-lspci
+pciutils ## Provides lspci
 
 ## Other Wifi Packages
 atheros-firmware
@@ -103,5 +103,7 @@ chromium
 @Gnome-desktop
 libreoffice
 
+## Added for Ansible and JSON Filtering
+python-jmespath
 
 %end
