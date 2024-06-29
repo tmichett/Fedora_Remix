@@ -106,4 +106,11 @@ libreoffice
 ## Added for Ansible and JSON Filtering
 python-jmespath
 
+## Added for Hardware Testing and Looking
+lspci
+lswh
+
+## Added for VSCode Packages
+xclip
+
 %end
