@@ -295,6 +295,8 @@ wget http://localhost/VSCode/redhat.vscode-yaml-1.15.0.vsix
 ## Add Fedora Dynamic MotD Script
 cd /usr/bin
 wget http://localhost/fedora-dynamic-motd.sh
+echo /usr/bin/fedora-dynamic-motd.sh >> /etc/profile
+
 
 ### Removal of network fix
 #rm /etc/resolv.conf
