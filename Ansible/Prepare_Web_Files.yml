@@ -9,7 +9,7 @@
     fedora_boot_files:
       - vmlinuz
       - initrd.img
-    fedora_version: 38
+    fedora_version: 40
   tasks:
 
 
