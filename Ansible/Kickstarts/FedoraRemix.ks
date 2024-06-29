@@ -284,6 +284,7 @@ wget http://localhost/files/boot/grub
 ## Create VSCode Extension Directory
 ## TODO: Automate this part
 mkdir VSCode
+cd VSCode
 wget http://localhost/VSCode/ChrisChinchilla.vale-vscode-0.21.0.vsix
 wget http://localhost/VSCode/asciidoctor.asciidoctor-vscode-3.3.1.vsix
 wget http://localhost/VSCode/flobilosaurus.vscode-asciidoc-slides-1.3.0.vsix
