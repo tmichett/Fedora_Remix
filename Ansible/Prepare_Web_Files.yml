@@ -82,6 +82,10 @@
         - Fedora_Remix_Apps.desktop
         - Fedora_Remix_Customize.sh
 
+    - name: Copy VSCode Extensions
+      ansible.posix.synchronize:
+        src: files/VSCode
+        dest: /var/www/html
 
     - name: Enable HTTPD Service
       ansible.builtin.systemd:
