@@ -107,8 +107,8 @@ libreoffice
 python-jmespath
 
 ## Added for Hardware Testing and Looking
-lspci
-lswh
+lshw
+pciutils
 
 ## Added for VSCode Packages
 xclip
