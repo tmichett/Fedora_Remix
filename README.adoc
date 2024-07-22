@@ -17,3 +17,5 @@ ifdef::env-github[]
 endif::[]
 
 = Fedora Remix Creation
+
+Download a pre-built ISO from: https://drive.google.com/drive/folders/1UAT07AJIrTdMk3ke_QE6S6vz-qn6qGtR
