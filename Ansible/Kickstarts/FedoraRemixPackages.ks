@@ -66,6 +66,12 @@ obs-studio
 ## Course and Classroom Building DLE-DOIT
 python3-devel
 gcc
+python3
+rsync
+
+## Speech Synthasis
+speech-dispatcher
+speech-dispatcher-utils
 
 ## Ansible Roles
 linux-system-roles
@@ -78,6 +84,7 @@ iwl*
 usbutils ## provides lsusb
 inxi
 pciutils ## Provides lspci
+wireguard-tools
 
 ## Other Wifi Packages
 atheros-firmware
