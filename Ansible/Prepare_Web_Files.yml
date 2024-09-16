@@ -87,6 +87,11 @@
         src: files/VSCode
         dest: /var/www/html
 
+    - name: Copy UDP Cast
+      ansible.posix.synchronize:
+        src: files/udpcast-20230924-1.x86_64.rpm
+        dest: /var/www/html
+
     - name: Enable HTTPD Service
       ansible.builtin.systemd:
         name: httpd

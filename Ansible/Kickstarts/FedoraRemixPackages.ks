@@ -68,6 +68,10 @@ python3-devel
 gcc
 python3
 rsync
+jq
+yq
+tree
+
 
 ## Speech Synthasis
 speech-dispatcher

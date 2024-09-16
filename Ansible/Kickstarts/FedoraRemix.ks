@@ -290,6 +290,10 @@ wget http://localhost/VSCode/asciidoctor.asciidoctor-vscode-3.3.1.vsix
 wget http://localhost/VSCode/flobilosaurus.vscode-asciidoc-slides-1.3.0.vsix
 wget http://localhost/VSCode/redhat.ansible-24.9.320163.vsix
 wget http://localhost/VSCode/redhat.vscode-yaml-1.15.0.vsix
+wget http://localhost/VSCode/aaron-bond.better-comments-3.0.2.vsix
+wget http://localhost/VSCode/adpyke.codesnap-1.3.4.vsix
+wget http://localhost/VSCode/Codeium.codeium-1.17.11.vsix
+wget http://localhost/VSCode/MS-vsliveshare.vsliveshare-1.0.5936.vsix
 
 
 ## Add Fedora Dynamic MotD Script
@@ -365,6 +369,12 @@ chown root:root -R /usr/share/gnome-shell/extensions/
 chmod 755  -R /usr/share/gnome-shell/extensions
 
 ## Enabled Desktop Icons
+
+## Install UDP Cast 
+mkdir -p /opt/udpcast
+cd /opt/udpcast
+wget http://localhost/udpcast-20230924-1.x86_64.rpm
+dnf localinstall udpcast-20230924-1.x86_64.rpm 
 
 
 ## Update to Latest Packages
