@@ -374,7 +374,7 @@ chmod 755  -R /usr/share/gnome-shell/extensions
 mkdir -p /opt/udpcast
 cd /opt/udpcast
 wget http://localhost/udpcast-20230924-1.x86_64.rpm
-dnf localinstall udpcast-20230924-1.x86_64.rpm 
+dnf localinstall -y udpcast-20230924-1.x86_64.rpm 
 
 
 ## Update to Latest Packages
