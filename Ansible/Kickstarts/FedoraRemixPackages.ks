@@ -42,6 +42,14 @@ sshuttle
 cockpit*
 meson
 ninja-build
+pinentry
+make
+genisoimage
+xorriso
+libxml2
+mc
+fuse-sshfs
+yum-utils
 
 ## Image Editing and Manipulation
 inkscape
