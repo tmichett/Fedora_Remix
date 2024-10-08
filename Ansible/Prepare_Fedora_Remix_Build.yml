@@ -44,10 +44,16 @@
         times: false
         use_ssh_args: true
       become: true
-
-    - name: Build Script
+      
+    - name: Copy Build Script Playbook
       ansible.builtin.copy:
         src: ./Prepare_Fedora_Remix_Build.yml
         dest: /livecd-creator/FedoraRemix/
       become: true
 
+    - name: Copy Build Script
+      ansible.builtin.copy:
+        src: ../Remix_Buid_Script.sh
+        dest: /livecd-creator/FedoraRemix/
+        mode: u+rwx,g+x,o+x
+      become: true      
