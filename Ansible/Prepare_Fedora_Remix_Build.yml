@@ -40,7 +40,10 @@
       ansible.posix.synchronize:
         src: ./Kickstarts/
         dest: /livecd-creator/FedoraRemix/
-      become: true        
+        rsync_path: "sudo -E rsync"
+        times: false
+        use_ssh_args: true
+      become: true
 
     - name: Build Script
       ansible.builtin.copy:
