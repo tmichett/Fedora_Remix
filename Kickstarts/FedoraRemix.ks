@@ -250,12 +250,15 @@ wget http://localhost/files/logos/fedora-logo-small.png
 wget http://localhost/files/logos/fedora-logo.png
 wget http://localhost/files/logos/fedora_logo_med.png
 
+## Use this in a script to fix after upgrade for desktop logo
 cd /usr/share/fedora-logos/
 rm fedora*.svg
 wget http://localhost/files/logos/fedora_logo.svg
 wget http://localhost/files/logos/fedora_logo_darkbackground.svg
 wget http://localhost/files/logos/fedora_lightbackground.svg 
 wget http://localhost/files/logos/fedora_darkbackground.svg
+## END Use this in a script to fix after upgrade for desktop logo END ##
+
 
 ## Customize Gnome Wallpaper
 mkdir -p /usr/share/backgrounds/f40/default/
