@@ -79,6 +79,9 @@ rsync
 jq
 yq
 tree
+pre-commit
+uv
+uvx
 
 
 ## Speech Synthasis
