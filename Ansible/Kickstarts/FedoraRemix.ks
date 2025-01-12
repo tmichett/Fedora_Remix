@@ -306,6 +306,13 @@ chmod +x /usr/bin/fedora-dynamic-motd.sh
 echo /usr/bin/fedora-dynamic-motd.sh >> /etc/profile
 
 
+## Customize BASH Prompts and Shell 
+mkdir /opt/bash
+cd /opt/bash
+wget http://localhost/bashrc.append
+git clone git clone https://github.com/tmichett/bash-git-prompt.git /opt/bash/bash-git-prompt --depth=1
+echo "$(cat //opt/bash/bashrc.append)" >> /etc/skel/.bashrc 
+
 ### Removal of network fix
 #rm /etc/resolv.conf
 

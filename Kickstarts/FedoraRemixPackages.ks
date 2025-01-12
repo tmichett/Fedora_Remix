@@ -82,7 +82,7 @@ tree
 pre-commit
 uv
 uvx
-
+toolbox
 
 ## Speech Synthasis
 speech-dispatcher
