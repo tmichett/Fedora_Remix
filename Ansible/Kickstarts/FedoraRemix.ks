@@ -354,6 +354,7 @@ chmod +x Fedora_Remix_Customize.sh
 ## Install Gnome-Tweaks and Prepare Packages
 cd /opt/FedoraRemixCustomize/
 ansible-playbook Deploy_Gnome_Tweaks.yml --connection=local > /FedoraRemix/Deploy_Gnome_Tweaks.log
+wget http://localhost/files/bashrc.append
 
 ## Create Ansible-User with Password and Add to Sudoers
 /usr/sbin/groupadd -g 700 ansible-user
@@ -386,6 +387,12 @@ cd /opt/udpcast
 wget http://localhost/udpcast-20230924-1.x86_64.rpm
 dnf localinstall -y udpcast-20230924-1.x86_64.rpm 
 
+## Isntall OhMyBash
+bash -c "$(curl -fsSL https://raw.githubusercontent.com/tmichett/oh-my-bash/master/tools/install.sh)" --prefix=/usr/local --unattended
+
+## Install Gitprompt
+git clone https://github.com/tmichett/bash-git-prompt.git ~/.bash-git-prompt --depth=1 /opt/bash-git-prompt
+echo "$(cat /opt/FedoraRemixCustomize/bashrc.append)" >> /etc/bashrc
 
 ## Update to Latest Packages
 dnf update -y

@@ -81,8 +81,8 @@ yq
 tree
 pre-commit
 uv
-uvx
 toolbox
+python-pyyaml
 
 ## Speech Synthasis
 speech-dispatcher
@@ -134,5 +134,9 @@ pciutils
 
 ## Added for VSCode Packages
 xclip
+
+## Added packages to fix FC41 Terminal
+gnome-terminal
+
 
 %end

@@ -1,16 +1,4 @@
-alias github="cd /Github"
-
-## Function for swithing to course directory
-
-course-dir(){
-        dir_name=$(echo "$1" | tr '[:lower:]' '[:upper:]')
-        cd /Github/$dir_name/classroom/ansible-playbooks-novello
-}
-
-doit-dir(){
-        dir_name=$(echo "$1" | tr '[:lower:]' '[:upper:]')
-        cd /workspace/classroom/ansible-playbooks-novello
-}
+source /usr/local/share/oh-my-bash/bashrc
 
 if [ -f "$HOME/.bash-git-prompt/gitprompt.sh" ]; then
     GIT_PROMPT_ONLY_IN_REPO=1
