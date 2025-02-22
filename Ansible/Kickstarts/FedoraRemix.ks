@@ -219,7 +219,11 @@ echo "Attempting to install flatpaks"
 
 # /usr/bin/flatpak install flathub com.slack.Slack -y
 # /usr/bin/flatpak install flathub us.zoom.Zoom -y
+/usr/bin/flatpak remote-add --if-not-exists --user flathub https://flathub.org/repo/flathub.flatpakrepo
+/usr/bin/flatpak install --system --noninteractive flathub io.podman_desktop.PodmanDesktop
 
+## Fix Flatpak SELinux
+restorecon -R /var/lib/flatpak
 
 ## Install Balena Etcher
 yum -y localinstall https://github.com/balena-io/etcher/releases/download/v1.18.11/balena-etcher-1.18.11.x86_64.rpm
@@ -309,7 +313,7 @@ echo /usr/bin/fedora-dynamic-motd.sh >> /etc/profile
 ## Customize BASH Prompts and Shell 
 mkdir /opt/bash
 cd /opt/bash
-wget http://localhost/bashrc.append
+wget http://localhost/files/bashrc.append
 git clone git clone https://github.com/tmichett/bash-git-prompt.git /opt/bash/bash-git-prompt --depth=1
 echo "$(cat //opt/bash/bashrc.append)" >> /etc/skel/.bashrc 
 
@@ -385,7 +389,7 @@ chmod 755  -R /usr/share/gnome-shell/extensions
 mkdir -p /opt/udpcast
 cd /opt/udpcast
 wget http://localhost/udpcast-20230924-1.x86_64.rpm
-dnf localinstall -y udpcast-20230924-1.x86_64.rpm 
+dnf install -y ./udpcast-20230924-1.x86_64.rpm 
 
 ## Isntall OhMyBash
 bash -c "$(curl -fsSL https://raw.githubusercontent.com/tmichett/oh-my-bash/master/tools/install.sh)" --prefix=/usr/local --unattended
