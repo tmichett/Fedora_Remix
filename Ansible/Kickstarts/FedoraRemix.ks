@@ -172,9 +172,9 @@ cp /usr/share/plymouth/themes/tm-fedora-remix/watermark.* /usr/share/plymouth/th
 cp /usr/share/plymouth/themes/tm-fedora-remix/logo.* /usr/share/plymouth/themes/spinner/
 
 ## Setting up Customization Pieces
-wget -P /opt -r -nH -np -R "index.htm*" http://localhost/FedoraRemixCustomize
-wget -P /opt -r -nH -np -R "index.htm*" http://localhost/FedoraRemixPXE
-wget -P /opt -r -nH -np -R "index.htm*" http://localhost/PXEServer
+wget -P /opt -r -nH -np --reject-regex "index\\.html?.*" http://localhost/FedoraRemixCustomize
+wget -P /opt -r -nH -np --reject-regex "index\\.html?.*" http://localhost/FedoraRemixPXE
+wget -P /opt -r -nH -np --reject-regex "index\\.html?.*" http://localhost/PXEServer
 
 ## Setting Theme
 
@@ -340,7 +340,7 @@ systemctl enable sshd.service
 
 ## Enable YAD Scripts and Looks
 cd /opt/FedoraRemix/
-wget -r -nH -np -R "index.htm*" http://localhost/scripts/
+wget -P /opt -r -nH -np --reject-regex "index\\.html?.*" http://localhost/scripts/
 wget http://localhost/files/Wallpaper.png
 cd /opt/FedoraRemix/scripts
 wget http://localhost/files/boot/fixgrub.sh
