@@ -314,8 +314,9 @@ echo /usr/bin/fedora-dynamic-motd.sh >> /etc/profile
 mkdir /opt/bash
 cd /opt/bash
 wget http://localhost/files/bashrc.append
-git clone git clone https://github.com/tmichett/bash-git-prompt.git /opt/bash/bash-git-prompt --depth=1
-echo "$(cat //opt/bash/bashrc.append)" >> /etc/skel/.bashrc 
+## Install Gitprompt
+git clone https://github.com/tmichett/bash-git-prompt.git /opt/bash-git-prompt --depth=1
+echo "$(cat /opt/FedoraRemixCustomize/bashrc.append)" >> /etc/bashrc
 
 ### Removal of network fix
 #rm /etc/resolv.conf
@@ -393,10 +394,6 @@ dnf install -y ./udpcast-20230924-1.x86_64.rpm
 
 ## Isntall OhMyBash
 bash -c "$(curl -fsSL https://raw.githubusercontent.com/tmichett/oh-my-bash/master/tools/install.sh)" --prefix=/usr/local --unattended
-
-## Install Gitprompt
-git clone https://github.com/tmichett/bash-git-prompt.git ~/.bash-git-prompt --depth=1 /opt/bash-git-prompt
-echo "$(cat /opt/FedoraRemixCustomize/bashrc.append)" >> /etc/bashrc
 
 ## Install Podman BootC from Repo (FIX ME - Not in Fedora Yet)
 sudo dnf -y install 'dnf-command(copr)'
