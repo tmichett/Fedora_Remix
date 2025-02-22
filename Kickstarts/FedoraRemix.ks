@@ -398,6 +398,11 @@ bash -c "$(curl -fsSL https://raw.githubusercontent.com/tmichett/oh-my-bash/mast
 git clone https://github.com/tmichett/bash-git-prompt.git ~/.bash-git-prompt --depth=1 /opt/bash-git-prompt
 echo "$(cat /opt/FedoraRemixCustomize/bashrc.append)" >> /etc/bashrc
 
+## Install Podman BootC from Repo (FIX ME - Not in Fedora Yet)
+sudo dnf -y install 'dnf-command(copr)'
+sudo dnf -y copr enable gmaglione/podman-bootc
+sudo dnf -y install podman-bootc
+
 ## Update to Latest Packages
 dnf update -y
 

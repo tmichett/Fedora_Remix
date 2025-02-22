@@ -64,6 +64,8 @@ kdenlive
 ## Container Tools
 buildah
 skopeo
+podman-machine
+
 
 ## Telecon and Media
 obs-studio
