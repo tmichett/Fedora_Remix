@@ -25,10 +25,6 @@ part / --size 20680
 #cp -P /etc/resolv.conf "$INSTALL_ROOT"/etc/resolv.conf
 /usr/bin/pip install ansible-core ansible-navigator ansible-builder ansible ansible-dev-tools ## Issues with ansible-cdk# (issues with DNS in Post)
 
-## Install Flatpaks
-#/usr/bin/flatpak install flathub com.slack.Slack -y
-#/usr/bin/flatpak install flathub us.zoom.Zoom -y
-
 %end
 
 
@@ -135,7 +131,7 @@ fi
 
 # make sure to set the right permissions and selinux contexts
 chown -R liveuser:liveuser /home/liveuser/
-restorecon -R /home/liveuser/
+/usr/sbin/restorecon-R /home/liveuser/
 
 EOF
 
@@ -215,15 +211,19 @@ cat /etc/resolv.conf > /FedoraRemix/DNS.txt
 
 ## Install Flatpaks
 echo "Attempting to install flatpaks"
-/usr/bin/flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
 
-# /usr/bin/flatpak install flathub com.slack.Slack -y
-# /usr/bin/flatpak install flathub us.zoom.Zoom -y
+# Enable unprivileged user namespaces
+sysctl -w kernel.unprivileged_userns_clone=1
+
+/usr/bin/flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
 /usr/bin/flatpak remote-add --if-not-exists --user flathub https://flathub.org/repo/flathub.flatpakrepo
 /usr/bin/flatpak install --system --noninteractive flathub io.podman_desktop.PodmanDesktop
+/usr/bin/flatpak install --system --noninteractive flathub com.slack.Slack
+/usr/bin/flatpak install --system --noninteractive flathub us.zoom.Zoom
+
 
 ## Fix Flatpak SELinux
-restorecon -R /var/lib/flatpak
+/usr/sbin/restorecon -R /var/lib/flatpak
 
 ## Install Balena Etcher
 yum -y localinstall https://github.com/balena-io/etcher/releases/download/v1.18.11/balena-etcher-1.18.11.x86_64.rpm
@@ -316,7 +316,7 @@ cd /opt/bash
 wget http://localhost/files/bashrc.append
 ## Install Gitprompt
 git clone https://github.com/tmichett/bash-git-prompt.git /opt/bash-git-prompt --depth=1
-echo "$(cat /opt/FedoraRemixCustomize/bashrc.append)" >> /etc/bashrc
+
 
 ### Removal of network fix
 #rm /etc/resolv.conf
@@ -392,9 +392,11 @@ cd /opt/udpcast
 wget http://localhost/udpcast-20230924-1.x86_64.rpm
 dnf install -y ./udpcast-20230924-1.x86_64.rpm 
 
-## Isntall OhMyBash
+## Install OhMyBash
 bash -c "$(curl -fsSL https://raw.githubusercontent.com/tmichett/oh-my-bash/master/tools/install.sh)" --prefix=/usr/local --unattended
 
+## Set BASHRC Defaults
+echo "$(cat /opt/FedoraRemixCustomize/bashrc.append)" >> /etc/bashrc
 
 ## Install Podman BootC from Repo (FIX ME - Not in Fedora Yet)
 sudo dnf -y install 'dnf-command(copr)'
