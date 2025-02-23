@@ -213,20 +213,21 @@ cat /etc/resolv.conf > /FedoraRemix/DNS.txt
 echo "Attempting to install flatpaks"
 
 # Enable unprivileged user namespaces
-sysctl -w kernel.unprivileged_userns_clone=1
+sudo chmod u+s /usr/bin/bwrap
 
 /usr/bin/flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
 /usr/bin/flatpak remote-add --if-not-exists --user flathub https://flathub.org/repo/flathub.flatpakrepo
 /usr/bin/flatpak install --system --noninteractive flathub io.podman_desktop.PodmanDesktop
-/usr/bin/flatpak install --system --noninteractive flathub com.slack.Slack
-/usr/bin/flatpak install --system --noninteractive flathub us.zoom.Zoom
+
+# Enable system-wide access
+flatpak override --system --filesystem=home
 
 
 ## Fix Flatpak SELinux
 /usr/sbin/restorecon -R /var/lib/flatpak
 
 ## Install Balena Etcher
-yum -y localinstall https://github.com/balena-io/etcher/releases/download/v1.18.11/balena-etcher-1.18.11.x86_64.rpm
+dnf -y install https://github.com/balena-io/etcher/releases/download/v1.18.11/balena-etcher-1.18.11.x86_64.rpm
 
 ## Customize Anaconda Installer
 
@@ -405,5 +406,6 @@ sudo dnf -y install podman-bootc
 
 ## Update to Latest Packages
 dnf update -y
+
 
 %end
