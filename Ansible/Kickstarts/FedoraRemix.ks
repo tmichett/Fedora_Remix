@@ -341,7 +341,7 @@ systemctl enable sshd.service
 
 ## Enable YAD Scripts and Looks
 cd /opt/FedoraRemix/
-wget -P /opt -r -nH -np --reject-regex "index\\.html?.*" http://localhost/scripts/
+wget -r -nH -np --reject-regex "index\\.html?.*" http://localhost/scripts/
 wget http://localhost/files/Wallpaper.png
 cd /opt/FedoraRemix/scripts
 wget http://localhost/files/boot/fixgrub.sh
