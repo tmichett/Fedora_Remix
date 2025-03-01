@@ -251,9 +251,7 @@ wget  http://localhost/files/boot/splash.lss
 cd /usr/share/pixmaps/
 rm fedora-logo*.png
 rm fedora_logo_med.png
-wget http://localhost/files/logos/fedora-logo-small.png
-wget http://localhost/files/logos/fedora-logo.png
-wget http://localhost/files/logos/fedora_logo_med.png
+
 
 ## Use this in a script to fix after upgrade for desktop logo
 cd /usr/share/fedora-logos/
