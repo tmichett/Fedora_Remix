@@ -364,7 +364,8 @@ wget http://localhost/files/bashrc.append
 /usr/sbin/groupadd -g 700 ansible-user
 /usr/sbin/useradd -u 700 -g 700 -c "Ansible User" ansible-user
 echo "ansiblepass" | passwd ansible-user --stdin
-echo "ansible-user ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/ansible-user
+sudo sh -c 'echo "Defaults:ansible-user !requiretty"  > /etc/sudoers.d/ansible-user'
+echo "ansible-user ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers.d/ansible-user
 
 ## Download and Install Calibre
 sudo -v && wget -nv -O- https://download.calibre-ebook.com/linux-installer.sh | sudo sh /dev/stdin
