@@ -92,6 +92,11 @@
         src: files/udpcast-20230924-1.x86_64.rpm
         dest: /var/www/html
 
+    - name: Copy Kickstart Python Fix
+      ansible.posix.synchronize:
+        src: files/Fixes/kickstart.py
+        dest: /var/www/html
+
     - name: Enable HTTPD Service
       ansible.builtin.systemd:
         name: httpd

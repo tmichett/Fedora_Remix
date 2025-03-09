@@ -14,5 +14,6 @@ yad --title "Fedora Remix Desktop Customization Tool" --form --columns=3 --width
 --field="<b>12 - Set Ansible User Password</b>":fbtn "gnome-terminal -t 'Ansible User Password Setting' -- sh -c 'sudo /opt/FedoraRemix/scripts/ansible-user_passwd.sh'" \
 --field="<b>13 - Create Fingerprint Services</b>":fbtn "gnome-terminal -t 'Deploying FPrintD Services' -- sh -c 'sudo /opt/FedoraRemix/scripts/deploy_fprintd.sh'" \
 --field="<b>14 - Install VSCode Extensions</b>":fbtn "gnome-terminal -t 'Deploying VSCode Extensions' -- sh -c '/opt/FedoraRemix/scripts/deploy_vscode_extensions.sh'" \
---field="<b>15 - Create PXEBoot Server</b>":fbtn "gnome-terminal -t 'Creating PXEBoot Server' -- sh -c 'sudo /opt/FedoraRemix/scripts/create_pxe_server.sh'" \
+--field="<b>15 - Fix Python Kickstart URL</b>":fbtn "gnome-terminal -t 'Deploying Python Kickstart Fix' -- sh -c '/opt/FedoraRemix/scripts/fix_kickstart_python.sh'" \
+--field="<b>16 - Create PXEBoot Server</b>":fbtn "gnome-terminal -t 'Creating PXEBoot Server' -- sh -c 'sudo /opt/FedoraRemix/scripts/create_pxe_server.sh'" \
 --button=Exit:1
