@@ -140,5 +140,7 @@ xclip
 ## Added packages to fix FC41 Terminal
 gnome-terminal
 
+## Added for Mlocate replacement for "locate" command
+plocate
 
 %end
