@@ -1,2 +1,2 @@
-# Fedora_Remix
+# Fedora Remix
 Fedora Linux Remix
