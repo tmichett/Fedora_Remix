@@ -1,0 +1,27 @@
+# Workflow name
+name: Build HTML
+
+
+# Controls when the workflow will run
+on: 
+  # This is a reusable workflow
+  workflow_dispatch:
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+
+  # This workflow contains a single job called "build"
+  build:
+    runs-on: ubuntu-latest
+    environment: deploy
+    steps:
+
+      # In this job, all steps begin with a name
+      - name: Checkout repo
+        uses: actions/checkout@v2
+
+      - name: Podman Build Book
+        run: podman run --name adochtml --rm -v $(pwd):/tmp/ADOC_Work:Z quay.io/tmichett/adoc-html:latest README.adoc
+
+      - name: Commit and Add Book
+        run: git config --global user.email "tmichett@redhat.com" && git config --global user.name "Travis Michette" && mv README.html ./docs/index.html && git add ./docs/index.html && git commit -m "Added new HTML" && git push
