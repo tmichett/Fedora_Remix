@@ -4,8 +4,9 @@ name: Build HTML
 
 # Controls when the workflow will run
 on: 
-  # This is a reusable workflow
-  workflow_dispatch:
+  push:
+    branches:
+      - main
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
