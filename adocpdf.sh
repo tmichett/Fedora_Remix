@@ -5,7 +5,7 @@
 set -e
 
 container='quay.io/tmichett/asciidocpdf:latest'
-pdf_theme='-a pdf-theme=/opt/asciidoc/themes/tm-gls-redhat-theme.yml'
+pdf_theme='-a pdf-theme=themes/tm-gls-redhat-theme.yml'
 current_directory="$(pwd)"
 
 
