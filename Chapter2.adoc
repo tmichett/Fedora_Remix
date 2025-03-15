@@ -1,0 +1,25 @@
+:pygments-style: tango
+:source-highlighter: pygments
+:toc:
+:toclevels: 7
+:sectnums:
+:sectnumlevels: 6
+:numbered:
+:chapter-label:
+:icons: font
+ifndef::env-github[:icons: font]
+ifdef::env-github[]
+:status:
+:outfilesuffix: .adoc
+:caution-caption: :fire:
+:important-caption: :exclamation:
+:note-caption: :paperclip:
+:tip-caption: :bulb:
+:warning-caption: :warning:
+endif::[]
+:imagesdir: ./images/
+
+==  Preparing a Build System
+
+:sectnums:
+include::Chapters/CH2/Section1.adoc[]

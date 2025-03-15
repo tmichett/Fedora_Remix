@@ -53,14 +53,14 @@ endif::[]
 
 // Introduction Section goes below here
 
-//:sectnums!:
-//include::Introduction.adoc[]
+:sectnums!:
+include::README.adoc[]
 
 :sectnums:
 include::Chapter1.adoc[]
-
+include::Chapter2.adoc[]
 
 // Appendix Section below here
 
-//[appendix]
-//include::AppendixA.adoc[]
+[appendix]
+include::AppendixA.adoc[]
