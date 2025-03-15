@@ -33,4 +33,4 @@ jobs:
 #        run: podman run --name adocpdf --rm  -e "-a pdf-theme=/opt/asciidoc/themes/tm-gls-redhat-theme.yml" -e "book_name=Main.adoc" -v $(pwd):/tmp/coursebook:Z quay.io/tmichett/asciidocpdf:latest
 
       - name: Commit and Add Book
-        run: git config --global user.email "tmichett@redhat.com" && git config --global user.name "Travis Michette" && git add Main.pdf && git commit -m "Added new main.pdf" && git push
+        run: git config --global user.email "tmichett@redhat.com" && git config --global user.name "Travis Michette" && git pull && git add Main.pdf && git commit -m "Added new main.pdf" && git push
