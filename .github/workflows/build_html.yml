@@ -21,7 +21,7 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Podman Build Book
-        run: podman run --name adochtml --rm -v $(pwd):/tmp/ADOC_Work:Z quay.io/tmichett/adoc-html:latest README.adoc
+        run: podman run --name adochtml --rm -v $(pwd):/tmp/ADOC_Work:Z quay.io/tmichett/adoc-html:latest Main.adoc
 
       - name: Commit and Add Book
-        run: git config --global user.email "tmichett@redhat.com" && git config --global user.name "Travis Michette" && mv README.html ./docs/index.html && git add ./docs/index.html && git commit -m "Added new HTML" && git push
+        run: git config --global user.email "tmichett@redhat.com" && git config --global user.name "Travis Michette" && mv Main.html ./docs/index.html && git add ./docs/index.html && git commit -m "Added new HTML" && git push
