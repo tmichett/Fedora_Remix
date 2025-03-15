@@ -29,8 +29,8 @@ jobs:
       - name: Podman Build Book
         run: bash ./adocpdf.sh Main.adoc
 
-#      - name: Podman Build Book
-#        run: podman run --name adocpdf --rm  -e "-a pdf-theme=/opt/asciidoc/themes/tm-gls-redhat-theme.yml" -e "book_name=Main.adoc" -v $(pwd):/tmp/coursebook:Z quay.io/tmichett/asciidocpdf:latest
+      - name: Podman Build HTML Website
+        run: podman run --name adochtml --rm -v $(pwd):/tmp/ADOC_Work:Z quay.io/tmichett/adoc-html:latest Main.adoc
 
       - name: Commit and Add Book
-        run: git config --global user.email "tmichett@redhat.com" && git config --global user.name "Travis Michette" && git pull && git add Main.pdf && git commit -m "Added new main.pdf" &&  git pull && git push
+        run: git config --global user.email "tmichett@redhat.com" && git config --global user.name "Travis Michette" git add Main.pdf && mv Main.html ./docs/index.html && git add ./docs/index.html && git commit -m "Added new main.pdf and index.html"  && git push
