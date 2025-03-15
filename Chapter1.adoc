@@ -19,7 +19,7 @@ ifdef::env-github[]
 endif::[]
 :imagesdir: ./images/
 
-==  <CHAPTER TITLE>
+==  Preparing a Build System
 
 :sectnums:
 include::Chapters/CH1/Section1.adoc[]
