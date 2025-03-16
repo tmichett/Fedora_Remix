@@ -26,6 +26,7 @@ ifdef::backend-pdf[]
 :title-page-background-image: image:Training_Cover.png[pdfwidth=8.0in,position=top left]
 :pygments-style: tango
 :source-highlighter: pygments
+:!chapter-signifier:
 endif::[]
 
 // Initial Settings for Github
@@ -53,7 +54,8 @@ endif::[]
 
 // Introduction Section goes below here
 
-:sectnums!:
+[preface]
+:sectnums:
 include::README.adoc[]
 
 :sectnums:
