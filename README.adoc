@@ -16,6 +16,9 @@ ifdef::env-github[]
 :warning-caption: :warning:
 endif::[]
 
-= Fedora Remix Creation
+== Fedora Remix Creation Quickstart
+
+
+=== Quickstart
 
 Download a pre-built ISO from: https://drive.google.com/drive/folders/1UAT07AJIrTdMk3ke_QE6S6vz-qn6qGtR
