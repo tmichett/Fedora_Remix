@@ -451,7 +451,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <ul class="sectlevel1">
 <li><a href="#_fedora_remix_creation_quickstart">Fedora Remix Creation Quickstart</a>
 <ul class="sectlevel2">
-<li><a href="#_quickstart">Quickstart</a></li>
+<li><a href="#_quickstart"><span class="blue"><strong>Quickstart</strong></span></a></li>
 </ul>
 </li>
 <li><a href="#_preparing_a_build_system">1. Preparing a Build System</a>
@@ -481,10 +481,63 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <div class="sect1">
 <h2 id="_fedora_remix_creation_quickstart">Fedora Remix Creation Quickstart</h2>
 <div class="sectionbody">
-<div class="sect2">
-<h3 id="_quickstart">Quickstart</h3>
 <div class="paragraph">
-<p>Download a pre-built ISO from: <a href="https://drive.google.com/drive/folders/1UAT07AJIrTdMk3ke_QE6S6vz-qn6qGtR" class="bare">https://drive.google.com/drive/folders/1UAT07AJIrTdMk3ke_QE6S6vz-qn6qGtR</a></p>
+<p>This quickstart will provide a quick method to download a pre-built Fedora Remix as well as creating your own Fedora Remix Building system. The <a href="https://github.com/tmichett/Fedora_Remix" class="bare">https://github.com/tmichett/Fedora_Remix</a> has been created with Ansible playbooks that will setup a Fedora Remix Building system using the Fedora Remix installed from the liveCD provided (<a href="https://drive.google.com/drive/folders/1UAT07AJIrTdMk3ke_QE6S6vz-qn6qGtR" class="bare">https://drive.google.com/drive/folders/1UAT07AJIrTdMk3ke_QE6S6vz-qn6qGtR</a>). The requirements are relatively simply to build and the system has Fedora Remix customization scripts and self-launching menu to assist with the initial setup.</p>
+</div>
+<div class="olist arabic">
+<div class="title"><strong>Building your own Fedora Remix - Overview</strong></div>
+<ol class="arabic">
+<li>
+<p>Download the Fedora Remix ISO and install locally to hard drive</p>
+<div class="olist loweralpha">
+<ol class="loweralpha" type="a">
+<li>
+<p>Setup a local user and ensure it is in the SUDOERS file</p>
+</li>
+<li>
+<p>Run some the Fedora Remix customize scripts to create SSH keys and SUDO with no password</p>
+</li>
+</ol>
+</div>
+</li>
+<li>
+<p>Clone <a href="https://github.com/tmichett/Fedora_Remix" class="bare">https://github.com/tmichett/Fedora_Remix</a></p>
+</li>
+<li>
+<p>Run the Ansible playbooks with the "sudo" command</p>
+<div class="olist loweralpha">
+<ol class="loweralpha" type="a">
+<li>
+<p>Prepare_Web_Files.yml</p>
+</li>
+<li>
+<p>Prepare_Fedora_Remix_Build.yml</p>
+</li>
+</ol>
+</div>
+</li>
+<li>
+<p>Modify the Kickstart files in <strong>/livecd-creator/FedoraRemix</strong></p>
+<div class="olist loweralpha">
+<ol class="loweralpha" type="a">
+<li>
+<p>FedoraRemix.ks - To control various setup components and run commands</p>
+</li>
+<li>
+<p>FedoraRemixPackages.ks - To control RPM packages that are installed as part of your Remix</p>
+</li>
+</ol>
+</div>
+</li>
+<li>
+<p>Run the <strong>Remix_Build_Script.sh</strong></p>
+</li>
+</ol>
+</div>
+<div class="sect2">
+<h3 id="_quickstart"><span class="blue"><strong>Quickstart</strong></span></h3>
+<div class="paragraph">
+<p>This quickstart provides detailed information on how to download, install, and create your custom Fedora Remix. It depends first on having the Fedora Remix installed locally and access to the Github repository and playbooks contained withing the repository.</p>
 </div>
 </div>
 </div>
@@ -675,7 +728,7 @@ cp /usr/share/spin-kickstarts/fedora-live-workstation.ks /livecd-creator/FedoraR
 <div id="footer">
 <div id="footer-text">
 Version 1.0<br>
-Last updated 2025-03-16 17:06:39 UTC
+Last updated 2025-03-17 18:03:11 UTC
 </div>
 </div>
 </body>
