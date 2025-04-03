@@ -18,7 +18,6 @@ wget
 fedora-remix-logos
 gh
 yad
-pykickstart
 terminator
 sshuttle
 pinentry
@@ -28,10 +27,6 @@ libxml2
 mc
 fuse-sshfs
 yum-utils
-
-## Container Tools
-buildah
-skopeo
 
 ## Remove Tour
 -gnome-tour
@@ -55,10 +50,7 @@ linux-system-roles
 ## For Wifi and Networking
 @hardware-support
 NetworkManager-wifi 
-iwlax2xx-firmware
-iwl*
 usbutils ## provides lsusb
-inxi
 pciutils ## Provides lspci
 wireguard-tools
 
