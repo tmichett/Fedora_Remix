@@ -13,7 +13,6 @@ Travis Michette <tmichett@redhat.com>
 :chapter-label:
 :pdf-page-size: LETTER
 :icons: font
-:imagesdir: images/
 // The IF Statements don't always work. So must comment out and uncomment based on ePub or PDF
 // Title-Page-Background is for PDF
 // Front-Cover-Image is for ePub
