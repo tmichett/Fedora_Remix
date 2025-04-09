@@ -18,7 +18,7 @@ endif::[]
 
 == Fedora Remix Creation Quickstart
 
-This quickstart will provide a quick method to download a pre-built Fedora Remix as well as creating your own Fedora Remix Building system. The https://github.com/tmichett/Fedora_Remix has been created with Ansible playbooks that will setup a Fedora Remix Building system using the Fedora Remix installed from the liveCD provided (https://drive.google.com/drive/folders/1UAT07AJIrTdMk3ke_QE6S6vz-qn6qGtR). The requirements are relatively simply to build and the system has Fedora Remix customization scripts and self-launching menu to assist with the initial setup.
+This quickstart will provide a quick method to download a pre-built Fedora Remix as well as creating your own Fedora Remix Building system. The https://github.com/tmichett/Fedora_Remix has been created with Ansible playbooks that will setup a Fedora Remix Building system using the Fedora Remix installed from the liveCD provided (https://drive.google.com/drive/folders/1UAT07AJIrTdMk3ke_QE6S6vz-qn6qGtR). The requirements are relatively simply to build and the system has Fedora Remix customization scripts and self-launching menu to assist with the initial setup. The quickstart and documentation are also available at the following link: https://tmichett.github.io/Fedora_Remix/.
 
 .*Building your own Fedora Remix - Overview*
 
@@ -38,3 +38,12 @@ This quickstart will provide a quick method to download a pre-built Fedora Remix
 === [blue]#*Quickstart*#
 
 This quickstart provides detailed information on how to download, install, and create your custom Fedora Remix. It depends first on having the Fedora Remix installed locally and access to the Github repository and playbooks contained withing the repository.
+
+. Download the "Latest" FedoraRemix LiveISO and create a bootable USB disk.
+* https://drive.google.com/drive/folders/1UAT07AJIrTdMk3ke_QE6S6vz-qn6qGtR
+** Use Balena Etcher or Fedora Media Writer to create the bootable USB device for installation on a physical machine.
+** Attach the ISO image to your virtual machine and select it as the boot device so it can be installed
+
+. Insert the disk into a computer or connect to the virtual machine and select 
+
+image::images/README-25-04-09-15-59-19.png[title="Caption",align="center"]
