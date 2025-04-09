@@ -36,4 +36,4 @@ jobs:
         run: rsync ./images ./docs/
 
       - name: Commit and Add Book
-        run: git config --global user.email "tmichett@redhat.com" && git config --global user.name "Travis Michette" && git add Main.pdf && mv Main.html ./docs/index.html && git add ./docs/index.html && git commit -m "Added new main.pdf and index.html"  && git push
+        run: git config --global user.email "tmichett@redhat.com" && git config --global user.name "Travis Michette" && git add Main.pdf && mv Main.html ./docs/index.html && git add ./docs/** && git commit -m "Added new main.pdf and index.html"  && git push
