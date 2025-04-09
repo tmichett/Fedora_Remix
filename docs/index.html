@@ -482,7 +482,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <h2 id="_fedora_remix_creation_quickstart">Fedora Remix Creation Quickstart</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>This quickstart will provide a quick method to download a pre-built Fedora Remix as well as creating your own Fedora Remix Building system. The <a href="https://github.com/tmichett/Fedora_Remix" class="bare">https://github.com/tmichett/Fedora_Remix</a> has been created with Ansible playbooks that will setup a Fedora Remix Building system using the Fedora Remix installed from the liveCD provided (<a href="https://drive.google.com/drive/folders/1UAT07AJIrTdMk3ke_QE6S6vz-qn6qGtR" class="bare">https://drive.google.com/drive/folders/1UAT07AJIrTdMk3ke_QE6S6vz-qn6qGtR</a>). The requirements are relatively simply to build and the system has Fedora Remix customization scripts and self-launching menu to assist with the initial setup.</p>
+<p>This quickstart will provide a quick method to download a pre-built Fedora Remix as well as creating your own Fedora Remix Building system. The <a href="https://github.com/tmichett/Fedora_Remix" class="bare">https://github.com/tmichett/Fedora_Remix</a> has been created with Ansible playbooks that will setup a Fedora Remix Building system using the Fedora Remix installed from the liveCD provided (<a href="https://drive.google.com/drive/folders/1UAT07AJIrTdMk3ke_QE6S6vz-qn6qGtR" class="bare">https://drive.google.com/drive/folders/1UAT07AJIrTdMk3ke_QE6S6vz-qn6qGtR</a>). The requirements are relatively simply to build and the system has Fedora Remix customization scripts and self-launching menu to assist with the initial setup. The quickstart and documentation are also available at the following link: <a href="https://tmichett.github.io/Fedora_Remix/" class="bare">https://tmichett.github.io/Fedora_Remix/</a>.</p>
 </div>
 <div class="olist arabic">
 <div class="title"><strong>Building your own Fedora Remix - Overview</strong></div>
@@ -538,6 +538,39 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <h3 id="_quickstart"><span class="blue"><strong>Quickstart</strong></span></h3>
 <div class="paragraph">
 <p>This quickstart provides detailed information on how to download, install, and create your custom Fedora Remix. It depends first on having the Fedora Remix installed locally and access to the Github repository and playbooks contained withing the repository.</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Download the "Latest" FedoraRemix LiveISO and create a bootable USB disk.</p>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="https://drive.google.com/drive/folders/1UAT07AJIrTdMk3ke_QE6S6vz-qn6qGtR" class="bare">https://drive.google.com/drive/folders/1UAT07AJIrTdMk3ke_QE6S6vz-qn6qGtR</a></p>
+<div class="ulist">
+<ul>
+<li>
+<p>Use Balena Etcher or Fedora Media Writer to create the bootable USB device for installation on a physical machine.</p>
+</li>
+<li>
+<p>Attach the ISO image to your virtual machine and select it as the boot device so it can be installed</p>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>Insert the disk into a computer or connect to the virtual machine and select</p>
+</li>
+</ol>
+</div>
+<div class="imageblock text-center">
+<div class="content">
+<img src="images/images/README-25-04-09-15-59-19.png" alt="README 25 04 09 15 59 19">
+</div>
+<div class="title">Figure 1. Caption</div>
 </div>
 </div>
 </div>
@@ -728,7 +761,7 @@ cp /usr/share/spin-kickstarts/fedora-live-workstation.ks /livecd-creator/FedoraR
 <div id="footer">
 <div id="footer-text">
 Version 1.0<br>
-Last updated 2025-04-08 20:42:46 UTC
+Last updated 2025-04-09 20:02:13 UTC
 </div>
 </div>
 </body>
