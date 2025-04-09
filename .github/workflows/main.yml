@@ -33,7 +33,7 @@ jobs:
         run: podman run --name adochtml --rm -v $(pwd):/tmp/ADOC_Work:Z quay.io/tmichett/adoc-html:latest Main.adoc
 
       - name: Copy all images to Docs Image Folder
-        run: rsync ./images ./docs/
+        run: rsync -avz ./images ./docs/
 
       - name: Commit and Add Book
         run: git config --global user.email "tmichett@redhat.com" && git config --global user.name "Travis Michette" && git add Main.pdf && mv Main.html ./docs/index.html && git add ./docs/** && git commit -m "Added new main.pdf and index.html"  && git push
