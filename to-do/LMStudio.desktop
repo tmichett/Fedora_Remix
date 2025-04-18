@@ -1,0 +1,12 @@
+#!/usr/bin/env xdg-open
+[Desktop Entry]
+Name=LMStudio
+GenericName=LMStudio
+X-GNOME-FullName=LMStudio
+Exec=/opt/FedoraRemixApps/LM-Studio-0.3.14-5-x64.AppImage
+Terminal=false
+Icon=/usr/share/icons/lmstudio.png
+Type=Application
+StartupNotify=true
+Categories=Development;
+Name[en_US]=LMStudio
