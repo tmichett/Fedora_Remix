@@ -96,7 +96,6 @@ linux-system-roles
 ## For Wifi and Networking
 @hardware-support
 NetworkManager-wifi 
-iwlax2xx-firmware
 iwl*
 usbutils ## provides lsusb
 inxi
