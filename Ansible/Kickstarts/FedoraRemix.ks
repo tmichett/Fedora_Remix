@@ -388,6 +388,9 @@ chown root:root -R /usr/share/gnome-shell/extensions/
 chmod 755  -R /usr/share/gnome-shell/extensions
 
 ## Enabled Desktop Icons
+/usr/bin/gnome-extensions install /opt/FedoraRemixCustomize/Gnome_Shell/dingrastersoft.com.v76.shell-extension.zip
+/usr/bin/gnome-extensions install /opt/FedoraRemixCustomize/Gnome_Shell/add-to-desktoptommimon.github.com.v14.shell-extension.zip
+
 
 ## Install UDP Cast 
 mkdir -p /opt/udpcast
