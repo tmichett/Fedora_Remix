@@ -135,6 +135,11 @@ chown -R liveuser:liveuser /home/liveuser/
 
 EOF
 
+### Update PATH
+echo 'export PATH=/usr/local/bin:$PATH' >> /etc/skel/.bashrc
+
+### Downlaod Logos 
+
 wget -O /usr/share/pixmaps/login-logo.png http://localhost/files/fedorap_small.png
 
 wget -O /etc/dconf/db/gdm.d/01-logo http://localhost/files/01-logo
@@ -451,5 +456,12 @@ wget  http://localhost/files/LMStudio.desktop
 cd /usr/share/icons
 wget http://localhost/files/logos/fedora_tools_logo.png
 wget http://localhost/files/logos/lmstudio.png
+
+## Enabled Desktop Icons from Extension
+/usr/bin/gnome-extensions install /opt/FedoraRemixCustomize/Gnome_Shell/dingrastersoft.com.v76.shell-extension.zip
+/usr/bin/gnome-extensions install /opt/FedoraRemixCustomize/Gnome_Shell/add-to-desktoptommimon.github.com.v14.shell-extension.zip
+
+su - live-user -c "/usr/bin/gnome-extensions install /opt/FedoraRemixCustomize/Gnome_Shell/dingrastersoft.com.v76.shell-extension.zip"
+su - live-user -c "/usr/bin/gnome-extensions install /opt/FedoraRemixCustomize/Gnome_Shell/add-to-desktoptommimon.github.com.v14.shell-extension.zip"
 
 %end
