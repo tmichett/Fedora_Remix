@@ -135,7 +135,16 @@ chown -R liveuser:liveuser /home/liveuser/
 
 EOF
 
+## Define colored output
+
+# Define color variables
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+NC='\033[0m' # No Color
+
 ### Update PATH
+echo -e "${GREEN}Adding /usr/local/bin to the PATH... ${NC}"
 echo 'export PATH=/usr/local/bin:$PATH' >> /etc/skel/.bashrc
 
 ### Downlaod Logos 
@@ -458,10 +467,12 @@ wget http://localhost/files/logos/fedora_tools_logo.png
 wget http://localhost/files/logos/lmstudio.png
 
 ## Enabled Desktop Icons from Extension
-/usr/bin/gnome-extensions install /opt/FedoraRemixCustomize/Gnome_Shell/dingrastersoft.com.v76.shell-extension.zip
-/usr/bin/gnome-extensions install /opt/FedoraRemixCustomize/Gnome_Shell/add-to-desktoptommimon.github.com.v14.shell-extension.zip
+/usr/bin/gnome-extensions install /opt/FedoraRemixCustomize/Gnome_Shell/dingrastersoft.com.v76.shell-extension.zip --force
+/usr/bin/gnome-extensions install /opt/FedoraRemixCustomize/Gnome_Shell/add-to-desktoptommimon.github.com.v14.shell-extension.zip --force
 
-su - live-user -c "/usr/bin/gnome-extensions install /opt/FedoraRemixCustomize/Gnome_Shell/dingrastersoft.com.v76.shell-extension.zip"
-su - live-user -c "/usr/bin/gnome-extensions install /opt/FedoraRemixCustomize/Gnome_Shell/add-to-desktoptommimon.github.com.v14.shell-extension.zip"
+## Live User
+echo "Attempting to Install Gnome Extensions for Live User"
+su - live-user -c "/usr/bin/gnome-extensions install /opt/FedoraRemixCustomize/Gnome_Shell/dingrastersoft.com.v76.shell-extension.zip" --force
+su - live-user -c "/usr/bin/gnome-extensions install /opt/FedoraRemixCustomize/Gnome_Shell/add-to-desktoptommimon.github.com.v14.shell-extension.zip" --force
 
 %end
