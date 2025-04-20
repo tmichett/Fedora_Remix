@@ -23,7 +23,7 @@ part / --size 20680
 #fi
 #%post --nochroot
 #cp -P /etc/resolv.conf "$INSTALL_ROOT"/etc/resolv.conf
-/usr/bin/pip install ansible-core ansible-navigator ansible-builder ansible ansible-dev-tools --no-warn-script-location --root-user-action ## Issues with ansible-cdk# (issues with DNS in Post)
+/usr/bin/pip install ansible-core ansible-navigator ansible-builder ansible ansible-dev-tools --no-warn-script-location --root-user-action=ignore ## Issues with ansible-cdk# (issues with DNS in Post)
 
 %end
 
@@ -215,7 +215,7 @@ cat /etc/resolv.conf > /FedoraRemix/DNS.txt
 
 
 ## Setup and Install Ansible and Ansible Navigator
-/usr/bin/pip install ansible-core ansible-navigator ansible-builder ansible ansible-dev-tools --no-warn-script-location --root-user-action ## ansible-cdk # (issues with DNS in Post)
+/usr/bin/pip install ansible-core ansible-navigator ansible-builder ansible ansible-dev-tools --no-warn-script-location --root-user-action=ignore ## ansible-cdk # (issues with DNS in Post)
 #wget -P /opt/ -r -nH -np -R "index.htm*" http://localhost/pip_packages/
 #wget -P /opt/ http://localhost/files/python_packages.txt
 #cd /opt/pip_packages
