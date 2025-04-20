@@ -23,7 +23,7 @@ part / --size 20680
 #fi
 #%post --nochroot
 #cp -P /etc/resolv.conf "$INSTALL_ROOT"/etc/resolv.conf
-/usr/bin/pip install ansible-core ansible-navigator ansible-builder ansible ansible-dev-tools ## Issues with ansible-cdk# (issues with DNS in Post)
+/usr/bin/pip install ansible-core ansible-navigator ansible-builder ansible ansible-dev-tools --no-warn-script-location --root-user-action ## Issues with ansible-cdk# (issues with DNS in Post)
 
 %end
 
@@ -215,7 +215,7 @@ cat /etc/resolv.conf > /FedoraRemix/DNS.txt
 
 
 ## Setup and Install Ansible and Ansible Navigator
-/usr/bin/pip install ansible-core ansible-navigator ansible-builder ansible ansible-dev-tools ## ansible-cdk # (issues with DNS in Post)
+/usr/bin/pip install ansible-core ansible-navigator ansible-builder ansible ansible-dev-tools --no-warn-script-location --root-user-action ## ansible-cdk # (issues with DNS in Post)
 #wget -P /opt/ -r -nH -np -R "index.htm*" http://localhost/pip_packages/
 #wget -P /opt/ http://localhost/files/python_packages.txt
 #cd /opt/pip_packages
@@ -279,16 +279,19 @@ wget http://localhost/files/logos/fedora_darkbackground.svg
 ## END Use this in a script to fix after upgrade for desktop logo END ##
 
 
-## Customize Gnome Wallpaper
+## Customize Gnome Wallpaper for FC42
 mkdir -p /usr/share/backgrounds/f40/default/
 cd /usr/share/backgrounds/f40/default/
 rm *.png
 wget http://localhost/files/f38-01-night.png
 wget http://localhost/files/f38-01-day.png
-mv f38-01-night.png f40-01-night.png
-mv f38-01-day.png f40-01-day.png
+cd /usr/share/backgrounds/gnome
+mv f38-01-night.png f42-night.png
+mv f38-01-day.png f42-day.png
 mv /usr/share/backgrounds/gnome/adwaita-l.jpg /usr/share/backgrounds/gnome/adwaita-l.orig
-cp f40-01-day.png /usr/share/backgrounds/gnome/adwaita-l.jpg
+mv /usr/share/backgrounds/gnome/adwaita-d.jpg /usr/share/backgrounds/gnome/adwaita-d.orig
+cp f42-day.png /usr/share/backgrounds/gnome/adwaita-l.jpg
+cp f42-night.png /usr/share/backgrounds/gnome/adwaita-d.jpg
 
 ## Customize Grub Boot Menu
 
