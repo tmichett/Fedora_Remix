@@ -414,10 +414,13 @@ chmod 755  -R /usr/share/gnome-shell/extensions
 ## Enable DING for All Users FC42 (4/21/2025)
 echo -e "${RED}Changing GNOME Extensions... ${NC}"
 cd /usr/share/gnome-shell/extensions
-rm -rf ding@rastersoft.com
+rm -rf ding@rastersoft.comding@rastersoft.com
+mkdir ding@rastersoft.com
+cd /usr/share/gnome-shell/extensions/ding@rastersoft.com
 unzip /opt/FedoraRemixCustomize/Files/dingrastersoft.com.v76.shell-extension.zip
-chmod 755  -R /usr/share/gnome-shell/extensions/ding@rastersoft.com
-
+chown -R root:root /usr/share/gnome-shell/extensions/ding@rastersoft.com
+chmod 755 -R /usr/share/gnome-shell/extensions/ding@rastersoft.com
+dconf update
 
 ## Install UDP Cast 
 mkdir -p /opt/udpcast
