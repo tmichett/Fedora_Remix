@@ -23,6 +23,7 @@ part / --size 20680
 #fi
 #%post --nochroot
 #cp -P /etc/resolv.conf "$INSTALL_ROOT"/etc/resolv.conf
+set -x
 /usr/bin/pip install ansible-core ansible-navigator ansible-builder ansible ansible-dev-tools --no-warn-script-location --root-user-action=ignore ## Issues with ansible-cdk# (issues with DNS in Post)
 
 %end
@@ -476,8 +477,9 @@ wget http://localhost/files/logos/lmstudio.png
 /usr/bin/gnome-extensions install /opt/FedoraRemixCustomize/Gnome_Shell/add-to-desktoptommimon.github.com.v14.shell-extension.zip --force
 
 ## Live User
-echo "Attempting to Install Gnome Extensions for Live User"
-su - liveuser -c "/usr/bin/gnome-extensions install /opt/FedoraRemixCustomize/Gnome_Shell/dingrastersoft.com.v76.shell-extension.zip --force" 
-su - liveuser -c "/usr/bin/gnome-extensions install /opt/FedoraRemixCustomize/Gnome_Shell/add-to-desktoptommimon.github.com.v14.shell-extension.zip --force" 
+## Didn't impact
+#echo "Attempting to Install Gnome Extensions for Live User"
+#su - liveuser -c "/usr/bin/gnome-extensions install /opt/FedoraRemixCustomize/Gnome_Shell/dingrastersoft.com.v76.shell-extension.zip --force" 
+#su - liveuser -c "/usr/bin/gnome-extensions install /opt/FedoraRemixCustomize/Gnome_Shell/add-to-desktoptommimon.github.com.v14.shell-extension.zip --force" 
 
 %end
