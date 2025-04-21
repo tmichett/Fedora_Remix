@@ -31,12 +31,14 @@ part / --size 20680
 ### Fix ISOLinux
 
 %post --nochroot
+set -x
 touch "$LIVE_ROOT/isolinx/travis"
 
 %end
 
 
 %post
+set -x
 ### Fix added for DNS and Network fixes in Post
 ### https://anaconda-installer.readthedocs.io/en/latest/common-bugs.html#missing-etc-resolv-conf-for-post-scripts
 
