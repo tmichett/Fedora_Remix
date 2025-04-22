@@ -23,7 +23,8 @@ part / --size 20680
 #fi
 #%post --nochroot
 #cp -P /etc/resolv.conf "$INSTALL_ROOT"/etc/resolv.conf
-/usr/bin/pip install ansible-core ansible-navigator ansible-builder ansible ansible-dev-tools ## Issues with ansible-cdk# (issues with DNS in Post)
+set -x
+/usr/bin/pip install ansible-core ansible-navigator ansible-builder ansible ansible-dev-tools --no-warn-script-location --root-user-action=ignore ## Issues with ansible-cdk# (issues with DNS in Post)
 
 %end
 
@@ -31,12 +32,14 @@ part / --size 20680
 ### Fix ISOLinux
 
 %post --nochroot
+set -x
 touch "$LIVE_ROOT/isolinx/travis"
 
 %end
 
 
 %post
+set -x
 ### Fix added for DNS and Network fixes in Post
 ### https://anaconda-installer.readthedocs.io/en/latest/common-bugs.html#missing-etc-resolv-conf-for-post-scripts
 
@@ -135,6 +138,20 @@ chown -R liveuser:liveuser /home/liveuser/
 
 EOF
 
+## Define colored output
+
+# Define color variables
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+NC='\033[0m' # No Color
+
+### Update PATH
+echo -e "${GREEN}Adding /usr/local/bin to the PATH... ${NC}"
+echo 'export PATH=/usr/local/bin:$PATH' >> /etc/skel/.bashrc
+
+### Downlaod Logos 
+
 wget -O /usr/share/pixmaps/login-logo.png http://localhost/files/fedorap_small.png
 
 wget -O /etc/dconf/db/gdm.d/01-logo http://localhost/files/01-logo
@@ -201,7 +218,7 @@ cat /etc/resolv.conf > /FedoraRemix/DNS.txt
 
 
 ## Setup and Install Ansible and Ansible Navigator
-/usr/bin/pip install ansible-core ansible-navigator ansible-builder ansible ansible-dev-tools ## ansible-cdk # (issues with DNS in Post)
+/usr/bin/pip install ansible-core ansible-navigator ansible-builder ansible ansible-dev-tools --no-warn-script-location --root-user-action=ignore ## ansible-cdk # (issues with DNS in Post)
 #wget -P /opt/ -r -nH -np -R "index.htm*" http://localhost/pip_packages/
 #wget -P /opt/ http://localhost/files/python_packages.txt
 #cd /opt/pip_packages
@@ -265,16 +282,19 @@ wget http://localhost/files/logos/fedora_darkbackground.svg
 ## END Use this in a script to fix after upgrade for desktop logo END ##
 
 
-## Customize Gnome Wallpaper
+## Customize Gnome Wallpaper for FC42
 mkdir -p /usr/share/backgrounds/f40/default/
 cd /usr/share/backgrounds/f40/default/
 rm *.png
 wget http://localhost/files/f38-01-night.png
 wget http://localhost/files/f38-01-day.png
-mv f38-01-night.png f40-01-night.png
-mv f38-01-day.png f40-01-day.png
+cd /usr/share/backgrounds/gnome
+mv f38-01-night.png f42-night.png
+mv f38-01-day.png f42-day.png
 mv /usr/share/backgrounds/gnome/adwaita-l.jpg /usr/share/backgrounds/gnome/adwaita-l.orig
-cp f40-01-day.png /usr/share/backgrounds/gnome/adwaita-l.jpg
+mv /usr/share/backgrounds/gnome/adwaita-d.jpg /usr/share/backgrounds/gnome/adwaita-d.orig
+cp f42-day.png /usr/share/backgrounds/gnome/adwaita-l.jpg
+cp f42-night.png /usr/share/backgrounds/gnome/adwaita-d.jpg
 
 ## Customize Grub Boot Menu
 
@@ -388,6 +408,19 @@ chown root:root -R /usr/share/gnome-shell/extensions/
 chmod 755  -R /usr/share/gnome-shell/extensions
 
 ## Enabled Desktop Icons
+/usr/bin/gnome-extensions install /opt/FedoraRemixCustomize/Gnome_Shell/dingrastersoft.com.v76.shell-extension.zip
+/usr/bin/gnome-extensions install /opt/FedoraRemixCustomize/Gnome_Shell/add-to-desktoptommimon.github.com.v14.shell-extension.zip
+
+## Enable DING for All Users FC42 (4/21/2025)
+echo -e "${RED}Changing GNOME Extensions... ${NC}"
+cd /usr/share/gnome-shell/extensions
+rm -rf ding@rastersoft.com
+mkdir ding@rastersoft.com
+cd /usr/share/gnome-shell/extensions/ding@rastersoft.com
+unzip /opt/FedoraRemixCustomize/Files/dingrastersoft.com.v76.shell-extension.zip
+chown -R root:root /usr/share/gnome-shell/extensions/ding@rastersoft.com
+chmod 755 -R /usr/share/gnome-shell/extensions/ding@rastersoft.com
+dconf update
 
 ## Install UDP Cast 
 mkdir -p /opt/udpcast
@@ -432,10 +465,31 @@ done
 
 ## Update System Collections for Ansible Posix and others
 
-
  ansible-galaxy collection install --upgrade ansible.posix community.general containers.podman fedora.linux_system_roles  -p /usr/share/ansible/collections/ansible_collections
 
+## Create FedoraRemix Custom Tools (LMStudio)
+mkdir /opt/FedoraRemixApps/
+cd /opt/FedoraRemixApps/
+wget https://installers.lmstudio.ai/linux/x64/0.3.14-5/LM-Studio-0.3.14-5-x64.AppImage
+chmod +x /opt/FedoraRemixApps/LM-Studio-0.3.14-5-x64.AppImage
 
+# Create Desktop Icon for LMStudio
+cd /usr/share/applications
+wget  http://localhost/files/LMStudio.desktop
 
+## Load Icons for Custom Applications
+cd /usr/share/icons
+wget http://localhost/files/logos/fedora_tools_logo.png
+wget http://localhost/files/logos/lmstudio.png
+
+## Enabled Desktop Icons from Extension
+/usr/bin/gnome-extensions install /opt/FedoraRemixCustomize/Gnome_Shell/dingrastersoft.com.v76.shell-extension.zip --force
+/usr/bin/gnome-extensions install /opt/FedoraRemixCustomize/Gnome_Shell/add-to-desktoptommimon.github.com.v14.shell-extension.zip --force
+
+## Live User
+## Didn't impact
+#echo "Attempting to Install Gnome Extensions for Live User"
+#su - liveuser -c "/usr/bin/gnome-extensions install /opt/FedoraRemixCustomize/Gnome_Shell/dingrastersoft.com.v76.shell-extension.zip --force" 
+#su - liveuser -c "/usr/bin/gnome-extensions install /opt/FedoraRemixCustomize/Gnome_Shell/add-to-desktoptommimon.github.com.v14.shell-extension.zip --force" 
 
 %end
