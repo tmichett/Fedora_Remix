@@ -146,6 +146,5 @@ plocate
 ttyd
 python-qt5
 python-pyyaml
-7z
 
 %end
