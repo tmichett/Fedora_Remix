@@ -5,4 +5,4 @@ if [ -f "$HOME/.bash-git-prompt/gitprompt.sh" ]; then
     source "$HOME/.bash-git-prompt/gitprompt.sh"
 fi
 
-alias tmux-web=tmux -f /opt/tmux/tmux.conf new-session -A -s web_terminal
+alias tmux-web="tmux -f /opt/tmux/tmux.conf new-session -A -s web_terminal"
