@@ -142,4 +142,9 @@ gnome-terminal
 ## Added for Mlocate replacement for "locate" command
 plocate
 
+## Added for Fedora Remix Tools
+ttyd
+python-qt5
+python-pyyaml
+
 %end

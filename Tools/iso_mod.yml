@@ -1,0 +1,9 @@
+ISO: "/livecd-creator/FedoraRemix/FedoraRemix-FC42-2025Q2-April.iso"
+ISO_LABEL: "FedoraRemix"
+OUTPUT_ISO: "Fedora-Custom.iso"
+
+# Format: SRC_PATH|DEST_PATH_INSIDE_ISO
+FILES: 
+  - name: Kickstart
+    src: "/livecd-creator/FedoraRemix/RemixInstall-ks.cfg"
+    dest: "/{{ CDIMAGE }}/LiveOS/ks.cfg"
