@@ -46,5 +46,188 @@ This quickstart provides detailed information on how to download, install, and c
 ** Attach the ISO image to your virtual machine and select it as the boot device so it can be installed
 
 . Insert the disk into a computer or connect to the virtual machine and select 
++
+image::README-25-04-09-15-59-19.png[title="GRUB Boot Menu",align="center"]
 
-image::README-25-04-09-15-59-19.png[title="Caption",align="center"]
+. Select "Start Fedoraremix" and hit Enter
+
+. Once booted to the main screen, click on the icon in the top left beside of "Apps" to bring up the application dock. Select the icon from the dock
++
+image::README-25-05-09-15-18-25.png[title="Fedora Remix LiveCD Desktop",align="center"]
+
+. The Anaconda graphical installer will appear. Select your desired language and optionally select the keyboard layout.
++
+image::README-25-05-09-15-22-57.png[title="Anaconda Installer - Language and Keyboard",align="center"]
+
+. Complete the required and optional installation components.
++
+image::2025-05-09T19-27-47-719Z.png[title="Anaconda Installer - Installation Summary",align="center"] 
+.. Select "Installation Destination" and choose an appropriate installation device.
++
+image::README-25-05-09-15-33-05.png[title="Setting Installation Location",align="center"]
+.. Create a user account by clicking "User Creation". Complete the required information and then click done.
++
+image::2025-05-09T19-35-59-879Z.png[title="User Creation",align="center"] 
++
+[IMPORTANT]
+.Root Account
+====
+After you have specified the installation location and an initial user, you may proceed with the installation. Creating and enabling the *root* user is optional and not required. If you create the root user, likewise, you are not required to create a regular user account.
+====
++
+[TIP]
+.Setup Complete
+====
+After the installation is completed, you will need to reboot your system and perform package updates and any other needed tasks.
+====
+
+
+. Clone the Fedora Remix Repository
++
+[source,bash]
+----
+travis@localhost-fedoraremix-live [~] | (05/09/25 @ 15:55)
+$ git clone https://github.com/tmichett/Fedora_Remix.git
+Cloning into 'Fedora_Remix'...
+remote: Enumerating objects: 1949, done
+
+... OUTPUT OMITTED ...
+
+Resolving deltas: 100% (1042/1042), done.
+----
+
+. Prepare the Fedora Remix build environment by running the Python scripts from the *Ansible* directory as the root user.
++
+[source,bash]
+.Create */livecd-creator/FedoraRemix* Assets
+----
+travis@localhost-fedoraremix-live [~/Fedora_Remix/Ansible] | (05/09/25 @ 15:57)  | main ✓ |
+$ sudo python Prepare_Fedora_Remix_Build.py
+
+... OUTPUT OMITTED ...
+
+Copying ../Remix_Buid_Script.sh to /livecd-creator/FedoraRemix/Remix_Buid_Script.sh
+Setup complete!
+----
++
+[source,bash]
+.Create httpd server and repository assets
+----
+travis@localhost-fedoraremix-live [~/Fedora_Remix/Ansible] | (05/09/25 @ 15:59)  | main ✓ |
+$ sudo python Prepare_Web_Files.py
+Installing packages: httpd
+Running command: dnf install -y httpd
+
+... OUTPUT OMITTED ...
+
+Setup complete!
+----
+
+
+. Perform System and Package customizations by modifying the *FedoraRemix.ks* kickstart file and the *FedoraRemixPackages.ks* file.
+.. The setup scripts or playbooks created */livecd-creator/FedoraRemix* directory. This is where the kickstart files live that you will modify as well as the directory where the FedoraRemix.iso will reside once built.
++
+[source,bash]
+.FedoraRemix.ks
+----
+... OUTPUT OMITTED ...
+
+## Add Fedora Dynamic MotD Script
+cd /usr/bin
+wget http://localhost/files/fedora-dynamic-motd.sh
+chmod +x /usr/bin/fedora-dynamic-motd.sh
+echo /usr/bin/fedora-dynamic-motd.sh >> /etc/profile
+
+
+## Customize BASH Prompts and Shell
+mkdir /opt/bash
+cd /opt/bash
+wget http://localhost/files/bashrc.append
+## Install Gitprompt
+git clone https://github.com/tmichett/bash-git-prompt.git /opt/bash-git-prompt --depth=1
+
+... OUTPUT OMITTED ...
+----
++
+[source,bash]
+.FedoraPackages.ks
+----
+... OUTPUT OMITTED ...
+
+## Image Editing and Manipulation
+inkscape
+gimp
+krita
+netpbm-progs
+scribus
+
+## Video Editing and Manipulation
+kdenlive
+
+## Container Tools
+buildah
+skopeo
+podman-machine
+
+... OUTPUT OMITTED ...
+----
+
+. Execute the *Remix_Build_Script.sh* file to kick off the build. Depending on system and Internet connection speed and customizations to the kickstart file, this process could take up to an hour.
++
+[source,bash]
+.Launching the Script
+----
+travis@localhost-fedoraremix-live [/livecd-creator/FedoraRemix] | (05/09/25 @ 16:09)
+$ time ./Remix_Buid_Script.sh
+/usr/lib/python3.13/site-packages/pykickstart/commands/partition.py:461: KickstartParseWarning: A partition with the mountpoint / has already been defined.
+  warnings.warn(_("A partition with the mountpoint %s has already been defined.") % pd.mountpoint, KickstartParseWarning)
+fedora                                           19 MB/s |  35 MB     00:01
+updates                                         3.8 MB/s | 5.8 MB     00:01
+google-chrome                                   7.5 kB/s | 1.9 kB     00:00
+
+... OUTPUT OMITTED ...
+
+Pass 4: Checking reference counts
+Pass 5: Checking group summary information
+_FedoraRemix: 371986/1324512 files (0.2% non-contiguous), 4248977/5294080 blocks
+
+ e2fsck 1.47.1 (20-May-2024)
+
+ 0
+
+real	34m41.254s
+user	143m42.195s
+sys	    5m11.054s
+----
+
+[WARNING]
+.Error Regarding *kickstart.py*
+====
+With newer Fedora releases, there is an error with the *kickstart.py* package and URLGrabber. Located on the "FedoraRemixTools" application, I've included a button to "FIX" the issue with the *kickstart.py* package. After completing the fix, you will no longer get the issue.
+
+[source,bash]
+.Python *kickstart.py* Errors
+----
+Traceback (most recent call last):
+  File "/usr/sbin/livecd-creator", line 265, in <module>
+    sys.exit(main())
+             ~~~~^^
+  File "/usr/sbin/livecd-creator", line 195, in main
+    ks = imgcreate.read_kickstart(options.kscfg)
+  File "/usr/lib/python3.13/site-packages/imgcreate/kickstart.py", line 54, in read_kickstart
+    ksfile = urlgrabber.urlgrab(path, filename=tmpks)
+  File "/usr/lib/python3.13/site-packages/urlgrabber/grabber.py", line 808, in urlgrab
+    return default_grabber.urlgrab(url, filename, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.13/site-packages/urlgrabber/grabber.py", line 1205, in urlgrab
+    (url,parts) = opts.urlparser.parse(url, opts)
+                  ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^
+  File "/usr/lib/python3.13/site-packages/urlgrabber/grabber.py", line 873, in parse
+    pathname = pathname2url(url)
+  File "/usr/lib64/python3.13/urllib/request.py", line 1679, in pathname2url
+    return quote(pathname, encoding=encoding, errors=errors)
+  File "/usr/lib64/python3.13/urllib/parse.py", line 924, in quote
+    raise TypeError("quote() doesn't support 'encoding' for bytes")
+TypeError: quote() doesn't support 'encoding' for bytes
+----
+====
