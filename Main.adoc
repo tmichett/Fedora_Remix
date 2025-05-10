@@ -66,5 +66,5 @@ include::README.adoc[]
 
 // Appendix Section below here
 
-//[appendix]
-//include::AppendixA.adoc[]
+[appendix]
+include::AppendixA.adoc[]
