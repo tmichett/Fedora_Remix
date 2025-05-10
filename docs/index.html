@@ -825,33 +825,33 @@ TypeError: quote() doesn't support 'encoding' for bytes</code></pre>
 <div class="ulist">
 <ul>
 <li>
-<p><strong>Log Viewer</strong></p>
+<p><strong>Log Viewer</strong> - (<a href="https://github.com/tmichett/log_viewer" class="bare">https://github.com/tmichett/log_viewer</a>)</p>
 <div class="paragraph">
-<p>The Log Viewer was developed to look at and analyze the output of the kickstart file. During development and updates to the Fedora Remix build process as part of Fedora 41/42, the kickstart and build files became extremely large and it was difficult to identify errors and successes within a huge file, so the Log Viewer was created to look for keywords in that file and assist with the building and troubleshooting process. This is a stand-alone application in (<a href="https://github.com/tmichett/log_viewer" class="bare">https://github.com/tmichett/log_viewer</a>). Using Github actions and workflows, this builds the Python application as a Linux executable with all dependencies as well as produces an RPM for easy installation in Fedora Remix.</p>
+<p>The Log Viewer was developed to look at and analyze the output of the kickstart file. During development and updates to the Fedora Remix build process as part of Fedora 41/42, the kickstart and build files became extremely large and it was difficult to identify errors and successes within a huge file, so the Log Viewer was created to look for keywords in that file and assist with the building and troubleshooting process. Using Github actions and workflows, this builds the Python application as a Linux executable with all dependencies as well as produces an RPM for easy installation in Fedora Remix.</p>
 </div>
 </li>
 <li>
-<p><strong>PXE Server</strong></p>
+<p><strong>PXE Server</strong> - (<a href="https://github.com/tmichett/PXEServer" class="bare">https://github.com/tmichett/PXEServer</a>)</p>
 <div class="paragraph">
-<p>The PXEServer repository was created to separate just the PXE-boot components from Fedora Remix. This may later be replaced as it will be a modular component and it was designed to allow a "lab" or "classroom-style" deployment where Fedora Remix would be installed to a single system and the PXE server could provide the Fedora Remix Live image across the network via PXE without ever installing anything to the remaining computers. The repository (<a href="https://github.com/tmichett/PXEServer" class="bare">https://github.com/tmichett/PXEServer</a>) contains the items and automation for configuring PXE boot services and identifying the components.</p>
+<p>The PXEServer repository was created to separate just the PXE-boot components from Fedora Remix. This may later be replaced as it will be a modular component and it was designed to allow a "lab" or "classroom-style" deployment where Fedora Remix would be installed to a single system and the PXE server could provide the Fedora Remix Live image across the network via PXE without ever installing anything to the remaining computers. This repository contains the items and automation for configuring PXE boot services and identifying the components.</p>
 </div>
 </li>
 <li>
-<p><strong>Fedora Remix Customize</strong></p>
+<p><strong>Fedora Remix Customize</strong> - (<a href="https://github.com/tmichett/FedoraRemixCustomize" class="bare">https://github.com/tmichett/FedoraRemixCustomize</a>)</p>
 <div class="paragraph">
-<p>The Fedora Remix Customize repository contains some of the user-based customizations. It was created as a separate repository for tracking playbooks and scripts that would further customize the environment. Eventually, this (<a href="https://github.com/tmichett/FedoraRemixCustomize" class="bare">https://github.com/tmichett/FedoraRemixCustomize</a>) will be the location of many more customization utilities as the build and deployment process gets more streamlined.</p>
+<p>The Fedora Remix Customize repository contains some of the user-based customizations. It was created as a separate repository for tracking playbooks and scripts that would further customize the environment. Eventually, this will be the location of many more customization utilities as the build and deployment process gets more streamlined.</p>
 </div>
 </li>
 <li>
-<p><strong>Fedora Remix Tools</strong></p>
+<p><strong>Fedora Remix Tools</strong> - (<a href="https://github.com/tmichett/Fedora_Remix_Tools" class="bare">https://github.com/tmichett/Fedora_Remix_Tools</a>)</p>
 <div class="paragraph">
-<p>The Fedora Remix Tools repository brings a new take to the <strong>Fedora Remix Apps</strong> which was the first set of tools and customizations. The Fedora Remix Apps used YAD and was a set of BASH scripts and playbooks located in the main Fedora Remix repository in the YAD folder (<a href="https://github.com/tmichett/Fedora_Remix/tree/main/YAD" class="bare">https://github.com/tmichett/Fedora_Remix/tree/main/YAD</a>). The implementation and location of YAD made things more difficult to test and maintain as well as add new features. With the release of Fedora 42, a newer Python application has been developed. This application has a dynamic menu system that can be controlled by changes in a configuration file (config.yml) that allows simple text changes to change and modify the application look and feel. The newer Fedora Remix Tools application also provides a <em>command output window</em> which can be detached and looked at so a user knows if there were errors or issues running any of the customizations. The Fedora Remix Tools (<a href="https://github.com/tmichett/Fedora_Remix_Tools" class="bare">https://github.com/tmichett/Fedora_Remix_Tools</a>) repository also uses Github actions and workflows to build an RPM which can be easily installed on  the Fedora Remix system.</p>
+<p>The Fedora Remix Tools repository brings a new take to the <strong>Fedora Remix Apps</strong> which was the first set of tools and customizations. The Fedora Remix Apps used YAD and was a set of BASH scripts and playbooks located in the main Fedora Remix repository in the YAD folder (<a href="https://github.com/tmichett/Fedora_Remix/tree/main/YAD" class="bare">https://github.com/tmichett/Fedora_Remix/tree/main/YAD</a>). The implementation and location of YAD made things more difficult to test and maintain as well as add new features. With the release of Fedora 42, a newer Python application has been developed. This application has a dynamic menu system that can be controlled by changes in a configuration file (config.yml) that allows simple text changes to change and modify the application look and feel. The newer Fedora Remix Tools application also provides a <em>command output window</em> which can be detached and looked at so a user knows if there were errors or issues running any of the customizations. The Fedora Remix Tools repository also uses Github actions and workflows to build an RPM which can be easily installed on  the Fedora Remix system.</p>
 </div>
 </li>
 <li>
-<p><strong>OhMyBash</strong></p>
+<p><strong>OhMyBash</strong> - (<a href="https://github.com/tmichett/oh-my-bash" class="bare">https://github.com/tmichett/oh-my-bash</a>)</p>
 <div class="paragraph">
-<p>The <strong>OhMyBash</strong> repository (<a href="https://github.com/tmichett/oh-my-bash" class="bare">https://github.com/tmichett/oh-my-bash</a>) was forked from the main repository but customized for Fedora Remix. This repository is used to install OhMyBash as part of the Fedora Remix built process and perform the various customizations to the terminal and BASH shell including configuration and creation of a custom theme developed for the Fedora Remix (<a href="https://github.com/tmichett/oh-my-bash/tree/master/themes/tm-fedora-remix" class="bare">https://github.com/tmichett/oh-my-bash/tree/master/themes/tm-fedora-remix</a>).</p>
+<p>The <strong>OhMyBash</strong> repository was forked from the main repository but customized for Fedora Remix. This repository is used to install OhMyBash as part of the Fedora Remix built process and perform the various customizations to the terminal and BASH shell including configuration and creation of a custom theme developed for the Fedora Remix (<a href="https://github.com/tmichett/oh-my-bash/tree/master/themes/tm-fedora-remix" class="bare">https://github.com/tmichett/oh-my-bash/tree/master/themes/tm-fedora-remix</a>).</p>
 </div>
 </li>
 </ul>
@@ -865,15 +865,15 @@ TypeError: quote() doesn't support 'encoding' for bytes</code></pre>
 <div class="ulist">
 <ul>
 <li>
-<p><strong>Fedora BootC</strong></p>
+<p><strong>Fedora BootC</strong> - (<a href="https://github.com/tmichett/Fedora_BootC" class="bare">https://github.com/tmichett/Fedora_BootC</a>)</p>
 <div class="paragraph">
-<p>The Fedora BootC repository (<a href="https://github.com/tmichett/Fedora_BootC" class="bare">https://github.com/tmichett/Fedora_BootC</a>) is in initial testing and development stages and is meant to be picked up later in 2025 to extend the customizations and create an image-based installer that can be used with the Fedora Remix PXE process that will allow a kickstart file to provision systems in lab or classroom-style environments rather than just a live image. This repository will also likely extend into research and initial starting point for creating a WSL image of Fedora Remix to run on Windows systems.</p>
+<p>The Fedora BootC repository is in initial testing and development stages and is meant to be picked up later in 2025 to extend the customizations and create an image-based installer that can be used with the Fedora Remix PXE process that will allow a kickstart file to provision systems in lab or classroom-style environments rather than just a live image. This repository will also likely extend into research and initial starting point for creating a WSL image of Fedora Remix to run on Windows systems.</p>
 </div>
 </li>
 <li>
-<p><strong>Fedora Remix Ventoy</strong></p>
+<p><strong>Fedora Remix Ventoy</strong> - (<a href="https://github.com/tmichett/Fedora_Remix_Ventoy" class="bare">https://github.com/tmichett/Fedora_Remix_Ventoy</a>)</p>
 <div class="paragraph">
-<p>The Ventoy application has been around and is available for Windows and Linux allowing users to build USB drives with multiple ISOs creating a multi-boot USB. Ventoy can also be customized with many components, but it must be installed and users must know how to use Ventoy. The Fedora Remix Ventoy repository (<a href="https://github.com/tmichett/Fedora_Remix_Ventoy" class="bare">https://github.com/tmichett/Fedora_Remix_Ventoy</a>) has been created to allow an RPM installer to bake in Ventoy into the Fedora Remix Live image. It also has a Python GUI application that is meant to bring up some of the Ventoy customization components without needing to know all the commands, procedures, and processes in an attempt to make things more accessible.</p>
+<p>The Ventoy application has been around and is available for Windows and Linux allowing users to build USB drives with multiple ISOs creating a multi-boot USB. Ventoy can also be customized with many components, but it must be installed and users must know how to use Ventoy. The Fedora Remix Ventoy repository has been created to allow an RPM installer to bake in Ventoy into the Fedora Remix Live image. It also has a Python GUI application that is meant to bring up some of the Ventoy customization components without needing to know all the commands, procedures, and processes in an attempt to make things more accessible.</p>
 </div>
 </li>
 </ul>
@@ -885,7 +885,7 @@ TypeError: quote() doesn't support 'encoding' for bytes</code></pre>
 <div id="footer">
 <div id="footer-text">
 Version 1.0<br>
-Last updated 2025-05-10 13:52:55 UTC
+Last updated 2025-05-10 14:00:41 UTC
 </div>
 </div>
 </body>
