@@ -423,23 +423,27 @@ chmod 755 -R /usr/share/gnome-shell/extensions/ding@rastersoft.com
 dconf update
 
 ## Install UDP Cast 
+echo "Installing UDPCast"
 mkdir -p /opt/udpcast
 cd /opt/udpcast
 wget http://localhost/udpcast-20230924-1.x86_64.rpm
 dnf install -y ./udpcast-20230924-1.x86_64.rpm 
 
 ## Install OhMyBash
+echo "Installing OhMyBash"
 bash -c "$(curl -fsSL https://raw.githubusercontent.com/tmichett/oh-my-bash/master/tools/install.sh)" --prefix=/usr/local --unattended
 
 ## Set BASHRC Defaults
 echo "$(cat /opt/FedoraRemixCustomize/bashrc.append)" >> /etc/bashrc
 
 ## Install Podman BootC from Repo (FIX ME - Not in Fedora Yet)
+echo "Installing Podman BootC"
 sudo dnf -y install 'dnf-command(copr)'
 sudo dnf -y copr enable gmaglione/podman-bootc
 sudo dnf -y install podman-bootc
 
 ## Update to Latest Packages
+echo "Updating all packages"
 dnf update -y
 
 ## Update Ansible Collections
@@ -459,21 +463,23 @@ echo "Using Python path: $INSTALL_PATH"
 for collection in $(ansible-galaxy collection list | awk '{print $1}' | tail -n +2); do
   echo "Upgrading collection: $collection"
   
-  # Use ansible-galaxy to install the collection with the specified path
+## Use ansible-galaxy to install the collection with the specified path ##
   ansible-galaxy collection install $collection --upgrade -p "$INSTALL_PATH"
-done
+  done
 
 ## Update System Collections for Ansible Posix and others
+echo "Updating Ansible Galaxy Posix Collection"
+ansible-galaxy collection install --upgrade ansible.posix community.general containers.podman fedora.linux_system_roles  -p /usr/share/ansible/collections/ansible_collections
 
- ansible-galaxy collection install --upgrade ansible.posix community.general containers.podman fedora.linux_system_roles  -p /usr/share/ansible/collections/ansible_collections
-
-## Create FedoraRemix Custom Tools (LMStudio)
-mkdir /opt/FedoraRemixApps/
-cd /opt/FedoraRemixApps/
+## Create FedoraRemix Custom Tools (LMStudio) ##
+echo "Downloading LMStudio AppImage"
+mkdir /opt/FedoraRemixApps
+cd /opt/FedoraRemixApps
 wget https://installers.lmstudio.ai/linux/x64/0.3.14-5/LM-Studio-0.3.14-5-x64.AppImage
 chmod +x /opt/FedoraRemixApps/LM-Studio-0.3.14-5-x64.AppImage
 
-# Create Desktop Icon for LMStudio
+## Create Desktop Icon for LMStudio
+echo "Installing LMStudio Icons"
 cd /usr/share/applications
 wget  http://localhost/files/LMStudio.desktop
 
@@ -483,13 +489,23 @@ wget http://localhost/files/logos/fedora_tools_logo.png
 wget http://localhost/files/logos/lmstudio.png
 
 ## Enabled Desktop Icons from Extension
+echo "Configuring GNOME Extensions for Desktop Shortcuts"
 /usr/bin/gnome-extensions install /opt/FedoraRemixCustomize/Gnome_Shell/dingrastersoft.com.v76.shell-extension.zip --force
 /usr/bin/gnome-extensions install /opt/FedoraRemixCustomize/Gnome_Shell/add-to-desktoptommimon.github.com.v14.shell-extension.zip --force
 
 ## Create TMUX Config Directory
+echo "Configuring TMUX"
 mkdir /opt/tmux
 cd /opt/tmux
 wget wget  http://localhost/files/tmux.conf
+
+## Install VeraCrypt
+echo "Installing VeraCrypt"
+dnf install -y https://github.com/veracrypt/VeraCrypt/releases/download/VeraCrypt_1.26.20/veracrypt-1.26.20-Fedora-40-x86_64.rpm
+cd /usr/share/applications
+wget http://localhost/files/logos/veracrypt.png
+sed -i 's/Icon=veracrypt/Icon=veracrypt.png/g' /usr/share/applications/veracrypt.desktop
+
 
 
 ## Live User
