@@ -517,6 +517,31 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 </li>
 <li>
 <p>Run the <strong>Remix_Build_Script.sh</strong></p>
+<div class="admonitionblock warning">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-warning" title="Warning"></i>
+</td>
+<td class="content">
+<div class="title">Error Regarding <strong>kickstart.py</strong></div>
+<div class="paragraph">
+<p>With newer Fedora releases, there is an error with the <strong>kickstart.py</strong> package and URLGrabber. Located on the "FedoraRemixTools" application, I&#8217;ve included a button to "FIX" the issue with the <strong>kickstart.py</strong> package. After completing the fix, you will no longer get the issue.</p>
+</div>
+<div class="listingblock">
+<div class="title">Listing 1. Python <strong>kickstart.py</strong> Errors</div>
+<div class="content">
+<pre class="highlight"><code class="language-bash" data-lang="bash">Traceback (most recent call last):
+  File "/usr/sbin/livecd-creator", line 265, in &lt;module&gt;
+    sys.exit(main())
+
+... OUTPUT OMITTED ...</code></pre>
+</div>
+</div>
+</td>
+</tr>
+</table>
+</div>
 </li>
 </ol>
 </div>
@@ -656,7 +681,7 @@ Resolving deltas: 100% (1042/1042), done.</code></pre>
 <li>
 <p>Prepare the Fedora Remix build environment by running the Python scripts from the <strong>Ansible</strong> directory as the root user.</p>
 <div class="listingblock">
-<div class="title">Listing 1. Create <strong>/livecd-creator/FedoraRemix</strong> Assets</div>
+<div class="title">Listing 2. Create <strong>/livecd-creator/FedoraRemix</strong> Assets</div>
 <div class="content">
 <pre class="highlight"><code class="language-bash" data-lang="bash">travis@localhost-fedoraremix-live [~/Fedora_Remix/Ansible] | (05/09/25 @ 15:57)  | main ✓ |
 $ sudo python Prepare_Fedora_Remix_Build.py
@@ -668,7 +693,7 @@ Setup complete!</code></pre>
 </div>
 </div>
 <div class="listingblock">
-<div class="title">Listing 2. Create httpd server and repository assets</div>
+<div class="title">Listing 3. Create httpd server and repository assets</div>
 <div class="content">
 <pre class="highlight"><code class="language-bash" data-lang="bash">travis@localhost-fedoraremix-live [~/Fedora_Remix/Ansible] | (05/09/25 @ 15:59)  | main ✓ |
 $ sudo python Prepare_Web_Files.py
@@ -688,7 +713,7 @@ Setup complete!</code></pre>
 <li>
 <p>The setup scripts or playbooks created <strong>/livecd-creator/FedoraRemix</strong> directory. This is where the kickstart files live that you will modify as well as the directory where the FedoraRemix.iso will reside once built.</p>
 <div class="listingblock">
-<div class="title">Listing 3. FedoraRemix.ks</div>
+<div class="title">Listing 4. FedoraRemix.ks</div>
 <div class="content">
 <pre class="highlight"><code class="language-bash" data-lang="bash">... OUTPUT OMITTED ...
 
@@ -710,7 +735,7 @@ git clone https://github.com/tmichett/bash-git-prompt.git /opt/bash-git-prompt -
 </div>
 </div>
 <div class="listingblock">
-<div class="title">Listing 4. FedoraPackages.ks</div>
+<div class="title">Listing 5. FedoraPackages.ks</div>
 <div class="content">
 <pre class="highlight"><code class="language-bash" data-lang="bash">... OUTPUT OMITTED ...
 
@@ -739,7 +764,7 @@ podman-machine
 <li>
 <p>Execute the <strong>Remix_Build_Script.sh</strong> file to kick off the build. Depending on system and Internet connection speed and customizations to the kickstart file, this process could take up to an hour.</p>
 <div class="listingblock">
-<div class="title">Listing 5. Launching the Script</div>
+<div class="title">Listing 6. Launching the Script</div>
 <div class="content">
 <pre class="highlight"><code class="language-bash" data-lang="bash">travis@localhost-fedoraremix-live [/livecd-creator/FedoraRemix] | (05/09/25 @ 16:09)
 $ time ./Remix_Buid_Script.sh
@@ -779,7 +804,7 @@ sys	    5m11.054s</code></pre>
 <p>With newer Fedora releases, there is an error with the <strong>kickstart.py</strong> package and URLGrabber. Located on the "FedoraRemixTools" application, I&#8217;ve included a button to "FIX" the issue with the <strong>kickstart.py</strong> package. After completing the fix, you will no longer get the issue.</p>
 </div>
 <div class="listingblock">
-<div class="title">Listing 6. Python <strong>kickstart.py</strong> Errors</div>
+<div class="title">Listing 7. Python <strong>kickstart.py</strong> Errors</div>
 <div class="content">
 <pre class="highlight"><code class="language-bash" data-lang="bash">Traceback (most recent call last):
   File "/usr/sbin/livecd-creator", line 265, in &lt;module&gt;
@@ -885,7 +910,7 @@ TypeError: quote() doesn't support 'encoding' for bytes</code></pre>
 <div id="footer">
 <div id="footer-text">
 Version 1.0<br>
-Last updated 2025-05-10 14:00:41 UTC
+Last updated 2025-05-13 16:25:17 UTC
 </div>
 </div>
 </body>
