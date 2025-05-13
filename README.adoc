@@ -34,7 +34,22 @@ This quickstart will provide a quick method to download a pre-built Fedora Remix
 .. FedoraRemix.ks - To control various setup components and run commands
 .. FedoraRemixPackages.ks - To control RPM packages that are installed as part of your Remix
 . Run the *Remix_Build_Script.sh*
++
+[WARNING]
+.Error Regarding *kickstart.py*
+====
+With newer Fedora releases, there is an error with the *kickstart.py* package and URLGrabber. Located on the "FedoraRemixTools" application, I've included a button to "FIX" the issue with the *kickstart.py* package. After completing the fix, you will no longer get the issue.
 
+[source,bash]
+.Python *kickstart.py* Errors
+----
+Traceback (most recent call last):
+  File "/usr/sbin/livecd-creator", line 265, in <module>
+    sys.exit(main())
+
+... OUTPUT OMITTED ...
+----
+====
 
 === [blue]#*Quickstart*#
 
