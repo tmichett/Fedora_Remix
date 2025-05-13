@@ -147,7 +147,6 @@ ttyd
 python-qt5
 python-pyyaml
 util-linux-script
-python-qt6
 
 
 %end
