@@ -2,12 +2,17 @@
 # http://fedoraproject.org/wiki/Workstation
 # mailto:desktop@lists.fedoraproject.org
 
+
+## Echo Finish time to screen
+echo "The kickstart started on $(date)"
+
 %include fedora-live-base.ks
 %include fedora-workstation-common.ks
 #
 # Disable this for now as packagekit is causing compose failures
 # by leaving a gpg-agent around holding /dev/null open.
 #
+
 #include snippets/packagekit-cached-metadata.ks
 %include FedoraRemixPackages.ks
 
@@ -506,12 +511,23 @@ cd /usr/share/applications
 wget http://localhost/files/logos/veracrypt.png
 sed -i 's/Icon=veracrypt/Icon=veracrypt.png/g' /usr/share/applications/veracrypt.desktop
 
+## Install and Configure Mutagen
+echo "Installing Matagen"
+cd /tmp
+wget https://github.com/mutagen-io/mutagen/releases/download/v0.18.1/mutagen_linux_amd64_v0.18.1.tar.gz
+tar xvf mutagen_linux_amd64_v0.18.1.tar.gz -C /usr/local/bin/
+rm mutagen_linux_amd64_v0.18.1.tar.gz
 
+## Put information in /etc regarding Fedora Remix Versions
+date "+This version of Fedora Remix 42 was created on %B %d, %Y" > /etc/fedora_remix_release
 
-## Live User
-## Didn't impact
-#echo "Attempting to Install Gnome Extensions for Live User"
-#su - liveuser -c "/usr/bin/gnome-extensions install /opt/FedoraRemixCustomize/Gnome_Shell/dingrastersoft.com.v76.shell-extension.zip --force" 
-#su - liveuser -c "/usr/bin/gnome-extensions install /opt/FedoraRemixCustomize/Gnome_Shell/add-to-desktoptommimon.github.com.v14.shell-extension.zip --force" 
+## Echo Finish time to screen
+echo "The kickstart completed on $(date)"
 
+echo "#########################################################"
+echo "## Kickstart Completed ##################################"
+echo "#########################################################"
+echo "#########################################################"
+echo "######### Building ISO ##################################"
+echo "#########################################################"
 %end

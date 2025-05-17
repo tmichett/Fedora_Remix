@@ -50,6 +50,7 @@ libxml2
 mc
 fuse-sshfs
 yum-utils
+cargo
 
 ## Image Editing and Manipulation
 inkscape
