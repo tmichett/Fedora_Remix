@@ -3,8 +3,7 @@
 # mailto:desktop@lists.fedoraproject.org
 
 
-## Echo Finish time to screen
-echo "The kickstart started on $(date)"
+
 
 %include fedora-live-base.ks
 %include fedora-workstation-common.ks
@@ -44,6 +43,10 @@ touch "$LIVE_ROOT/isolinx/travis"
 
 
 %post
+
+## Echo Start time to screen
+echo "The kickstart started on $(date)"
+
 set -x
 ### Fix added for DNS and Network fixes in Post
 ### https://anaconda-installer.readthedocs.io/en/latest/common-bugs.html#missing-etc-resolv-conf-for-post-scripts
@@ -517,6 +520,7 @@ cd /tmp
 wget https://github.com/mutagen-io/mutagen/releases/download/v0.18.1/mutagen_linux_amd64_v0.18.1.tar.gz
 tar xvf mutagen_linux_amd64_v0.18.1.tar.gz -C /usr/local/bin/
 rm mutagen_linux_amd64_v0.18.1.tar.gz
+
 
 ## Put information in /etc regarding Fedora Remix Versions
 date "+This version of Fedora Remix 42 was created on %B %d, %Y" > /etc/fedora_remix_release

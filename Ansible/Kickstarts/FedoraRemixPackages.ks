@@ -151,9 +151,11 @@ util-linux-script
 
 ## Artur's CLI Utils
 zoxide
-eza
+eza ## Needs repo
 btop
 bat
 fzf
+yazi  ## Needs repo
+dust  ## Needs repo
 
 %end
