@@ -512,7 +512,7 @@ echo "Installing VeraCrypt"
 dnf install -y https://github.com/veracrypt/VeraCrypt/releases/download/VeraCrypt_1.26.20/veracrypt-1.26.20-Fedora-40-x86_64.rpm
 cd /usr/share/applications
 wget http://localhost/files/logos/veracrypt.png
-sed -i 's/Icon=veracrypt/Icon=veracrypt.png/g' /usr/share/applications/veracrypt.desktop
+sed -i 's/Icon=veracrypt/Icon=/usr/share/applications/veracrypt.png/g' /usr/share/applications/veracrypt.desktop
 
 ## Install and Configure Mutagen
 echo "Installing Matagen"
@@ -521,6 +521,14 @@ wget https://github.com/mutagen-io/mutagen/releases/download/v0.18.1/mutagen_lin
 tar xvf mutagen_linux_amd64_v0.18.1.tar.gz -C /usr/local/bin/
 rm mutagen_linux_amd64_v0.18.1.tar.gz
 
+
+## Install Cursor
+wget -O  /opt/FedoraRemixApps/Cursor.AppImage https://downloads.cursor.com/production/96e5b01ca25f8fbd4c4c10bc69b15f6228c80771/linux/x64/Cursor-0.50.5-x86_64.AppImage
+chmod +x /opt/FedoraRemixApps/Cursor.AppImage
+cd /usr/share/icons 
+wget http://localhost/files/logos/Cursor.svg
+cd /usr/share/applications
+wget http://localhost/files/Cursor.desktop
 
 ## Put information in /etc regarding Fedora Remix Versions
 date "+This version of Fedora Remix 42 was created on %B %d, %Y" > /etc/fedora_remix_release
