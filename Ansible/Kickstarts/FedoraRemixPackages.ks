@@ -149,5 +149,11 @@ python-qt5
 python-pyyaml
 util-linux-script
 
+## Artur's CLI Utils
+zoxide
+eza
+btop
+bat
+fzf
 
 %end
