@@ -496,6 +496,9 @@ cd /usr/share/icons
 wget http://localhost/files/logos/fedora_tools_logo.png
 wget http://localhost/files/logos/lmstudio.png
 
+## Install LogViewer
+dnf install -y https://github.com/tmichett/log_viewer/releases/download/1.1.0/LogViewer-1.1-0.x86_64.rpm
+
 ## Enabled Desktop Icons from Extension
 echo "Configuring GNOME Extensions for Desktop Shortcuts"
 /usr/bin/gnome-extensions install /opt/FedoraRemixCustomize/Gnome_Shell/dingrastersoft.com.v76.shell-extension.zip --force
