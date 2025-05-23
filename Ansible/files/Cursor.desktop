@@ -1,0 +1,12 @@
+#!/usr/bin/env xdg-open
+[Desktop Entry]
+Name=Cursor
+GenericName=Cursor
+X-GNOME-FullName=LMStudio
+Exec=/opt/FedoraRemixApps/Cursor.AppImage
+Terminal=false
+Icon=/usr/share/icons/Cursor.svg
+Type=Application
+StartupNotify=true
+Categories=Development;
+Name[en_US]=Cursor

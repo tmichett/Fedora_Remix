@@ -1,0 +1,157 @@
+# GRUB2 Theme for Ventoy
+#
+# Based on the image of a penguin wearing a blue suit and fedora, holding a "MultiBoot Tools" sign.
+# Designed for use with Ventoy.
+#
+# Author: Gemini (AI Assistant)
+#
+# Installation:
+# 1.  Create a directory named "ventoy" in /boot/grub/themes.
+# 2.  Place this theme.txt and the penguin image (penguin.png) in that directory.  Make sure the image filename matches.
+# 3.  Edit /boot/grub/grub.cfg and add or modify the following lines:
+#
+#    ```
+#    set theme=/boot/grub/themes/ventoy/theme.txt
+#    set gfxmode=auto
+#    ```
+#
+# 4.  Ensure the penguin image (penguin.png) is in the same directory as this theme.txt.
+# 5.  Update GRUB configuration: `sudo update-grub`
+# 6.  Reboot your system.
+#
+# Features:
+# * Penguin background image.
+# * Blue and orange color scheme.
+# * Ventoy-focused design.
+# * Clear and readable text.
+# * Custom progress bar.
+# * Shadow effects for better visibility.
+#
+# File: /boot/grub/themes/ventoy/theme.txt
+#
+# Ensure you have a penguin.png image in the same directory.  This theme assumes the image is named "penguin.png".
+# If you use a different name, change the filename in the "background_image" line below.
+#
+# For best results, the penguin.png image should be a PNG with a resolution appropriate for your screen.
+# A resolution of 1024x768 or 1280x800 is a good starting point.  The image should have a transparent
+# background if you want the background color to show through in areas where the penguin image
+# does not cover.
+
+# Global settings
+global_font="DejaVu Sans 16"  # Increased font size for better readability
+timeout_style=menu
+timeout=10
+default=0
+gfxmode=auto
+# terminal_input console
+# terminal_output gfxterm
+
+# Background image
+background_image=penguin.png # Make sure this matches the filename of your penguin image.
+# background_color=202020 # Dark gray background (hex color) -  Set in thesection_style
+desktop_color=ffffff # white - not really used, the background image overrides this, but good to set.
+
+# Theme colors (blue and orange)
+color_normal=ffffff/336699 # White text on a dark blue.  Slightly darker blue.
+color_highlight=ffffff/ff8c00 # White text on a dark orange
+# color_menu_selected_bg=4a148c # Removed, using highlight color
+# color_menu_normal_bg=1a237e # Removed, using normal color
+color_progress_bar=ff8c00, 336699 # Orange bar, Dark Blue background
+color_progress_bar_ii=ff8c00, 336699 # Orange bar, Dark Blue background
+
+# For better contrast on modern screens, add a shadow
+shadow=1
+shadow_color=00000080 # Black shadow, 50% opacity
+
+# Style for the menu
+menu_font="DejaVu Sans 16" # Ensure this font is available
+menu_color_normal=ffffff/336699
+menu_color_highlight=ffffff/ff8c00
+menu_bgcolor_normal=00000000 # Fully transparent background for normal items.
+menu_bgcolor_highlight=00000040 # Semi-transparent background for highlighted items.
+menu_frame=0 # No frame around the menu.
+menu_width=60 # Increased width of the menu.  Adjust as needed.
+menu_height=12 # Increased height.
+menu_offset_x=20
+menu_offset_y=20
+menu_sel_pixmap_style="! >" #  '>' - adds a '>' character to the left of the selected option.  '!' makes it bold.
+menu_arrow=off # removes arrows
+
+# Style for the progress bar
+progressbar_font="DejaVu Sans 10"
+# progressbar_color_normal=ff8c00/336699 # Defined above.
+# progressbar_color_highlight=ff8c00/336699 # Defined above.
+progressbar_bgcolor=00000000 # Fully transparent
+progressbar_frame=1
+progressbar_width=30
+progressbar_height=2
+progressbar_border_style=0
+progressbar_align=center
+# Style for the message box
+message_font="DejaVu Sans 14"
+message_color_normal=ffffff/336699
+message_color_highlight=ffffff/ff8c00
+message_bgcolor_normal=00000080 # Semi-transparent black
+message_frame=1
+message_width=50
+message_height=8
+message_border_style=2
+message_align=center
+
+# Style for the help text
+help_font="DejaVu Sans 12"
+help_color_normal=ffffff/336699
+help_color_highlight=ffffff/ff8c00
+help_bgcolor_normal=00000000 # Fully transparent
+help_frame=0
+help_width=80
+help_height=auto
+help_offset_x=10
+help_offset_y=-10 # Positioned relative to the bottom of the screen
+
+# Style for the edit entry
+edit_font="Monospace 14" # Use a monospace font for editing.
+edit_color_normal=ffffff/336699
+edit_color_highlight=ffffff/ff8c00
+edit_bgcolor_normal=00000080 # Semi-transparent black
+edit_frame=1
+edit_width=40
+edit_height=3
+edit_offset_x=center
+edit_offset_y=center
+
+# Style for the scrollbar
+scrollbar_normal=336699
+scrollbar_highlight=ff8c00
+slider_normal=ffffff
+slider_highlight=ffffff
+
+# Section Styles - applying background color and frame to the whole screen.
+section_bg_color = #000000 # Make the background black.  Overridden by background image, but set it anyway.
+section_fg_color = ffffff
+section_frame = 0 # No frame
+
+# Apply styles to the whole screen.
+desktop {
+  background_color = #000000
+  image = "penguin.png"
+}
+
+# Global text style (applied to all text elements)
+global {
+  font = "DejaVu Sans 16"
+  color = ffffff
+  alignment = left
+}
+
+# Menu specific style
+menu {
+  font = "DejaVu Sans 16"
+  color_normal = ffffff/336699
+  color_highlight = ffffff/ff8c00
+  alignment = center
+  width = 60
+  height = 12
+  sel_pixmap_style = "! >"
+}
+

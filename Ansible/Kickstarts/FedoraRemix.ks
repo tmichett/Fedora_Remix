@@ -2,12 +2,16 @@
 # http://fedoraproject.org/wiki/Workstation
 # mailto:desktop@lists.fedoraproject.org
 
+
+
+
 %include fedora-live-base.ks
 %include fedora-workstation-common.ks
 #
 # Disable this for now as packagekit is causing compose failures
 # by leaving a gpg-agent around holding /dev/null open.
 #
+
 #include snippets/packagekit-cached-metadata.ks
 %include FedoraRemixPackages.ks
 
@@ -39,6 +43,10 @@ touch "$LIVE_ROOT/isolinx/travis"
 
 
 %post
+
+## Echo Start time to screen
+echo "The kickstart started on $(date)"
+
 set -x
 ### Fix added for DNS and Network fixes in Post
 ### https://anaconda-installer.readthedocs.io/en/latest/common-bugs.html#missing-etc-resolv-conf-for-post-scripts
@@ -423,23 +431,27 @@ chmod 755 -R /usr/share/gnome-shell/extensions/ding@rastersoft.com
 dconf update
 
 ## Install UDP Cast 
+echo "Installing UDPCast"
 mkdir -p /opt/udpcast
 cd /opt/udpcast
 wget http://localhost/udpcast-20230924-1.x86_64.rpm
 dnf install -y ./udpcast-20230924-1.x86_64.rpm 
 
 ## Install OhMyBash
+echo "Installing OhMyBash"
 bash -c "$(curl -fsSL https://raw.githubusercontent.com/tmichett/oh-my-bash/master/tools/install.sh)" --prefix=/usr/local --unattended
 
 ## Set BASHRC Defaults
 echo "$(cat /opt/FedoraRemixCustomize/bashrc.append)" >> /etc/bashrc
 
 ## Install Podman BootC from Repo (FIX ME - Not in Fedora Yet)
+echo "Installing Podman BootC"
 sudo dnf -y install 'dnf-command(copr)'
 sudo dnf -y copr enable gmaglione/podman-bootc
 sudo dnf -y install podman-bootc
 
 ## Update to Latest Packages
+echo "Updating all packages"
 dnf update -y
 
 ## Update Ansible Collections
@@ -459,21 +471,23 @@ echo "Using Python path: $INSTALL_PATH"
 for collection in $(ansible-galaxy collection list | awk '{print $1}' | tail -n +2); do
   echo "Upgrading collection: $collection"
   
-  # Use ansible-galaxy to install the collection with the specified path
+## Use ansible-galaxy to install the collection with the specified path ##
   ansible-galaxy collection install $collection --upgrade -p "$INSTALL_PATH"
-done
+  done
 
 ## Update System Collections for Ansible Posix and others
+echo "Updating Ansible Galaxy Posix Collection"
+ansible-galaxy collection install --upgrade ansible.posix community.general containers.podman fedora.linux_system_roles  -p /usr/share/ansible/collections/ansible_collections
 
- ansible-galaxy collection install --upgrade ansible.posix community.general containers.podman fedora.linux_system_roles  -p /usr/share/ansible/collections/ansible_collections
-
-## Create FedoraRemix Custom Tools (LMStudio)
-mkdir /opt/FedoraRemixApps/
-cd /opt/FedoraRemixApps/
+## Create FedoraRemix Custom Tools (LMStudio) ##
+echo "Downloading LMStudio AppImage"
+mkdir /opt/FedoraRemixApps
+cd /opt/FedoraRemixApps
 wget https://installers.lmstudio.ai/linux/x64/0.3.14-5/LM-Studio-0.3.14-5-x64.AppImage
 chmod +x /opt/FedoraRemixApps/LM-Studio-0.3.14-5-x64.AppImage
 
-# Create Desktop Icon for LMStudio
+## Create Desktop Icon for LMStudio
+echo "Installing LMStudio Icons"
 cd /usr/share/applications
 wget  http://localhost/files/LMStudio.desktop
 
@@ -482,14 +496,53 @@ cd /usr/share/icons
 wget http://localhost/files/logos/fedora_tools_logo.png
 wget http://localhost/files/logos/lmstudio.png
 
+## Install LogViewer
+dnf install -y https://github.com/tmichett/log_viewer/releases/download/1.1.0/LogViewer-1.1-0.x86_64.rpm
+
 ## Enabled Desktop Icons from Extension
+echo "Configuring GNOME Extensions for Desktop Shortcuts"
 /usr/bin/gnome-extensions install /opt/FedoraRemixCustomize/Gnome_Shell/dingrastersoft.com.v76.shell-extension.zip --force
 /usr/bin/gnome-extensions install /opt/FedoraRemixCustomize/Gnome_Shell/add-to-desktoptommimon.github.com.v14.shell-extension.zip --force
 
-## Live User
-## Didn't impact
-#echo "Attempting to Install Gnome Extensions for Live User"
-#su - liveuser -c "/usr/bin/gnome-extensions install /opt/FedoraRemixCustomize/Gnome_Shell/dingrastersoft.com.v76.shell-extension.zip --force" 
-#su - liveuser -c "/usr/bin/gnome-extensions install /opt/FedoraRemixCustomize/Gnome_Shell/add-to-desktoptommimon.github.com.v14.shell-extension.zip --force" 
+## Create TMUX Config Directory
+echo "Configuring TMUX"
+mkdir /opt/tmux
+cd /opt/tmux
+wget wget  http://localhost/files/tmux.conf
 
+## Install VeraCrypt
+echo "Installing VeraCrypt"
+dnf install -y https://github.com/veracrypt/VeraCrypt/releases/download/VeraCrypt_1.26.20/veracrypt-1.26.20-Fedora-40-x86_64.rpm
+cd /usr/share/applications
+wget http://localhost/files/logos/veracrypt.png
+sed -i 's/Icon=veracrypt/Icon=\/usr\/share\/applications\/veracrypt.png/g' /usr/share/applications/veracrypt.desktop
+
+## Install and Configure Mutagen
+echo "Installing Matagen"
+cd /tmp
+wget https://github.com/mutagen-io/mutagen/releases/download/v0.18.1/mutagen_linux_amd64_v0.18.1.tar.gz
+tar xvf mutagen_linux_amd64_v0.18.1.tar.gz -C /usr/local/bin/
+rm mutagen_linux_amd64_v0.18.1.tar.gz
+
+
+## Install Cursor
+wget -O  /opt/FedoraRemixApps/Cursor.AppImage https://downloads.cursor.com/production/96e5b01ca25f8fbd4c4c10bc69b15f6228c80771/linux/x64/Cursor-0.50.5-x86_64.AppImage
+chmod +x /opt/FedoraRemixApps/Cursor.AppImage
+cd /usr/share/icons 
+wget http://localhost/files/logos/Cursor.svg
+cd /usr/share/applications
+wget http://localhost/files/Cursor.desktop
+
+## Put information in /etc regarding Fedora Remix Versions
+date "+This version of Fedora Remix 42 was created on %B %d, %Y" > /etc/fedora_remix_release
+
+## Echo Finish time to screen
+echo "The kickstart completed on $(date)"
+
+echo "#########################################################"
+echo "## Kickstart Completed ##################################"
+echo "#########################################################"
+echo "#########################################################"
+echo "######### Building ISO ##################################"
+echo "#########################################################"
 %end

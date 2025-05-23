@@ -50,6 +50,7 @@ libxml2
 mc
 fuse-sshfs
 yum-utils
+cargo
 
 ## Image Editing and Manipulation
 inkscape
@@ -141,5 +142,20 @@ gnome-terminal
 
 ## Added for Mlocate replacement for "locate" command
 plocate
+
+## Added for Fedora Remix Tools
+ttyd
+python-qt5
+python-pyyaml
+util-linux-script
+
+## Artur's CLI Utils
+zoxide
+eza ## Needs repo
+btop
+bat
+fzf
+yazi  ## Needs repo
+dust  ## Needs repo
 
 %end

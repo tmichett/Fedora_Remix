@@ -6,5 +6,9 @@
 
 setenforce 0
 
-livecd-creator --cache=/livecd-creator/package-cache -f FedoraRemix -c FedoraRemix.ks --title="Travis's Fedora Remix" 2>&1 | tee FedoraBuildi-$(date +%m%d%y-%k%M).out
+# Use script to capture output with colors
+script -c "livecd-creator --cache=/livecd-creator/package-cache -f FedoraRemix -c FedoraRemix.ks --title=\"Travis's Fedora Remix 42\" 2>&1" FedoraBuild-$(date +%m%d%y-%k%M).out
+
+
+#livecd-creator --cache=/livecd-creator/package-cache -f FedoraRemix -c FedoraRemix.ks --title="Travis's Fedora Remix" 2>&1 | tee FedoraBuild-$(date +%m%d%y-%k%M).out
 
