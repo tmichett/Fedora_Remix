@@ -454,26 +454,12 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <li><a href="#_quickstart"><span class="blue"><strong>Quickstart</strong></span></a></li>
 </ul>
 </li>
-<li><a href="#_preparing_a_build_system">1. Preparing a Build System</a>
+<li><a href="#_fedora_remix">Appendix A: Fedora Remix</a>
 <ul class="sectlevel2">
-<li><a href="#_getting_started">1.1. Getting Started</a>
-<ul class="sectlevel3">
-<li><a href="#_preparing_environment">1.1.1. Preparing Environment</a></li>
-<li><a href="#_create_build_and_package_cache_directories_and_copy_kickstarts">1.1.2. Create Build and Package Cache Directories and Copy Kickstarts</a></li>
+<li><a href="#_fedora_remix_application_repositories">A.1. Fedora Remix Application Repositories</a></li>
+<li><a href="#_fedora_remix_extensions_and_additional_projects">A.2. Fedora Remix Extensions and Additional Projects</a></li>
 </ul>
 </li>
-</ul>
-</li>
-<li><a href="#_preparing_a_build_system_2">2. Preparing a Build System</a>
-<ul class="sectlevel2">
-<li><a href="#_getting_started_2">2.1. Getting Started</a>
-<ul class="sectlevel3">
-<li><a href="#_preparing_environment_2">2.1.1. Preparing Environment</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li><a href="#_fedora_remix">Appendix A: Fedora Remix</a></li>
 </ul>
 </div>
 </div>
@@ -531,6 +517,31 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 </li>
 <li>
 <p>Run the <strong>Remix_Build_Script.sh</strong></p>
+<div class="admonitionblock warning">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-warning" title="Warning"></i>
+</td>
+<td class="content">
+<div class="title">Error Regarding <strong>kickstart.py</strong></div>
+<div class="paragraph">
+<p>With newer Fedora releases, there is an error with the <strong>kickstart.py</strong> package and URLGrabber. Located on the "FedoraRemixTools" application, I&#8217;ve included a button to "FIX" the issue with the <strong>kickstart.py</strong> package. After completing the fix, you will no longer get the issue.</p>
+</div>
+<div class="listingblock">
+<div class="title">Listing 1. Python <strong>kickstart.py</strong> Errors</div>
+<div class="content">
+<pre class="highlight"><code class="language-bash" data-lang="bash">Traceback (most recent call last):
+  File "/usr/sbin/livecd-creator", line 265, in &lt;module&gt;
+    sys.exit(main())
+
+... OUTPUT OMITTED ...</code></pre>
+</div>
+</div>
+</td>
+</tr>
+</table>
+</div>
 </li>
 </ol>
 </div>
@@ -563,161 +574,60 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 </li>
 <li>
 <p>Insert the disk into a computer or connect to the virtual machine and select</p>
-</li>
-</ol>
-</div>
 <div class="imageblock text-center">
 <div class="content">
 <img src="images/README-25-04-09-15-59-19.png" alt="README 25 04 09 15 59 19">
 </div>
-<div class="title">Figure 1. Caption</div>
+<div class="title">Figure 1. GRUB Boot Menu</div>
 </div>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_preparing_a_build_system">1. Preparing a Build System</h2>
-<div class="sectionbody">
-<div class="sect2">
-<h3 id="_getting_started">1.1. Getting Started</h3>
-<div class="paragraph">
-<p>Section Info Here</p>
-</div>
-<div class="ulist">
-<div class="title">Initial Configuration</div>
-<ul>
-<li>
-<p><strong>User for Ansible</strong>: ansible</p>
 </li>
 <li>
-<p><strong>Password for Ansible User</strong>: ansiblepassword</p>
+<p>Select "Start Fedoraremix" and hit Enter</p>
 </li>
 <li>
-<p>User in sudoers.d file to become root without prompting for password</p>
-</li>
-</ul>
-</div>
-<div class="listingblock">
-<div class="title">Listing 1. <strong>/etc/sudoers.d/ansible</strong> File</div>
+<p>Once booted to the main screen, click on the icon in the top left beside of "Apps" to bring up the application dock. Select the icon from the dock</p>
+<div class="imageblock text-center">
 <div class="content">
-<pre class="highlight"><code class="language-bash" data-lang="bash"></code></pre>
+<img src="images/README-25-05-09-15-18-25.png" alt="README 25 05 09 15 18 25">
 </div>
-</div>
-<div class="sect3">
-<h4 id="_preparing_environment">1.1.1. Preparing Environment</h4>
-<div class="paragraph">
-<p>In order to prepare the environment, you will need a system running with Fedora already installed from the LiveCD and it will also need to have sufficient disk space to download REPO files, create the repository, and house the DVD ISO that is being created.</p>
-</div>
-<div class="ulist">
-<div class="title">Required Items for Build Environment</div>
-<ul>
-<li>
-<p>Same version of Fedora as Remix</p>
-</li>
-<li>
-<p>Same system architecture as Remix</p>
-</li>
-<li>
-<p>SELinux in <strong>permissive</strong> Mode</p>
-</li>
-<li>
-<p>Packages</p>
-<div class="ulist">
-<ul>
-<li>
-<p>livecd-tools</p>
-</li>
-<li>
-<p>spin-kickstarts</p>
-</li>
-</ul>
+<div class="title">Figure 2. Fedora Remix LiveCD Desktop</div>
 </div>
 </li>
 <li>
-<p>Lots of disk space</p>
-</li>
-</ul>
-</div>
-<div class="admonitionblock tip">
-<table>
-<tr>
-<td class="icon">
-<i class="fa icon-tip" title="Tip"></i>
-</td>
-<td class="content">
-<div class="title">Default Kickstart files</div>
-<div class="paragraph">
-<p>The default kickstart files are installed in <strong>/usr/share/spin-kickstarts</strong>.</p>
-</div>
-<div class="listingblock">
-<div class="title">Listing 2. Initial Kickstart Files</div>
+<p>The Anaconda graphical installer will appear. Select your desired language and optionally select the keyboard layout.</p>
+<div class="imageblock text-center">
 <div class="content">
-<pre class="highlight"><code class="language-bash" data-lang="bash">fedora-cinnamon-common.ks         fedora-live-kde-base.ks
-fedora-cloud-base-gcp.ks          fedora-live-kde.ks
-fedora-cloud-base.ks              fedora-live-lxde.ks
-fedora-cloud-base-vagrant.ks      fedora-live-lxqt.ks
-fedora-comp-neuro-common.ks       fedora-live-mate_compiz.ks
-fedora-container-base.ks          fedora-live-minimization.ks
-fedora-container-base-minimal.ks  fedora-live-python-classroom.ks
-fedora-container-common.ks        fedora-live-robotics.ks
-fedora-design-suite-common.ks     fedora-live-scientific_kde.ks
-fedora-disk-base.ks               fedora-live-security.ks
-fedora-disk-kde.ks                fedora-live-soas.ks
-fedora-disk-minimal.ks            fedora-live-workstation.ks
-fedora-disk-python-classroom.ks   fedora-live-xfce.ks
-fedora-disk-server.ks             fedora-lxde-common.ks
-fedora-disk-soas.ks               fedora-lxqt-common.ks
-fedora-disk-workstation.ks        fedora-mate-common.ks
-fedora-disk-xbase.ks              fedora-minimal-common.ks
-fedora-disk-xfce.ks               fedora-modular-arm-server.ks
-fedora-eln-container-base.ks      fedora-modular-disk-minimal.ks
-fedora-eln-guest.ks               fedora-neuro-gnome-common.ks
-fedora-i3-common.ks               fedora-python-classroom-common.ks
-fedora-iot.ks                     fedora-python-classroom-gnome-common.ks
-fedora-kde-common.ks              fedora-python-classroom-vagrant.ks
-fedora-kde-minimization.ks        fedora-repo.ks
-fedora-live-astronomy_kde.ks      fedora-repo-not-rawhide.ks
-fedora-live-base.ks               fedora-repo-rawhide.ks
-fedora-live-cinnamon.ks           fedora-scientific-common.ks
-fedora-live-comp_neuro.ks         fedora-scientific-vagrant.ks
-fedora-live-design_suite.ks       fedora-soas-common.ks
-fedora-live-games.ks              fedora-workstation-common.ks
-fedora-live-i3.ks                 fedora-xfce-common.ks
-fedora-live-jam_kde.ks            snippets</code></pre>
+<img src="images/README-25-05-09-15-22-57.png" alt="README 25 05 09 15 22 57">
 </div>
+<div class="title">Figure 3. Anaconda Installer - Language and Keyboard</div>
 </div>
-<div class="paragraph">
-<p>The one Fedora starts with is <strong>fedora-live-base.ks</strong>.</p>
-</div>
-</td>
-</tr>
-</table>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_create_build_and_package_cache_directories_and_copy_kickstarts">1.1.2. Create Build and Package Cache Directories and Copy Kickstarts</h4>
-<div class="paragraph">
-<p>A build and cache directory should be created and you should copy kickstart files to your build directory.</p>
-</div>
-<div class="listingblock">
-<div class="title">Listing 3. Create Build Directory</div>
+</li>
+<li>
+<p>Complete the required and optional installation components.</p>
+<div class="imageblock text-center">
 <div class="content">
-<pre class="highlight"><code class="language-bash" data-lang="bash">mkdir -p /livecd-creator/{FedoraRemix,package-cache}</code></pre>
+<img src="images/2025-05-09T19-27-47-719Z.png" alt="2025 05 09T19 27 47 719Z">
 </div>
+<div class="title">Figure 4. Anaconda Installer - Installation Summary</div>
 </div>
-<div class="listingblock">
-<div class="title">Listing 4. Copy the Base KS and the Desired Custom KS to the <strong>FedoraRemix</strong> directory</div>
+<div class="olist loweralpha">
+<ol class="loweralpha" type="a">
+<li>
+<p>Select "Installation Destination" and choose an appropriate installation device.</p>
+<div class="imageblock text-center">
 <div class="content">
-<pre class="highlight"><code class="language-bash" data-lang="bash">cp /usr/share/spin-kickstarts/fedora-live-base.ks /livecd-creator/FedoraRemix/
-
-cp /usr/share/spin-kickstarts/fedora-repo.ks /livecd-creator/FedoraRemix/
-
-cp /usr/share/spin-kickstarts/fedora-workstation-common.ks /livecd-creator/FedoraRemix/
-
-cp /usr/share/spin-kickstarts/fedora-repo-not-rawhide.ks /livecd-creator/FedoraRemix/
-
-cp /usr/share/spin-kickstarts/fedora-live-workstation.ks /livecd-creator/FedoraRemix/FedoraRemix.ks</code></pre>
+<img src="images/README-25-05-09-15-33-05.png" alt="README 25 05 09 15 33 05">
 </div>
+<div class="title">Figure 5. Setting Installation Location</div>
+</div>
+</li>
+<li>
+<p>Create a user account by clicking "User Creation". Complete the required information and then click done.</p>
+<div class="imageblock text-center">
+<div class="content">
+<img src="images/2025-05-09T19-35-59-879Z.png" alt="2025 05 09T19 35 59 879Z">
+</div>
+<div class="title">Figure 6. User Creation</div>
 </div>
 <div class="admonitionblock important">
 <table>
@@ -726,27 +636,202 @@ cp /usr/share/spin-kickstarts/fedora-live-workstation.ks /livecd-creator/FedoraR
 <i class="fa icon-important" title="Important"></i>
 </td>
 <td class="content">
-<div class="title">Customizing Repositories</div>
+<div class="title">Root Account</div>
 <div class="paragraph">
-<p>Modify and update the <strong>* with the correct repositories to use. Comment out the *RAWHIDE</strong> and use the repos for the version of Fedora you are Remixing.</p>
+<p>After you have specified the installation location and an initial user, you may proceed with the installation. Creating and enabling the <strong>root</strong> user is optional and not required. If you create the root user, likewise, you are not required to create a regular user account.</p>
 </div>
 </td>
 </tr>
 </table>
 </div>
-<div style="page-break-after: always;"></div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+<div class="title">Setup Complete</div>
+<div class="paragraph">
+<p>After the installation is completed, you will need to reboot your system and perform package updates and any other needed tasks.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</li>
+</ol>
+</div>
+</li>
+<li>
+<p>Clone the Fedora Remix Repository</p>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-bash" data-lang="bash">travis@localhost-fedoraremix-live [~] | (05/09/25 @ 15:55)
+$ git clone https://github.com/tmichett/Fedora_Remix.git
+Cloning into 'Fedora_Remix'...
+remote: Enumerating objects: 1949, done
+
+... OUTPUT OMITTED ...
+
+Resolving deltas: 100% (1042/1042), done.</code></pre>
 </div>
 </div>
+</li>
+<li>
+<p>Prepare the Fedora Remix build environment by running the Python scripts from the <strong>Ansible</strong> directory as the root user.</p>
+<div class="listingblock">
+<div class="title">Listing 2. Create <strong>/livecd-creator/FedoraRemix</strong> Assets</div>
+<div class="content">
+<pre class="highlight"><code class="language-bash" data-lang="bash">travis@localhost-fedoraremix-live [~/Fedora_Remix/Ansible] | (05/09/25 @ 15:57)  | main ✓ |
+$ sudo python Prepare_Fedora_Remix_Build.py
+
+... OUTPUT OMITTED ...
+
+Copying ../Remix_Buid_Script.sh to /livecd-creator/FedoraRemix/Remix_Buid_Script.sh
+Setup complete!</code></pre>
 </div>
 </div>
-<div class="sect1">
-<h2 id="_preparing_a_build_system_2">2. Preparing a Build System</h2>
-<div class="sectionbody">
-<div class="sect2">
-<h3 id="_getting_started_2">2.1. Getting Started</h3>
-<div class="sect3">
-<h4 id="_preparing_environment_2">2.1.1. Preparing Environment</h4>
-<div style="page-break-after: always;"></div>
+<div class="listingblock">
+<div class="title">Listing 3. Create httpd server and repository assets</div>
+<div class="content">
+<pre class="highlight"><code class="language-bash" data-lang="bash">travis@localhost-fedoraremix-live [~/Fedora_Remix/Ansible] | (05/09/25 @ 15:59)  | main ✓ |
+$ sudo python Prepare_Web_Files.py
+Installing packages: httpd
+Running command: dnf install -y httpd
+
+... OUTPUT OMITTED ...
+
+Setup complete!</code></pre>
+</div>
+</div>
+</li>
+<li>
+<p>Perform System and Package customizations by modifying the <strong>FedoraRemix.ks</strong> kickstart file and the <strong>FedoraRemixPackages.ks</strong> file.</p>
+<div class="olist loweralpha">
+<ol class="loweralpha" type="a">
+<li>
+<p>The setup scripts or playbooks created <strong>/livecd-creator/FedoraRemix</strong> directory. This is where the kickstart files live that you will modify as well as the directory where the FedoraRemix.iso will reside once built.</p>
+<div class="listingblock">
+<div class="title">Listing 4. FedoraRemix.ks</div>
+<div class="content">
+<pre class="highlight"><code class="language-bash" data-lang="bash">... OUTPUT OMITTED ...
+
+## Add Fedora Dynamic MotD Script
+cd /usr/bin
+wget http://localhost/files/fedora-dynamic-motd.sh
+chmod +x /usr/bin/fedora-dynamic-motd.sh
+echo /usr/bin/fedora-dynamic-motd.sh &gt;&gt; /etc/profile
+
+
+## Customize BASH Prompts and Shell
+mkdir /opt/bash
+cd /opt/bash
+wget http://localhost/files/bashrc.append
+## Install Gitprompt
+git clone https://github.com/tmichett/bash-git-prompt.git /opt/bash-git-prompt --depth=1
+
+... OUTPUT OMITTED ...</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Listing 5. FedoraPackages.ks</div>
+<div class="content">
+<pre class="highlight"><code class="language-bash" data-lang="bash">... OUTPUT OMITTED ...
+
+## Image Editing and Manipulation
+inkscape
+gimp
+krita
+netpbm-progs
+scribus
+
+## Video Editing and Manipulation
+kdenlive
+
+## Container Tools
+buildah
+skopeo
+podman-machine
+
+... OUTPUT OMITTED ...</code></pre>
+</div>
+</div>
+</li>
+</ol>
+</div>
+</li>
+<li>
+<p>Execute the <strong>Remix_Build_Script.sh</strong> file to kick off the build. Depending on system and Internet connection speed and customizations to the kickstart file, this process could take up to an hour.</p>
+<div class="listingblock">
+<div class="title">Listing 6. Launching the Script</div>
+<div class="content">
+<pre class="highlight"><code class="language-bash" data-lang="bash">travis@localhost-fedoraremix-live [/livecd-creator/FedoraRemix] | (05/09/25 @ 16:09)
+$ time ./Remix_Buid_Script.sh
+/usr/lib/python3.13/site-packages/pykickstart/commands/partition.py:461: KickstartParseWarning: A partition with the mountpoint / has already been defined.
+  warnings.warn(_("A partition with the mountpoint %s has already been defined.") % pd.mountpoint, KickstartParseWarning)
+fedora                                           19 MB/s |  35 MB     00:01
+updates                                         3.8 MB/s | 5.8 MB     00:01
+google-chrome                                   7.5 kB/s | 1.9 kB     00:00
+
+... OUTPUT OMITTED ...
+
+Pass 4: Checking reference counts
+Pass 5: Checking group summary information
+_FedoraRemix: 371986/1324512 files (0.2% non-contiguous), 4248977/5294080 blocks
+
+ e2fsck 1.47.1 (20-May-2024)
+
+ 0
+
+real	34m41.254s
+user	143m42.195s
+sys	    5m11.054s</code></pre>
+</div>
+</div>
+</li>
+</ol>
+</div>
+<div class="admonitionblock warning">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-warning" title="Warning"></i>
+</td>
+<td class="content">
+<div class="title">Error Regarding <strong>kickstart.py</strong></div>
+<div class="paragraph">
+<p>With newer Fedora releases, there is an error with the <strong>kickstart.py</strong> package and URLGrabber. Located on the "FedoraRemixTools" application, I&#8217;ve included a button to "FIX" the issue with the <strong>kickstart.py</strong> package. After completing the fix, you will no longer get the issue.</p>
+</div>
+<div class="listingblock">
+<div class="title">Listing 7. Python <strong>kickstart.py</strong> Errors</div>
+<div class="content">
+<pre class="highlight"><code class="language-bash" data-lang="bash">Traceback (most recent call last):
+  File "/usr/sbin/livecd-creator", line 265, in &lt;module&gt;
+    sys.exit(main())
+             ~~~~^^
+  File "/usr/sbin/livecd-creator", line 195, in main
+    ks = imgcreate.read_kickstart(options.kscfg)
+  File "/usr/lib/python3.13/site-packages/imgcreate/kickstart.py", line 54, in read_kickstart
+    ksfile = urlgrabber.urlgrab(path, filename=tmpks)
+  File "/usr/lib/python3.13/site-packages/urlgrabber/grabber.py", line 808, in urlgrab
+    return default_grabber.urlgrab(url, filename, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.13/site-packages/urlgrabber/grabber.py", line 1205, in urlgrab
+    (url,parts) = opts.urlparser.parse(url, opts)
+                  ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^
+  File "/usr/lib/python3.13/site-packages/urlgrabber/grabber.py", line 873, in parse
+    pathname = pathname2url(url)
+  File "/usr/lib64/python3.13/urllib/request.py", line 1679, in pathname2url
+    return quote(pathname, encoding=encoding, errors=errors)
+  File "/usr/lib64/python3.13/urllib/parse.py", line 924, in quote
+    raise TypeError("quote() doesn't support 'encoding' for bytes")
+TypeError: quote() doesn't support 'encoding' for bytes</code></pre>
+</div>
+</div>
+</td>
+</tr>
+</table>
 </div>
 </div>
 </div>
@@ -754,14 +839,78 @@ cp /usr/share/spin-kickstarts/fedora-live-workstation.ks /livecd-creator/FedoraR
 <div class="sect1">
 <h2 id="_fedora_remix">Appendix A: Fedora Remix</h2>
 <div class="sectionbody">
-
+<div class="paragraph">
+<p>This Fedora Remix has been built and assembled from many projects and continues to evolve and become simplified. The various Github repositories are meant to allow easier updates to individual Fedora Remix components and to allow certain components to be used more in a utility fashion where they can be used without impacting the Fedora Remix project.</p>
+</div>
+<div class="sect2">
+<h3 id="_fedora_remix_application_repositories">A.1. Fedora Remix Application Repositories</h3>
+<div class="paragraph">
+<p>This project was initially 100% part of the Fedora Remix repository using various BASH scripts, Ansible Playbooks, Python tools, and various applications like YAD (Yet Another Dialog). As the project grew, some of the components have been separated out into their own repositories for use in the creation of the Fedora Remix.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Log Viewer</strong> - (<a href="https://github.com/tmichett/log_viewer" class="bare">https://github.com/tmichett/log_viewer</a>)</p>
+<div class="paragraph">
+<p>The Log Viewer was developed to look at and analyze the output of the kickstart file. During development and updates to the Fedora Remix build process as part of Fedora 41/42, the kickstart and build files became extremely large and it was difficult to identify errors and successes within a huge file, so the Log Viewer was created to look for keywords in that file and assist with the building and troubleshooting process. Using Github actions and workflows, this builds the Python application as a Linux executable with all dependencies as well as produces an RPM for easy installation in Fedora Remix.</p>
+</div>
+</li>
+<li>
+<p><strong>PXE Server</strong> - (<a href="https://github.com/tmichett/PXEServer" class="bare">https://github.com/tmichett/PXEServer</a>)</p>
+<div class="paragraph">
+<p>The PXEServer repository was created to separate just the PXE-boot components from Fedora Remix. This may later be replaced as it will be a modular component and it was designed to allow a "lab" or "classroom-style" deployment where Fedora Remix would be installed to a single system and the PXE server could provide the Fedora Remix Live image across the network via PXE without ever installing anything to the remaining computers. This repository contains the items and automation for configuring PXE boot services and identifying the components.</p>
+</div>
+</li>
+<li>
+<p><strong>Fedora Remix Customize</strong> - (<a href="https://github.com/tmichett/FedoraRemixCustomize" class="bare">https://github.com/tmichett/FedoraRemixCustomize</a>)</p>
+<div class="paragraph">
+<p>The Fedora Remix Customize repository contains some of the user-based customizations. It was created as a separate repository for tracking playbooks and scripts that would further customize the environment. Eventually, this will be the location of many more customization utilities as the build and deployment process gets more streamlined.</p>
+</div>
+</li>
+<li>
+<p><strong>Fedora Remix Tools</strong> - (<a href="https://github.com/tmichett/Fedora_Remix_Tools" class="bare">https://github.com/tmichett/Fedora_Remix_Tools</a>)</p>
+<div class="paragraph">
+<p>The Fedora Remix Tools repository brings a new take to the <strong>Fedora Remix Apps</strong> which was the first set of tools and customizations. The Fedora Remix Apps used YAD and was a set of BASH scripts and playbooks located in the main Fedora Remix repository in the YAD folder (<a href="https://github.com/tmichett/Fedora_Remix/tree/main/YAD" class="bare">https://github.com/tmichett/Fedora_Remix/tree/main/YAD</a>). The implementation and location of YAD made things more difficult to test and maintain as well as add new features. With the release of Fedora 42, a newer Python application has been developed. This application has a dynamic menu system that can be controlled by changes in a configuration file (config.yml) that allows simple text changes to change and modify the application look and feel. The newer Fedora Remix Tools application also provides a <em>command output window</em> which can be detached and looked at so a user knows if there were errors or issues running any of the customizations. The Fedora Remix Tools repository also uses Github actions and workflows to build an RPM which can be easily installed on  the Fedora Remix system.</p>
+</div>
+</li>
+<li>
+<p><strong>OhMyBash</strong> - (<a href="https://github.com/tmichett/oh-my-bash" class="bare">https://github.com/tmichett/oh-my-bash</a>)</p>
+<div class="paragraph">
+<p>The <strong>OhMyBash</strong> repository was forked from the main repository but customized for Fedora Remix. This repository is used to install OhMyBash as part of the Fedora Remix built process and perform the various customizations to the terminal and BASH shell including configuration and creation of a custom theme developed for the Fedora Remix (<a href="https://github.com/tmichett/oh-my-bash/tree/master/themes/tm-fedora-remix" class="bare">https://github.com/tmichett/oh-my-bash/tree/master/themes/tm-fedora-remix</a>).</p>
+</div>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_fedora_remix_extensions_and_additional_projects">A.2. Fedora Remix Extensions and Additional Projects</h3>
+<div class="paragraph">
+<p>There are two additional projects inspired by the Fedora Remix work which will be coming soon to Fedora Remix or stand slightly apart from Fedora Remix. The idea is to look at making a Live boot USB more interactive and not waste an entire thumb drive as well as experiment with PXE and other distribution methods including BootC container images.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Fedora BootC</strong> - (<a href="https://github.com/tmichett/Fedora_BootC" class="bare">https://github.com/tmichett/Fedora_BootC</a>)</p>
+<div class="paragraph">
+<p>The Fedora BootC repository is in initial testing and development stages and is meant to be picked up later in 2025 to extend the customizations and create an image-based installer that can be used with the Fedora Remix PXE process that will allow a kickstart file to provision systems in lab or classroom-style environments rather than just a live image. This repository will also likely extend into research and initial starting point for creating a WSL image of Fedora Remix to run on Windows systems.</p>
+</div>
+</li>
+<li>
+<p><strong>Fedora Remix Ventoy</strong> - (<a href="https://github.com/tmichett/Fedora_Remix_Ventoy" class="bare">https://github.com/tmichett/Fedora_Remix_Ventoy</a>)</p>
+<div class="paragraph">
+<p>The Ventoy application has been around and is available for Windows and Linux allowing users to build USB drives with multiple ISOs creating a multi-boot USB. Ventoy can also be customized with many components, but it must be installed and users must know how to use Ventoy. The Fedora Remix Ventoy repository has been created to allow an RPM installer to bake in Ventoy into the Fedora Remix Live image. It also has a Python GUI application that is meant to bring up some of the Ventoy customization components without needing to know all the commands, procedures, and processes in an attempt to make things more accessible.</p>
+</div>
+</li>
+</ul>
+</div>
+</div>
 </div>
 </div>
 </div>
 <div id="footer">
 <div id="footer-text">
 Version 1.0<br>
-Last updated 2025-04-22 16:47:18 UTC
+Last updated 2025-05-13 16:25:17 UTC
 </div>
 </div>
 </body>
