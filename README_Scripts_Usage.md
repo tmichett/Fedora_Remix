@@ -330,7 +330,7 @@ The build script automatically captures output to timestamped log files. To see 
 sudo ./Remix_Build_Script.sh
 
 # Monitor the log file in real-time
-tail -f FedoraBuildi-*.out
+tail -f FedoraBuild-*.out
 ```
 
 #### Testing Web Setup
