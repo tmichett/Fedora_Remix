@@ -28,6 +28,8 @@ mock
 git
 gedit
 vlc
+## VLC Plugin conflicts removing plugin
+-vlc-plugins-freeworld  
 code
 tmux
 ntfs-3g

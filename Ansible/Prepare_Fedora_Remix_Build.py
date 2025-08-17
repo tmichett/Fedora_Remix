@@ -77,7 +77,7 @@ def main():
     ensure_root()
     
     # Variables
-    remix_packages = ["vim", "livecd-tools", "sshfs"]
+    remix_packages = ["vim", "livecd-tools", "sshfs", "util-linux-script"]
     remix_directories = [
         "/livecd-creator/FedoraRemix",
         "/livecd-creator/package-cache"
@@ -97,15 +97,37 @@ def main():
     else:
         print(f"Warning: Kickstarts directory not found at {kickstart_src}")
     
-    # Copy Build Script Playbook
+    # Copy Python automation scripts
+    copy_file("./Prepare_Fedora_Remix_Build.py", "/livecd-creator/FedoraRemix/Prepare_Fedora_Remix_Build.py")
+    copy_file("./Prepare_Web_Files.py", "/livecd-creator/FedoraRemix/Prepare_Web_Files.py")
+    
+    # Copy Ansible playbooks (for advanced users)
     copy_file("./Prepare_Fedora_Remix_Build.yml", "/livecd-creator/FedoraRemix/Prepare_Fedora_Remix_Build.yml")
+    copy_file("./Prepare_Web_Files.yml", "/livecd-creator/FedoraRemix/Prepare_Web_Files.yml")
     
     # Copy Build Script with executable permissions
     # Calculate the mode for u+rwx,g+x,o+x (0755 in octal)
     exec_mode = 0o755
-    copy_file("../Remix_Buid_Script.sh", "/livecd-creator/FedoraRemix/Remix_Buid_Script.sh", exec_mode)
+    copy_file("../Remix_Build_Script.sh", "/livecd-creator/FedoraRemix/Remix_Build_Script.sh", exec_mode)
+    
+    # Copy config.yml for web files setup
+    copy_file("./config.yml", "/livecd-creator/FedoraRemix/config.yml")
     
     print("Setup complete!")
+    print("Files copied to /livecd-creator/FedoraRemix/:")
+    print("  - Kickstart files")
+    print("  - Python automation scripts:")
+    print("    * Prepare_Fedora_Remix_Build.py")
+    print("    * Prepare_Web_Files.py")
+    print("  - Ansible playbooks:")
+    print("    * Prepare_Fedora_Remix_Build.yml")
+    print("    * Prepare_Web_Files.yml")
+    print("  - Remix_Build_Script.sh (executable)")
+    print("  - config.yml")
+    print("")
+    print("Build environment is ready! You can now:")
+    print("1. cd /livecd-creator/FedoraRemix")
+    print("2. Run: sudo ./Remix_Build_Script.sh")
 
 if __name__ == "__main__":
     main()
