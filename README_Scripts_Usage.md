@@ -1,25 +1,27 @@
-# Fedora Remix Build Scripts Usage Guide
+# Fedora Remix Python Automation Scripts Usage Guide
 
-This guide provides comprehensive documentation for the Fedora Remix build system, which consists of three main scripts that work together to create custom Fedora Live ISOs and set up web hosting for distribution.
+This guide provides comprehensive documentation for the Fedora Remix build system's Python automation scripts, which work together to create custom Fedora Live ISOs and set up web hosting for distribution.
 
 ## Table of Contents
 
 1. [Overview](#overview)
 2. [Prerequisites](#prerequisites)
-3. [Script Descriptions](#script-descriptions)
+3. [Python Script Descriptions](#python-script-descriptions)
 4. [Configuration](#configuration)
-5. [Usage Workflow](#usage-workflow)
+5. [Python Automation Workflow](#python-automation-workflow)
 6. [File Structure](#file-structure)
 7. [Troubleshooting](#troubleshooting)
 8. [Advanced Usage](#advanced-usage)
 
 ## Overview
 
-The Fedora Remix project allows you to create customized Fedora Linux live ISOs with additional software, themes, and configurations. The system consists of three main components:
+The Fedora Remix project provides Python-based automation scripts to create customized Fedora Linux live ISOs with additional software, themes, and configurations. The system consists of three main Python components:
 
-1. **Build Environment Setup** - Prepares your system for ISO creation
-2. **Web Hosting Setup** - Creates a web server for distributing files and PXE boot
-3. **ISO Creation** - Builds the actual Live ISO using kickstart files
+1. **Build Environment Setup** (`Prepare_Fedora_Remix_Build.py`) - Prepares your system for ISO creation
+2. **Web Hosting Setup** (`Prepare_Web_Files.py`) - Creates a web server for distributing files and PXE boot
+3. **ISO Creation** (`Remix_Build_Script.sh`) - Builds the actual Live ISO using kickstart files
+
+These Python scripts provide complete automation without requiring Ansible knowledge, making the build process accessible to all users.
 
 ## Prerequisites
 
@@ -47,7 +49,7 @@ sudo dnf install -y ansible-core
 - Python 3.6+ (included in Fedora)
 - PyYAML (for configuration file support)
 
-## Script Descriptions
+## Python Script Descriptions
 
 ### 1. Prepare_Fedora_Remix_Build.py
 
@@ -78,7 +80,7 @@ sudo dnf install -y ansible-core
 **Location**: `Ansible/Prepare_Web_Files.py`
 **Configuration**: Uses `Ansible/config.yml` for settings
 
-### 3. Remix_Buid_Script.sh
+### 3. Remix_Build_Script.sh
 
 **Purpose**: Actually builds the Fedora Remix Live ISO.
 
@@ -88,7 +90,8 @@ sudo dnf install -y ansible-core
 - Creates timestamped build logs
 - Generates the final ISO file
 
-**Location**: `Remix_Buid_Script.sh` (copied to `/livecd-creator/FedoraRemix/` during setup)
+**Location**: `Remix_Build_Script.sh` (copied to `/livecd-creator/FedoraRemix/` during setup)
+**Note**: The script name contains a typo ("Build" instead of "Build") - this is the actual filename used in the project.
 
 ## Configuration
 
@@ -129,7 +132,7 @@ Additional kickstart files are located in `Ansible/Kickstarts/`:
 - `FedoraRemixPackages.ks` - Custom package selections
 - `FedoraRemixRepos.ks` - Repository configurations
 
-## Usage Workflow
+## Python Automation Workflow
 
 ### Step 1: Prepare Build Environment
 
@@ -137,7 +140,7 @@ Additional kickstart files are located in `Ansible/Kickstarts/`:
 # Navigate to the Ansible directory
 cd /path/to/Fedora_Remix/Ansible
 
-# Run the build preparation script as root
+# Run the Python build preparation script as root
 sudo python3 Prepare_Fedora_Remix_Build.py
 ```
 
@@ -156,7 +159,7 @@ cd /path/to/Fedora_Remix/Ansible
 # Edit configuration if needed
 vim config.yml
 
-# Run the web setup script as root
+# Run the Python web setup script as root
 sudo python3 Prepare_Web_Files.py
 ```
 
@@ -173,8 +176,8 @@ sudo python3 Prepare_Web_Files.py
 # Navigate to the build directory
 cd /livecd-creator/FedoraRemix/
 
-# Run the build script
-sudo ./Remix_Buid_Script.sh
+# Run the build script (note: script name has "Build" not "Build")
+sudo ./Remix_Build_Script.sh
 ```
 
 **What happens**:
@@ -183,17 +186,19 @@ sudo ./Remix_Buid_Script.sh
 - Creates timestamped log file
 - Generates the final ISO (typically named `FedoraRemix.iso`)
 
-### Alternative: Using Ansible Playbooks
+### Alternative: Using Ansible Playbooks (Advanced Users)
 
-For automated deployment, you can use the Ansible playbooks:
+**Note**: The Python scripts above are the recommended primary automation method. Ansible playbooks are available for advanced users who prefer Ansible-based deployment:
 
 ```bash
-# For build environment setup
+# Alternative: For build environment setup
 ansible-playbook Prepare_Fedora_Remix_Build.yml
 
-# For web hosting setup
+# Alternative: For web hosting setup  
 ansible-playbook Prepare_Web_Files.yml
 ```
+
+The Ansible playbooks perform the same functions as the Python scripts but require Ansible knowledge and setup.
 
 ## File Structure
 
@@ -201,11 +206,11 @@ ansible-playbook Prepare_Web_Files.yml
 Fedora_Remix/
 ├── Ansible/
 │   ├── config.yml                          # Web configuration
-│   ├── Prepare_Fedora_Remix_Build.py      # Build environment setup
-│   ├── Prepare_Fedora_Remix_Build.yml     # Ansible playbook version
-│   ├── Prepare_Web_Files.py               # Web hosting setup
-│   ├── Prepare_Web_Files.yml              # Ansible playbook version
-│   ├── Remix_Buid_Script.sh               # ISO build script
+│   ├── Prepare_Fedora_Remix_Build.py      # Build environment setup (PRIMARY)
+│   ├── Prepare_Fedora_Remix_Build.yml     # Ansible playbook alternative
+│   ├── Prepare_Web_Files.py               # Web hosting setup (PRIMARY)
+│   ├── Prepare_Web_Files.yml              # Ansible playbook alternative
+│   ├── Remix_Build_Script.sh               # ISO build script
 │   ├── Kickstarts/                        # Kickstart files
 │   │   ├── FedoraRemix.ks                 # Main kickstart
 │   │   ├── fedora-live-base.ks            # Base configuration
@@ -216,7 +221,7 @@ Fedora_Remix/
 │       ├── VSCode/                        # VSCode extensions
 │       └── ...                            # Other files
 ├── FedoraRemix.ks                         # Main kickstart (root level)
-├── Remix_Buid_Script.sh                   # Build script (root level)
+├── Remix_Build_Script.sh                   # Build script (root level copy)
 └── ...                                    # Other project files
 ```
 
@@ -227,8 +232,8 @@ After running the build preparation:
 ```
 /livecd-creator/
 ├── FedoraRemix/
-│   ├── Remix_Buid_Script.sh               # Executable build script
-│   ├── Prepare_Fedora_Remix_Build.yml     # Ansible playbook
+│   ├── Remix_Build_Script.sh               # Executable build script (copied here)
+│   ├── Prepare_Fedora_Remix_Build.yml     # Ansible playbook (optional)
 │   ├── FedoraRemix.ks                     # Main kickstart
 │   ├── fedora-live-base.ks                # Base kickstart
 │   └── ...                                # Other kickstart files
@@ -321,7 +326,10 @@ sudo python3 Prepare_Web_Files.py
 The build script automatically captures output to timestamped log files. To see real-time output:
 
 ```bash
-sudo ./Remix_Buid_Script.sh
+# Run the build script (note: "Build" spelling in filename)
+sudo ./Remix_Build_Script.sh
+
+# Monitor the log file in real-time
 tail -f FedoraBuildi-*.out
 ```
 
@@ -348,10 +356,12 @@ Edit kickstart files in `Ansible/Kickstarts/` to customize:
 Place custom files in `Ansible/files/` directory to include them in the web hosting setup.
 
 #### 3. Modify Build Parameters
-Edit `Remix_Buid_Script.sh` to change:
+Edit `Remix_Build_Script.sh` to change:
 - ISO title
-- Output filename
+- Output filename  
 - livecd-creator options
+
+**Note**: Remember the script name uses "Build" not "Build" spelling.
 
 ### Using Different Fedora Versions
 
@@ -359,16 +369,33 @@ Edit `Remix_Buid_Script.sh` to change:
 2. Update kickstart files to reference correct repositories
 3. Ensure package availability for target version
 
-### Automation with Ansible
+### Python Script Automation
 
-For complete automation across multiple systems:
+The Python scripts provide the primary automation method and can be easily scripted for multiple systems:
+
+```bash
+# Automated Python script execution
+cd /path/to/Fedora_Remix/Ansible
+
+# Setup build environment
+sudo python3 Prepare_Fedora_Remix_Build.py
+
+# Setup web hosting (optional)
+sudo python3 Prepare_Web_Files.py
+
+# Build the ISO
+cd /livecd-creator/FedoraRemix
+sudo ./Remix_Build_Script.sh
+```
+
+### Alternative: Ansible Automation (Advanced)
+
+For advanced users preferring Ansible:
 
 ```bash
 # Run both setup scripts via Ansible
 ansible-playbook Prepare_Fedora_Remix_Build.yml
 ansible-playbook Prepare_Web_Files.yml
-
-# Or create a master playbook that includes both
 ```
 
 ### Creating Multiple Variants
