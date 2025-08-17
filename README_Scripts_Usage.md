@@ -134,6 +134,45 @@ Additional kickstart files are located in `Ansible/Kickstarts/`:
 
 ## Python Automation Workflow
 
+The following diagram illustrates the complete Python automation workflow for setting up and building Fedora Remix ISOs:
+
+```mermaid
+flowchart TD
+    A["Start: Fedora Remix Setup<br/>Python Automation"] --> B{Choose Setup Type}
+    
+    B --> C["Build Environment Only<br/>Prepare_Fedora_Remix_Build.py"]
+    B --> D["Web Hosting Only<br/>Prepare_Web_Files.py"]
+    B --> E["Complete Setup<br/>Both Build + Web"]
+    
+    C --> F["Build Environment Setup<br/>• Install packages (livecd-tools, util-linux-script)<br/>• Create /livecd-creator/FedoraRemix/<br/>• Copy kickstart files<br/>• Copy Python scripts<br/>• Copy config.yml"]
+    
+    D --> G["Web Hosting Setup<br/>• Install Apache httpd<br/>• Download Fedora boot files<br/>• Setup /var/www/html/ structure<br/>• Clone Git repositories<br/>• Copy extensions & tools"]
+    
+    E --> F
+    E --> G
+    
+    F --> H["Build Environment Ready<br/>/livecd-creator/FedoraRemix/<br/>├── Python Scripts<br/>├── Kickstart Files<br/>├── config.yml<br/>└── Remix_Build_Script.sh"]
+    
+    G --> I["Web Server Ready<br/>/var/www/html/<br/>├── PXE boot files<br/>├── Customization tools<br/>├── Extensions<br/>└── Documentation"]
+    
+    H --> J["Run Build Script<br/>cd /livecd-creator/FedoraRemix<br/>sudo ./Remix_Build_Script.sh<br/>• Disable SELinux<br/>• Run livecd-creator<br/>• Generate timestamped logs"]
+    
+    J --> K["Fedora Remix ISO Created<br/>FedoraRemix.iso<br/>+ Build logs"]
+    
+    I --> L["Web Services Available<br/>• File hosting (Apache)<br/>• PXE boot support<br/>• Customization scripts<br/>• VSCode extensions"]
+    
+    K --> M["Distribution Ready<br/>ISO + Web Infrastructure"]
+    L --> M
+    
+    style A fill:#e1f5fe
+    style F fill:#fff3e0
+    style G fill:#f3e5f5
+    style J fill:#e8f5e8
+    style K fill:#ffebee
+    style L fill:#ffebee
+    style M fill:#e8f5e8
+```
+
 ### Step 1: Prepare Build Environment
 
 ```bash
