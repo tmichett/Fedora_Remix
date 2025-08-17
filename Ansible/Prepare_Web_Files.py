@@ -106,7 +106,7 @@ def main():
     
     # Variables
     fedora_boot_files = ["vmlinuz", "initrd.img"]
-    fedora_version = 40
+    fedora_version = 42
     web_root = "/var/www/html"
     
     # Install required packages

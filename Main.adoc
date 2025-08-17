@@ -58,9 +58,11 @@ endif::[]
 :sectnums:
 include::README.adoc[]
 
-:sectnums:
-include::Chapter1.adoc[]
-include::Chapter2.adoc[]
+// Commented out as only want kickstart for now. Need to create remaining documentation content
+
+//:sectnums:
+//include::Chapter1.adoc[]
+//include::Chapter2.adoc[]
 
 // Appendix Section below here
 
