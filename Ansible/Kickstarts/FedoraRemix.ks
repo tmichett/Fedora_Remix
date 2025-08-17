@@ -1,10 +1,9 @@
-# Maintained by the Fedora Workstation WG:
-# http://fedoraproject.org/wiki/Workstation
-# mailto:desktop@lists.fedoraproject.org
+# Maintained by Travis Michette:
+# https://github.com/tmichett/Fedora_Remix
 
 
 
-
+# Fedora Remix Base Kickstart packages - Maintained by Fedora Project
 %include fedora-live-base.ks
 %include fedora-workstation-common.ks
 #
@@ -45,22 +44,10 @@ touch "$LIVE_ROOT/isolinx/travis"
 %post
 
 ## Echo Start time to screen
-echo "The kickstart started on $(date)"
+print_banner "🚀 TRAVIS'S FEDORA REMIX 42 BUILD STARTED" "$PURPLE"
+print_step "Build initiated at $(date)" "$CYAN"
 
 set -x
-### Fix added for DNS and Network fixes in Post
-### https://anaconda-installer.readthedocs.io/en/latest/common-bugs.html#missing-etc-resolv-conf-for-post-scripts
-
-#echo "nameserver 8.8.8.8" >> /etc/resolv.conf
-
-#echo "nameserver 8.8.8.8" >> $INSTALL_ROOT/etc/resolv.conf
-
-#/usr/bin/systemctl restart NetworkManager
-
-#/usr/bin/systemd-resolve --set-dns=192.168.15.1 --interface=eth0
-
-# network --device=link --bootproto=static --ip=192.168.15.15 --netmask=255.255.255.0 --gateway=192.168.15.1 --nameserver=192.168.15.1
-
 
 cat >> /etc/rc.d/init.d/livesys << EOF
 
@@ -148,11 +135,47 @@ EOF
 
 ## Define colored output
 
-# Define color variables
+# Define color variables and pretty output functions
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+PURPLE='\033[0;35m'
+CYAN='\033[0;36m'
+WHITE='\033[1;37m'
+BOLD='\033[1m'
 NC='\033[0m' # No Color
+
+# Pretty output functions
+print_banner() {
+    local message="$1"
+    local color="${2:-$CYAN}"
+    echo -e "\n${color}╔════════════════════════════════════════════════════════════════════════════════╗${NC}"
+    printf "${color}║${NC} ${BOLD}%-76s${NC} ${color}║${NC}\n" "$message"
+    echo -e "${color}╚════════════════════════════════════════════════════════════════════════════════╝${NC}"
+}
+
+print_step() {
+    local message="$1"
+    local color="${2:-$GREEN}"
+    local timestamp=$(date '+%H:%M:%S')
+    echo -e "${color}●${NC} ${BOLD}[$timestamp]${NC} $message"
+}
+
+print_success() {
+    local message="$1"
+    echo -e "${GREEN}✓${NC} ${BOLD}SUCCESS:${NC} $message"
+}
+
+print_warning() {
+    local message="$1"
+    echo -e "${YELLOW}⚠${NC}  ${BOLD}WARNING:${NC} $message"
+}
+
+print_error() {
+    local message="$1"
+    echo -e "${RED}✗${NC} ${BOLD}ERROR:${NC} $message"
+}
 
 ### Update PATH
 echo -e "${GREEN}Adding /usr/local/bin to the PATH... ${NC}"
@@ -199,7 +222,8 @@ wget -P /opt -r -nH -np --reject-regex "index\\.html?.*" http://localhost/PXESer
 
 ## Setting Theme
 
-echo "Setting Fedora Theme"
+print_banner "🎨 CONFIGURING FEDORA REMIX THEME" "$PURPLE"
+print_step "Setting Plymouth boot theme to tm-fedora-remix"
 
 /usr/sbin/plymouth-set-default-theme tm-fedora-remix -R
 
@@ -208,7 +232,8 @@ dracut -f --no-kernel
 
 ## Fix Networking
 
-echo "Attempting to setup DNS and configure networking"
+print_banner "🌐 NETWORK & DNS CONFIGURATION" "$BLUE"
+print_step "Configuring DNS servers and network settings"
 echo "nameserver 8.8.8.8" > /etc/resolv.conf
 /usr/bin/mkdir /FedoraRemix
 cat /etc/resolv.conf > /FedoraRemix/DNS.txt
@@ -235,7 +260,8 @@ cat /etc/resolv.conf > /FedoraRemix/DNS.txt
 
 
 ## Install Flatpaks
-echo "Attempting to install flatpaks"
+print_banner "📦 FLATPAK APPLICATION SETUP" "$GREEN"
+print_step "Configuring Flathub repository and installing applications"
 
 # Enable unprivileged user namespaces
 sudo chmod u+s /usr/bin/bwrap
@@ -256,7 +282,8 @@ dnf -y install https://github.com/balena-io/etcher/releases/download/v1.18.11/ba
 
 ## Customize Anaconda Installer
 
-echo "Customizing Anaconda"
+print_banner "⚙️  ANACONDA INSTALLER CUSTOMIZATION" "$CYAN"
+print_step "Applying custom branding and logos to installer"
 
 cd /usr/share/anaconda/pixmaps
 rm sidebar-logo.png
@@ -306,7 +333,8 @@ cp f42-night.png /usr/share/backgrounds/gnome/adwaita-d.jpg
 
 ## Customize Grub Boot Menu
 
-echo "Attempting to customize GRUB"
+print_banner "🛠️  GRUB BOOTLOADER CONFIGURATION" "$YELLOW"
+print_step "Installing custom GRUB theme and configuration"
 
 /usr/bin/mkdir /boot/grub2/images
 cd /etc/default
@@ -363,7 +391,8 @@ chmod 644  /etc/systemd/system/fixgrub.service
 systemctl enable fixgrub.service
 
 ## Enable Cockpit and SSHD
-echo "Enabling Cockpit and SSHD Services"
+print_banner "🔧 SYSTEM SERVICES ACTIVATION" "$GREEN"
+print_step "Enabling Cockpit web console and SSH daemon"
 systemctl enable cockpit.socket
 systemctl enable sshd.service
 
@@ -431,27 +460,28 @@ chmod 755 -R /usr/share/gnome-shell/extensions/ding@rastersoft.com
 dconf update
 
 ## Install UDP Cast 
-echo "Installing UDPCast"
+print_step "Installing UDPCast for network imaging" "$BLUE"
 mkdir -p /opt/udpcast
 cd /opt/udpcast
 wget http://localhost/udpcast-20230924-1.x86_64.rpm
 dnf install -y ./udpcast-20230924-1.x86_64.rpm 
 
 ## Install OhMyBash
-echo "Installing OhMyBash"
+print_step "Installing OhMyBash shell enhancement" "$PURPLE"
 bash -c "$(curl -fsSL https://raw.githubusercontent.com/tmichett/oh-my-bash/master/tools/install.sh)" --prefix=/usr/local --unattended
 
 ## Set BASHRC Defaults
 echo "$(cat /opt/FedoraRemixCustomize/bashrc.append)" >> /etc/bashrc
 
 ## Install Podman BootC from Repo (FIX ME - Not in Fedora Yet)
-echo "Installing Podman BootC"
+print_step "Installing Podman BootC container support" "$CYAN"
 sudo dnf -y install 'dnf-command(copr)'
 sudo dnf -y copr enable gmaglione/podman-bootc
 sudo dnf -y install podman-bootc
 
 ## Update to Latest Packages
-echo "Updating all packages"
+print_banner "📦 SYSTEM UPDATES & MAINTENANCE" "$YELLOW"
+print_step "Updating all packages to latest versions"
 dnf update -y
 
 ## Update Ansible Collections
@@ -480,7 +510,8 @@ echo "Updating Ansible Galaxy Posix Collection"
 ansible-galaxy collection install --upgrade ansible.posix community.general containers.podman fedora.linux_system_roles  -p /usr/share/ansible/collections/ansible_collections
 
 ## Create FedoraRemix Custom Tools (LMStudio) ##
-echo "Downloading LMStudio AppImage"
+print_banner "🤖 AI & DEVELOPMENT TOOLS" "$PURPLE"
+print_step "Downloading LMStudio AI application"
 mkdir /opt/FedoraRemixApps
 cd /opt/FedoraRemixApps
 wget https://installers.lmstudio.ai/linux/x64/0.3.14-5/LM-Studio-0.3.14-5-x64.AppImage
@@ -511,7 +542,7 @@ cd /opt/tmux
 wget wget  http://localhost/files/tmux.conf
 
 ## Install VeraCrypt
-echo "Installing VeraCrypt"
+print_step "Installing VeraCrypt encryption tool" "$RED"
 dnf install -y https://github.com/veracrypt/VeraCrypt/releases/download/VeraCrypt_1.26.20/veracrypt-1.26.20-Fedora-40-x86_64.rpm
 cd /usr/share/applications
 wget http://localhost/files/logos/veracrypt.png
@@ -537,12 +568,9 @@ wget http://localhost/files/Cursor.desktop
 date "+This version of Fedora Remix 42 was created on %B %d, %Y" > /etc/fedora_remix_release
 
 ## Echo Finish time to screen
-echo "The kickstart completed on $(date)"
+print_banner "🎉 TRAVIS'S FEDORA REMIX 42 BUILD COMPLETED!" "$GREEN"
+print_step "Build completed successfully at $(date)" "$GREEN"
 
-echo "#########################################################"
-echo "## Kickstart Completed ##################################"
-echo "#########################################################"
-echo "#########################################################"
-echo "######### Building ISO ##################################"
-echo "#########################################################"
+print_banner "🔥 STARTING ISO CREATION PROCESS" "$YELLOW"
+print_step "Preparing to build final ISO image" "$YELLOW"
 %end
