@@ -5,6 +5,7 @@ import subprocess
 import shutil
 import urllib.request
 import sys
+import yaml
 
 def run_command(command, shell=False):
     """Run a shell command and return the output"""
@@ -30,6 +31,26 @@ def ensure_root():
     """Ensure the script is running as root"""
     if not is_root():
         print("This script must be run as root. Please use sudo.")
+        sys.exit(1)
+
+def load_config(config_file="config.yml"):
+    """Load configuration from YAML file"""
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    config_path = os.path.join(script_dir, config_file)
+    
+    if not os.path.exists(config_path):
+        print(f"Error: Configuration file {config_path} not found")
+        sys.exit(1)
+    
+    try:
+        with open(config_path, 'r') as file:
+            config = yaml.safe_load(file)
+        return config
+    except yaml.YAMLError as e:
+        print(f"Error parsing YAML configuration file: {e}")
+        sys.exit(1)
+    except Exception as e:
+        print(f"Error reading configuration file: {e}")
         sys.exit(1)
 
 def install_packages(packages):
@@ -104,10 +125,11 @@ def main():
     # Ensure we're running as root
     ensure_root()
     
-    # Variables
-    fedora_boot_files = ["vmlinuz", "initrd.img"]
-    fedora_version = 42
-    web_root = "/var/www/html"
+    # Load configuration
+    config = load_config()
+    fedora_boot_files = config['fedora_boot_files']
+    fedora_version = config['fedora_version']
+    web_root = config['web_root']
     
     # Install required packages
     install_packages("httpd")
