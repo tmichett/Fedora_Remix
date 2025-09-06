@@ -17,7 +17,8 @@
 
 #network --device=link --bootproto=static --ip=192.168.15.15 --netmask=255.255.255.0 --gateway=192.168.15.1 --nameserver=192.168.15.1
 
-part / --size 20680
+# part / --size 20680
+# Commented out - partition definition is handled by fedora-live-base.ks
 
 
 
@@ -290,6 +291,8 @@ dnf update -y
 
 
 %include KickstartSnippets/install-cursor.ks
+
+%include KickstartSnippets/install-vlc.ks
 
 ## Put information in /etc regarding Fedora Remix Versions
 date "+This version of Fedora Remix 42 was created on %B %d, %Y" > /etc/fedora_remix_release

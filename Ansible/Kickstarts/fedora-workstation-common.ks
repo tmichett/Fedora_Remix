@@ -9,7 +9,7 @@
 #@^workstation-product-environment
 
 # Exclude unwanted packages from @anaconda-tools group
--gfs2-utils
+# gfs2-utils may not exist in FC42, so we'll handle this more gracefully
 -reiserfs-utils
 
 %end

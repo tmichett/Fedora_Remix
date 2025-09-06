@@ -20,7 +20,7 @@ Kickstarts/
 │   ├── FedoraRemix_Demo.ks
 │   ├── FedoraRemix-Summit.ks
 │   └── ...
-└── KickstartSnippets/                # Modular installation snippets
+└── KickstartSnippets/                # Modular installation snippets (28 files)
     ├── create-ansible-user.ks
     ├── customize-anaconda.ks
     ├── customize-bash-shell.ks
@@ -39,6 +39,7 @@ Kickstarts/
     ├── install-podman-bootc.ks
     ├── install-udpcast.ks
     ├── install-veracrypt.ks
+    ├── install-vlc.ks
     ├── set-bash-defaults.ks
     ├── setup-desktop-icons.ks
     ├── setup-dynamic-motd.ks
@@ -52,7 +53,7 @@ Kickstarts/
 
 ## Refactoring Overview
 
-The original `FedoraRemix.ks` file contained all installation and configuration logic in a single monolithic file. This has been refactored into 27 modular snippet files, each handling a specific aspect of the system configuration.
+The original `FedoraRemix.ks` file contained all installation and configuration logic in a single monolithic file. This has been refactored into 28 modular snippet files, each handling a specific aspect of the system configuration.
 
 ### Benefits of Refactoring
 
@@ -65,7 +66,7 @@ The original `FedoraRemix.ks` file contained all installation and configuration 
 
 ## Kickstart Snippet Files
 
-### Application Installations
+### Application Installations (13 snippets)
 
 | Snippet File | Description | Original Location |
 |--------------|-------------|-------------------|
@@ -81,8 +82,9 @@ The original `FedoraRemix.ks` file contained all installation and configuration 
 | `install-podman-bootc.ks` | Installs Podman BootC from COPR repository | Lines 448-451 |
 | `install-udpcast.ks` | Downloads and installs UDPCast for network imaging | Lines 433-438 |
 | `install-veracrypt.ks` | Installs VeraCrypt encryption software and configures icon | Lines 513-518 |
+| `install-vlc.ks` | Installs VLC Media Player with freeworld plugins for enhanced codec support | Post-install (added during refactoring) |
 
-### System Customizations
+### System Customizations (4 snippets)
 
 | Snippet File | Description | Original Location |
 |--------------|-------------|-------------------|
@@ -91,7 +93,7 @@ The original `FedoraRemix.ks` file contained all installation and configuration 
 | `customize-gnome-wallpaper.ks` | Configures custom GNOME wallpapers for FC42 | Lines 292-305 |
 | `customize-grub.ks` | Customizes GRUB boot menu appearance and themes | Lines 307-318 |
 
-### GNOME/Desktop Configuration
+### GNOME/Desktop Configuration (3 snippets)
 
 | Snippet File | Description | Original Location |
 |--------------|-------------|-------------------|
@@ -99,7 +101,7 @@ The original `FedoraRemix.ks` file contained all installation and configuration 
 | `setup-desktop-icons.ks` | Configures GNOME extensions for desktop shortcuts | Lines 502-505 |
 | `setup-gnome-extensions.ks` | Installs and configures GNOME shell extensions (DING, etc.) | Lines 404-431 |
 
-### System Setup & Configuration
+### System Setup & Configuration (8 snippets)
 
 | Snippet File | Description | Original Location |
 |--------------|-------------|-------------------|
@@ -151,7 +153,8 @@ FedoraRemix.ks
     ├── setup-tmux.ks
     ├── install-veracrypt.ks
     ├── install-mutagen.ks
-    └── install-cursor.ks
+    ├── install-cursor.ks
+    └── install-vlc.ks
 ```
 
 ## Usage
@@ -216,6 +219,18 @@ echo "Installing/configuring [component]"
 ## Compatibility
 
 The refactored kickstart produces **identical results** to the original kickstart. All functionality, packages, configurations, and customizations remain exactly the same.
+
+## Known Issues and Fixes
+
+### VLC Media Player Installation
+- **Issue**: Package conflict between `vlc-plugins-base` and `vlc-plugins-freeworld`
+- **Solution**: VLC is installed in post-install phase using `install-vlc.ks` snippet with `--allowerasing` flag to handle conflicts
+- **Benefit**: Installs VLC with enhanced codec support from RPM Fusion freeworld
+
+### Package Group Dependencies
+- **Issue**: Some excluded packages (like `gfs2-utils`) may not exist in newer Fedora versions
+- **Solution**: Gracefully handle missing packages in exclusion lists
+- **Result**: Build continues without errors for non-existent packages
 
 ## Maintenance Guidelines
 
