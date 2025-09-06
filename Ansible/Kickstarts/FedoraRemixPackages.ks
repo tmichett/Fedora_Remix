@@ -27,7 +27,8 @@ ImageMagick
 mock
 git
 gedit
-vlc
+# vlc - Temporarily disabled due to plugins conflict
+# Will be installed via flatpak or post-install script instead
 code
 tmux
 ntfs-3g

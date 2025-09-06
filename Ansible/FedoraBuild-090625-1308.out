@@ -1,0 +1,4 @@
+Script started on 2025-09-06 13:08:16-04:00 [COMMAND="livecd-creator --cache=/livecd-creator/package-cache -f FedoraRemix -c FedoraRemix.ks --title="Travis's Fedora Remix 42" 2>&1" TERM="xterm-256color" TTY="/dev/pts/3" COLUMNS="112" LINES="24"]
+Kickstart file 'FedoraRemix.ks' does not exist
+
+Script done on 2025-09-06 13:08:17-04:00 [COMMAND_EXIT_CODE="2"]
