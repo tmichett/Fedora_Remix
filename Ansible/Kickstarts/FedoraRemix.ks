@@ -158,7 +158,7 @@ NC='\033[0m' # No Color
 echo -e "${GREEN}Adding /usr/local/bin to the PATH... ${NC}"
 echo 'export PATH=/usr/local/bin:$PATH' >> /etc/skel/.bashrc
 
-### Downlaod Logos 
+### Download Logos 
 
 wget -O /usr/share/pixmaps/login-logo.png http://localhost/files/fedorap_small.png
 
@@ -225,313 +225,71 @@ cat /etc/resolv.conf > /FedoraRemix/DNS.txt
 #/usr/bin/nmcli con show
 
 
-## Setup and Install Ansible and Ansible Navigator
-/usr/bin/pip install ansible-core ansible-navigator ansible-builder ansible ansible-dev-tools --no-warn-script-location --root-user-action=ignore ## ansible-cdk # (issues with DNS in Post)
-#wget -P /opt/ -r -nH -np -R "index.htm*" http://localhost/pip_packages/
-#wget -P /opt/ http://localhost/files/python_packages.txt
-#cd /opt/pip_packages
-#/usr/bin/pip3 install -r /opt/python_packages.txt
+%include KickstartSnippets/install-ansible.ks
 
 
 
-## Install Flatpaks
-echo "Attempting to install flatpaks"
+%include KickstartSnippets/install-flatpaks.ks
 
-# Enable unprivileged user namespaces
-sudo chmod u+s /usr/bin/bwrap
+%include KickstartSnippets/install-balena-etcher.ks
 
-/usr/bin/flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
-/usr/bin/flatpak remote-add --if-not-exists --user flathub https://flathub.org/repo/flathub.flatpakrepo
-/usr/bin/flatpak install --system --noninteractive flathub io.podman_desktop.PodmanDesktop
-
-# Enable system-wide access
-flatpak override --system --filesystem=home
+%include KickstartSnippets/customize-anaconda.ks
 
 
-## Fix Flatpak SELinux
-/usr/sbin/restorecon -R /var/lib/flatpak
+%include KickstartSnippets/customize-gnome-wallpaper.ks
 
-## Install Balena Etcher
-dnf -y install https://github.com/balena-io/etcher/releases/download/v1.18.11/balena-etcher-1.18.11.x86_64.rpm
+%include KickstartSnippets/customize-grub.ks
 
-## Customize Anaconda Installer
-
-echo "Customizing Anaconda"
-
-cd /usr/share/anaconda/pixmaps
-rm sidebar-logo.png
-rm anaconda_header.png
-wget  http://localhost/files/boot/sidebar-logo.png
-wget  http://localhost/files/boot/anaconda_header.png
-cd /usr/share/anaconda/pixmaps/workstation/
-rm sidebar-logo.png
-wget  http://localhost/files/boot/sidebar-logo.png
-
-cd /usr/share/anaconda/boot
-rm splash.lss
-wget  http://localhost/files/boot/splash.lss
+%include KickstartSnippets/setup-vscode-extensions.ks
 
 
-## Customize Logos - General
-cd /usr/share/pixmaps/
-rm fedora-logo*.png
-rm fedora_logo_med.png
-wget http://localhost/files/logos/fedora-logo-small.png
-wget http://localhost/files/logos/fedora-logo.png
-wget http://localhost/files/logos/fedora_logo_med.png
-
-## Use this in a script to fix after upgrade for desktop logo
-cd /usr/share/fedora-logos/
-rm fedora*.svg
-wget http://localhost/files/logos/fedora_logo.svg
-wget http://localhost/files/logos/fedora_logo_darkbackground.svg
-wget http://localhost/files/logos/fedora_lightbackground.svg 
-wget http://localhost/files/logos/fedora_darkbackground.svg
-## END Use this in a script to fix after upgrade for desktop logo END ##
+%include KickstartSnippets/setup-dynamic-motd.ks
 
 
-## Customize Gnome Wallpaper for FC42
-mkdir -p /usr/share/backgrounds/f40/default/
-cd /usr/share/backgrounds/f40/default/
-rm *.png
-wget http://localhost/files/f38-01-night.png
-wget http://localhost/files/f38-01-day.png
-cd /usr/share/backgrounds/gnome
-mv f38-01-night.png f42-night.png
-mv f38-01-day.png f42-day.png
-mv /usr/share/backgrounds/gnome/adwaita-l.jpg /usr/share/backgrounds/gnome/adwaita-l.orig
-mv /usr/share/backgrounds/gnome/adwaita-d.jpg /usr/share/backgrounds/gnome/adwaita-d.orig
-cp f42-day.png /usr/share/backgrounds/gnome/adwaita-l.jpg
-cp f42-night.png /usr/share/backgrounds/gnome/adwaita-d.jpg
-
-## Customize Grub Boot Menu
-
-echo "Attempting to customize GRUB"
-
-/usr/bin/mkdir /boot/grub2/images
-cd /etc/default
-wget  http://localhost/files/boot/grub
-cp /usr/share/plymouth/themes/tm-fedora-remix/watermark.* /boot/grub2/images
-mkdir /opt/FedoraRemix
-cd /opt/FedoraRemix/ 
-wget http://localhost/files/boot/grub
-/usr/sbin/grub2-mkconfig -o /boot/grub2/grub.cfg
-
-## Create VSCode Extension Directory
-## TODO: Automate this part
-mkdir VSCode
-cd VSCode
-wget http://localhost/VSCode/ChrisChinchilla.vale-vscode-0.21.0.vsix
-wget http://localhost/VSCode/asciidoctor.asciidoctor-vscode-3.3.1.vsix
-wget http://localhost/VSCode/flobilosaurus.vscode-asciidoc-slides-1.3.0.vsix
-wget http://localhost/VSCode/redhat.ansible-24.9.320163.vsix
-wget http://localhost/VSCode/redhat.vscode-yaml-1.15.0.vsix
-wget http://localhost/VSCode/aaron-bond.better-comments-3.0.2.vsix
-wget http://localhost/VSCode/adpyke.codesnap-1.3.4.vsix
-wget http://localhost/VSCode/Codeium.codeium-1.17.11.vsix
-wget http://localhost/VSCode/MS-vsliveshare.vsliveshare-1.0.5936.vsix
+%include KickstartSnippets/customize-bash-shell.ks
 
 
-## Add Fedora Dynamic MotD Script
-cd /usr/bin
-wget http://localhost/files/fedora-dynamic-motd.sh
-chmod +x /usr/bin/fedora-dynamic-motd.sh
-echo /usr/bin/fedora-dynamic-motd.sh >> /etc/profile
 
+%include KickstartSnippets/setup-firstboot.ks
 
-## Customize BASH Prompts and Shell 
-mkdir /opt/bash
-cd /opt/bash
-wget http://localhost/files/bashrc.append
-## Install Gitprompt
-git clone https://github.com/tmichett/bash-git-prompt.git /opt/bash-git-prompt --depth=1
+%include KickstartSnippets/setup-yad-scripts.ks
 
+%include KickstartSnippets/install-gnome-tweaks.ks
 
-### Removal of network fix
-#rm /etc/resolv.conf
+%include KickstartSnippets/create-ansible-user.ks
 
-## Setting up Firstboot
-## Copy resourcse and enable the service
-#systemctl enable firststart.service
-systemctl enable systemd-firstboot.service
-cd /etc/systemd/system 
-wget http://localhost/files/boot/fixgrub.service
-cd /opt/FedoraRemix/
-wget http://localhost/files/boot/fixgrub.sh
-chmod +x /opt/FedoraRemix/fixgrub.sh
-chmod 644  /etc/systemd/system/fixgrub.service
-systemctl enable fixgrub.service
+%include KickstartSnippets/install-calibre.ks
 
-## Enable Cockpit and SSHD
-echo "Enabling Cockpit and SSHD Services"
-systemctl enable cockpit.socket
-systemctl enable sshd.service
+%include KickstartSnippets/setup-gnome-extensions.ks
 
-## Enable YAD Scripts and Looks
-cd /opt/FedoraRemix/
-wget http://localhost/kickstart.py
-wget -r -nH -np --reject-regex "index\\.html?.*" http://localhost/scripts/
-wget http://localhost/files/Wallpaper.png
-cd /opt/FedoraRemix/scripts
-wget http://localhost/files/boot/fixgrub.sh
-chmod +x *.sh
+%include KickstartSnippets/install-udpcast.ks 
 
+%include KickstartSnippets/install-ohmybash.ks
 
-mkdir /opt/FedoraRemix/logos
-wget -O /opt/FedoraRemix/logos/splash.png http://localhost/tm-fedora-remix/logo.png
-cd /opt/FedoraRemix
-wget http://localhost/Fedora_Remix_Apps.desktop
-wget http://localhost/Fedora_Remix_Customize.sh
-cp /opt/FedoraRemix/Fedora_Remix_Apps.desktop /usr/share/gnome/autostart/
-cp /opt/FedoraRemix/Fedora_Remix_Apps.desktop /usr/share/applications/
-chmod +x Fedora_Remix_Customize.sh
+%include KickstartSnippets/set-bash-defaults.ks
 
-## Install Gnome-Tweaks and Prepare Packages
-cd /opt/FedoraRemixCustomize/
-ansible-playbook Deploy_Gnome_Tweaks.yml --connection=local > /FedoraRemix/Deploy_Gnome_Tweaks.log
-wget http://localhost/files/bashrc.append
-
-## Create Ansible-User with Password and Add to Sudoers
-/usr/sbin/groupadd -g 700 ansible-user
-/usr/sbin/useradd -u 700 -g 700 -c "Ansible User" ansible-user
-echo "ansiblepass" | passwd ansible-user --stdin
-sudo sh -c 'echo "Defaults:ansible-user !requiretty"  > /etc/sudoers.d/ansible-user'
-echo "ansible-user ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers.d/ansible-user
-
-## Download and Install Calibre
-sudo -v && wget -nv -O- https://download.calibre-ebook.com/linux-installer.sh | sudo sh /dev/stdin
-
-## Attempt to Install Gnome Extensions
-
-#!/bin/bash
-USER="$(whoami)"
-cd /opt/FedoraRemixCustomize/
-ansible-playbook Enable_Gnome_Extensions.yml 
-
-## Customize Extensions for all Users 
-#!/bin/bash
-cd /opt/FedoraRemixCustomize/Files/extensions/
-rsync -avz * /usr/share/gnome-shell/extensions/
-chown root:root -R /usr/share/gnome-shell/extensions/
-chmod 755  -R /usr/share/gnome-shell/extensions
-
-## Enabled Desktop Icons
-/usr/bin/gnome-extensions install /opt/FedoraRemixCustomize/Gnome_Shell/dingrastersoft.com.v76.shell-extension.zip
-/usr/bin/gnome-extensions install /opt/FedoraRemixCustomize/Gnome_Shell/add-to-desktoptommimon.github.com.v14.shell-extension.zip
-
-## Enable DING for All Users FC42 (4/21/2025)
-echo -e "${RED}Changing GNOME Extensions... ${NC}"
-cd /usr/share/gnome-shell/extensions
-rm -rf ding@rastersoft.com
-mkdir ding@rastersoft.com
-cd /usr/share/gnome-shell/extensions/ding@rastersoft.com
-unzip /opt/FedoraRemixCustomize/Files/dingrastersoft.com.v76.shell-extension.zip
-chown -R root:root /usr/share/gnome-shell/extensions/ding@rastersoft.com
-chmod 755 -R /usr/share/gnome-shell/extensions/ding@rastersoft.com
-dconf update
-
-## Install UDP Cast 
-echo "Installing UDPCast"
-mkdir -p /opt/udpcast
-cd /opt/udpcast
-wget http://localhost/udpcast-20230924-1.x86_64.rpm
-dnf install -y ./udpcast-20230924-1.x86_64.rpm 
-
-## Install OhMyBash
-echo "Installing OhMyBash"
-bash -c "$(curl -fsSL https://raw.githubusercontent.com/tmichett/oh-my-bash/master/tools/install.sh)" --prefix=/usr/local --unattended
-
-## Set BASHRC Defaults
-echo "$(cat /opt/FedoraRemixCustomize/bashrc.append)" >> /etc/bashrc
-
-## Install Podman BootC from Repo (FIX ME - Not in Fedora Yet)
-echo "Installing Podman BootC"
-sudo dnf -y install 'dnf-command(copr)'
-sudo dnf -y copr enable gmaglione/podman-bootc
-sudo dnf -y install podman-bootc
+%include KickstartSnippets/install-podman-bootc.ks
 
 ## Update to Latest Packages
 echo "Updating all packages"
 dnf update -y
 
-## Update Ansible Collections
+%include KickstartSnippets/update-ansible-collections.ks
 
-# Get the Python path for ansible collections
-INSTALL_PATH=$(ansible-galaxy collection list | grep ansible_collections | grep python | awk '{print $2}')
+%include KickstartSnippets/install-lmstudio.ks
 
-# Check if the INSTALL_PATH variable is not empty
-if [ -z "$INSTALL_PATH" ]; then
-    echo "Error: Unable to determine the Python path for ansible collections."
-    exit 1
-fi
+%include KickstartSnippets/install-logviewer.ks
 
-echo "Using Python path: $INSTALL_PATH"
+%include KickstartSnippets/setup-desktop-icons.ks
 
-# List all installed collections and loop through them
-for collection in $(ansible-galaxy collection list | awk '{print $1}' | tail -n +2); do
-  echo "Upgrading collection: $collection"
-  
-## Use ansible-galaxy to install the collection with the specified path ##
-  ansible-galaxy collection install $collection --upgrade -p "$INSTALL_PATH"
-  done
+%include KickstartSnippets/setup-tmux.ks
 
-## Update System Collections for Ansible Posix and others
-echo "Updating Ansible Galaxy Posix Collection"
-ansible-galaxy collection install --upgrade ansible.posix community.general containers.podman fedora.linux_system_roles  -p /usr/share/ansible/collections/ansible_collections
+%include KickstartSnippets/install-veracrypt.ks
 
-## Create FedoraRemix Custom Tools (LMStudio) ##
-echo "Downloading LMStudio AppImage"
-mkdir /opt/FedoraRemixApps
-cd /opt/FedoraRemixApps
-wget https://installers.lmstudio.ai/linux/x64/0.3.14-5/LM-Studio-0.3.14-5-x64.AppImage
-chmod +x /opt/FedoraRemixApps/LM-Studio-0.3.14-5-x64.AppImage
-
-## Create Desktop Icon for LMStudio
-echo "Installing LMStudio Icons"
-cd /usr/share/applications
-wget  http://localhost/files/LMStudio.desktop
-
-## Load Icons for Custom Applications
-cd /usr/share/icons
-wget http://localhost/files/logos/fedora_tools_logo.png
-wget http://localhost/files/logos/lmstudio.png
-
-## Install LogViewer
-dnf install -y https://github.com/tmichett/log_viewer/releases/download/1.1.0/LogViewer-1.1-0.x86_64.rpm
-
-## Enabled Desktop Icons from Extension
-echo "Configuring GNOME Extensions for Desktop Shortcuts"
-/usr/bin/gnome-extensions install /opt/FedoraRemixCustomize/Gnome_Shell/dingrastersoft.com.v76.shell-extension.zip --force
-/usr/bin/gnome-extensions install /opt/FedoraRemixCustomize/Gnome_Shell/add-to-desktoptommimon.github.com.v14.shell-extension.zip --force
-
-## Create TMUX Config Directory
-echo "Configuring TMUX"
-mkdir /opt/tmux
-cd /opt/tmux
-wget wget  http://localhost/files/tmux.conf
-
-## Install VeraCrypt
-echo "Installing VeraCrypt"
-dnf install -y https://github.com/veracrypt/VeraCrypt/releases/download/VeraCrypt_1.26.20/veracrypt-1.26.20-Fedora-40-x86_64.rpm
-cd /usr/share/applications
-wget http://localhost/files/logos/veracrypt.png
-sed -i 's/Icon=veracrypt/Icon=\/usr\/share\/applications\/veracrypt.png/g' /usr/share/applications/veracrypt.desktop
-
-## Install and Configure Mutagen
-echo "Installing Matagen"
-cd /tmp
-wget https://github.com/mutagen-io/mutagen/releases/download/v0.18.1/mutagen_linux_amd64_v0.18.1.tar.gz
-tar xvf mutagen_linux_amd64_v0.18.1.tar.gz -C /usr/local/bin/
-rm mutagen_linux_amd64_v0.18.1.tar.gz
+%include KickstartSnippets/install-mutagen.ks
 
 
-## Install Cursor
-wget -O  /opt/FedoraRemixApps/Cursor.AppImage https://downloads.cursor.com/production/96e5b01ca25f8fbd4c4c10bc69b15f6228c80771/linux/x64/Cursor-0.50.5-x86_64.AppImage
-chmod +x /opt/FedoraRemixApps/Cursor.AppImage
-cd /usr/share/icons 
-wget http://localhost/files/logos/Cursor.svg
-cd /usr/share/applications
-wget http://localhost/files/Cursor.desktop
+%include KickstartSnippets/install-cursor.ks
 
 ## Put information in /etc regarding Fedora Remix Versions
 date "+This version of Fedora Remix 42 was created on %B %d, %Y" > /etc/fedora_remix_release
