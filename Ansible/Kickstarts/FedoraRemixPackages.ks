@@ -61,7 +61,8 @@ netpbm-progs
 scribus
 
 ## Video Editing and Manipulation
-kdenlive
+# kdenlive - Temporarily disabled due to VLC plugin dependencies conflicts
+# Will be installed via post-install script or flatpak
 
 ## Container Tools
 buildah
@@ -126,6 +127,10 @@ chromium
 
 ## Added packages that were removed in FC40 from default
 @Gnome-desktop
+-vlc*  # Exclude all VLC packages from main installation due to plugins conflict
+-phonon-qt5-backend-vlc  # Exclude VLC phonon backend to prevent plugin conflicts
+-phonon-qt6-backend-vlc  # Exclude VLC phonon backend to prevent plugin conflicts
+-kaffeine  # Exclude kaffeine to prevent VLC plugin dependencies
 libreoffice
 
 ## Added for Ansible and JSON Filtering

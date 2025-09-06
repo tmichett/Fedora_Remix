@@ -20,7 +20,7 @@ Kickstarts/
 │   ├── FedoraRemix_Demo.ks
 │   ├── FedoraRemix-Summit.ks
 │   └── ...
-└── KickstartSnippets/                # Modular installation snippets (28 files)
+└── KickstartSnippets/                # Modular installation snippets (29 files)
     ├── create-ansible-user.ks
     ├── customize-anaconda.ks
     ├── customize-bash-shell.ks
@@ -53,7 +53,7 @@ Kickstarts/
 
 ## Refactoring Overview
 
-The original `FedoraRemix.ks` file contained all installation and configuration logic in a single monolithic file. This has been refactored into 28 modular snippet files, each handling a specific aspect of the system configuration.
+The original `FedoraRemix.ks` file contained all installation and configuration logic in a single monolithic file. This has been refactored into 29 modular snippet files, each handling a specific aspect of the system configuration.
 
 ### Benefits of Refactoring
 
@@ -66,7 +66,7 @@ The original `FedoraRemix.ks` file contained all installation and configuration 
 
 ## Kickstart Snippet Files
 
-### Application Installations (13 snippets)
+### Application Installations (14 snippets)
 
 | Snippet File | Description | Original Location |
 |--------------|-------------|-------------------|
@@ -83,6 +83,7 @@ The original `FedoraRemix.ks` file contained all installation and configuration 
 | `install-udpcast.ks` | Downloads and installs UDPCast for network imaging | Lines 433-438 |
 | `install-veracrypt.ks` | Installs VeraCrypt encryption software and configures icon | Lines 513-518 |
 | `install-vlc.ks` | Installs VLC Media Player with freeworld plugins for enhanced codec support | Post-install (added during refactoring) |
+| `install-kdenlive.ks` | Installs KDEnlive video editor after VLC is configured | Post-install (moved to prevent conflicts) |
 
 ### System Customizations (4 snippets)
 
@@ -154,7 +155,8 @@ FedoraRemix.ks
     ├── install-veracrypt.ks
     ├── install-mutagen.ks
     ├── install-cursor.ks
-    └── install-vlc.ks
+    ├── install-vlc.ks
+    └── install-kdenlive.ks
 ```
 
 ## Usage
@@ -224,8 +226,13 @@ The refactored kickstart produces **identical results** to the original kickstar
 
 ### VLC Media Player Installation
 - **Issue**: Package conflict between `vlc-plugins-base` and `vlc-plugins-freeworld`
-- **Solution**: VLC is installed in post-install phase using `install-vlc.ks` snippet with `--allowerasing` flag to handle conflicts
-- **Benefit**: Installs VLC with enhanced codec support from RPM Fusion freeworld
+- **Root Cause**: Multiple packages (GNOME Desktop group, KDEnlive, Phonon backends) were pulling in VLC during main installation
+- **Solution**: 
+  - Excluded all VLC-related packages from main installation (`-vlc*`)
+  - Excluded packages that depend on VLC (`-phonon-qt5-backend-vlc`, `-phonon-qt6-backend-vlc`, `-kaffeine`)
+  - Moved KDEnlive to post-install phase to prevent dependency conflicts
+  - VLC installed in post-install phase with `--allowerasing` flag
+- **Benefit**: Clean installation with VLC + KDEnlive using enhanced codec support from RPM Fusion freeworld
 
 ### Package Group Dependencies
 - **Issue**: Some excluded packages (like `gfs2-utils`) may not exist in newer Fedora versions
