@@ -1,6 +1,7 @@
 ## Customize Anaconda Installer
+ks_print_section "ANACONDA INSTALLER CUSTOMIZATION"
 
-echo "Customizing Anaconda"
+ks_print_configure "Anaconda installer branding and themes"
 
 cd /usr/share/anaconda/pixmaps
 rm sidebar-logo.png

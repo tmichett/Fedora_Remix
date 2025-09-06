@@ -1,12 +1,18 @@
 ## Install KDEnlive Video Editor
-echo "Installing KDEnlive video editing software"
+ks_print_section "KDENLIVE VIDEO EDITOR INSTALLATION"
 
-# Install KDEnlive after VLC is properly configured to avoid plugin conflicts
+ks_print_step 1 3 "Installing KDEnlive video editing suite"
+ks_print_info "Installing after VLC configuration to prevent plugin conflicts"
+ks_print_install "kdenlive (Professional Video Editor)"
 dnf install -y kdenlive
 
-# Verify installation
+ks_print_step 2 3 "Verifying KDEnlive installation"
 if command -v kdenlive >/dev/null 2>&1; then
-    echo "KDEnlive installed successfully"
+    ks_print_success "KDEnlive video editor installed successfully"
+    ks_print_info "Professional video editing capabilities now available"
 else
-    echo "Warning: KDEnlive installation may have failed"
+    ks_print_error "KDEnlive installation verification failed"
 fi
+
+ks_print_step 3 3 "KDEnlive installation completed"
+ks_completion_banner "KDENLIVE VIDEO EDITOR"

@@ -100,12 +100,20 @@ def main():
     # Copy Build Script Playbook
     copy_file("./Prepare_Fedora_Remix_Build.yml", "/livecd-creator/FedoraRemix/Prepare_Fedora_Remix_Build.yml")
     
-    # Copy Build Script with executable permissions
+    # Copy Build Scripts with executable permissions
     # Calculate the mode for u+rwx,g+x,o+x (0755 in octal)
     exec_mode = 0o755
     copy_file("../Remix_Buid_Script.sh", "/livecd-creator/FedoraRemix/Remix_Buid_Script.sh", exec_mode)
+    copy_file("../Enhanced_Remix_Build_Script.sh", "/livecd-creator/FedoraRemix/Enhanced_Remix_Build_Script.sh", exec_mode)
+    
+    # Copy formatting demo script with executable permissions
+    copy_file("../format-demo.sh", "/livecd-creator/FedoraRemix/format-demo.sh", exec_mode)
     
     print("Setup complete!")
+    print("Available build scripts:")
+    print("  - Remix_Buid_Script.sh (Original)")
+    print("  - Enhanced_Remix_Build_Script.sh (Recommended - Rich formatting)")
+    print("  - format-demo.sh (Formatting demonstration)")
 
 if __name__ == "__main__":
     main()

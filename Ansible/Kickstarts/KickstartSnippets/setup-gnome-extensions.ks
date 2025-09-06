@@ -17,7 +17,7 @@ chmod 755  -R /usr/share/gnome-shell/extensions
 /usr/bin/gnome-extensions install /opt/FedoraRemixCustomize/Gnome_Shell/add-to-desktoptommimon.github.com.v14.shell-extension.zip
 
 ## Enable DING for All Users FC42 (4/21/2025)
-echo -e "${RED}Changing GNOME Extensions... ${NC}"
+ks_print_configure "GNOME Desktop Extensions (DING)"
 cd /usr/share/gnome-shell/extensions
 rm -rf ding@rastersoft.com
 mkdir ding@rastersoft.com

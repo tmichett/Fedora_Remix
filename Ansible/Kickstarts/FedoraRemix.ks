@@ -45,8 +45,10 @@ touch "$LIVE_ROOT/isolinx/travis"
 
 %post
 
-## Echo Start time to screen
-echo "The kickstart started on $(date)"
+## Enhanced kickstart start banner
+ks_print_header "FEDORA REMIX KICKSTART INSTALLATION"
+ks_print_info "Kickstart started on $(date)"
+ks_print_info "Building ${BOLD}Travis's Fedora Remix 42${NC}"
 
 set -x
 ### Fix added for DNS and Network fixes in Post
@@ -147,16 +149,35 @@ chown -R liveuser:liveuser /home/liveuser/
 
 EOF
 
-## Define colored output
-
-# Define color variables
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-YELLOW='\033[1;33m'
-NC='\033[0m' # No Color
+## Load shared formatting functions for enhanced output
+source /kickstart-root/KickstartSnippets/format-functions.ks 2>/dev/null || {
+    # Fallback color definitions if format-functions.ks not available
+    RED='\033[0;31m'
+    GREEN='\033[0;32m'
+    YELLOW='\033[1;33m'
+    BLUE='\033[0;34m'
+    PURPLE='\033[0;35m'
+    CYAN='\033[0;36m'
+    WHITE='\033[1;37m'
+    BOLD='\033[1m'
+    NC='\033[0m'
+    
+    # Fallback Unicode symbols
+    CHECKMARK="✅"
+    CROSS="❌"
+    ARROW="➤"
+    GEAR="⚙️"
+    ROCKET="🚀"
+    SUCCESS_STAR="⭐"
+    
+    # Fallback functions
+    ks_print_header() { echo -e "\n${CYAN}╔══ $1 ══╗${NC}\n"; }
+    ks_print_info() { echo -e "${BLUE}${ARROW}${NC} $1"; }
+    ks_print_success() { echo -e "${GREEN}${CHECKMARK}${NC} $1"; }
+}
 
 ### Update PATH
-echo -e "${GREEN}Adding /usr/local/bin to the PATH... ${NC}"
+ks_print_configure "System PATH environment"
 echo 'export PATH=/usr/local/bin:$PATH' >> /etc/skel/.bashrc
 
 ### Download Logos 
@@ -200,7 +221,7 @@ wget -P /opt -r -nH -np --reject-regex "index\\.html?.*" http://localhost/PXESer
 
 ## Setting Theme
 
-echo "Setting Fedora Theme"
+ks_print_configure "Plymouth boot theme"
 
 /usr/sbin/plymouth-set-default-theme tm-fedora-remix -R
 
@@ -209,7 +230,7 @@ dracut -f --no-kernel
 
 ## Fix Networking
 
-echo "Attempting to setup DNS and configure networking"
+ks_print_configure "DNS and network settings"
 echo "nameserver 8.8.8.8" > /etc/resolv.conf
 /usr/bin/mkdir /FedoraRemix
 cat /etc/resolv.conf > /FedoraRemix/DNS.txt
@@ -272,7 +293,8 @@ cat /etc/resolv.conf > /FedoraRemix/DNS.txt
 %include KickstartSnippets/install-podman-bootc.ks
 
 ## Update to Latest Packages
-echo "Updating all packages"
+ks_print_section "SYSTEM PACKAGE UPDATES"
+ks_print_install "Latest package updates"
 dnf update -y
 
 %include KickstartSnippets/update-ansible-collections.ks
@@ -299,13 +321,12 @@ dnf update -y
 ## Put information in /etc regarding Fedora Remix Versions
 date "+This version of Fedora Remix 42 was created on %B %d, %Y" > /etc/fedora_remix_release
 
-## Echo Finish time to screen
-echo "The kickstart completed on $(date)"
+## Enhanced completion banner
+ks_separator
+ks_print_success "Kickstart installation completed on $(date)"
+ks_completion_banner "FEDORA REMIX KICKSTART"
 
-echo "#########################################################"
-echo "## Kickstart Completed ##################################"
-echo "#########################################################"
-echo "#########################################################"
-echo "######### Building ISO ##################################"
-echo "#########################################################"
+ks_print_header "PROCEEDING TO ISO BUILD PHASE"
+ks_print_info "${ROCKET} Initiating Live ISO creation process..."
+ks_separator
 %end
