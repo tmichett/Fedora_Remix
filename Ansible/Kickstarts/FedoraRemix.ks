@@ -38,7 +38,11 @@ set -x
 
 %post --nochroot
 set -x
-touch "$LIVE_ROOT/isolinx/travis"
+# Create isolinux directory if it doesn't exist and add marker file
+if [ -d "$LIVE_ROOT" ]; then
+    mkdir -p "$LIVE_ROOT/isolinux" 2>/dev/null || mkdir -p "$LIVE_ROOT/isolinx" 2>/dev/null || true
+    touch "$LIVE_ROOT/isolinux/travis" 2>/dev/null || touch "$LIVE_ROOT/isolinx/travis" 2>/dev/null || echo "Could not create travis marker file"
+fi
 
 %end
 
@@ -150,31 +154,111 @@ chown -R liveuser:liveuser /home/liveuser/
 EOF
 
 ## Load shared formatting functions for enhanced output
-source /kickstart-root/KickstartSnippets/format-functions.ks 2>/dev/null || {
-    # Fallback color definitions if format-functions.ks not available
-    RED='\033[0;31m'
-    GREEN='\033[0;32m'
-    YELLOW='\033[1;33m'
-    BLUE='\033[0;34m'
-    PURPLE='\033[0;35m'
-    CYAN='\033[0;36m'
-    WHITE='\033[1;37m'
-    BOLD='\033[1m'
-    NC='\033[0m'
-    
-    # Fallback Unicode symbols
-    CHECKMARK="✅"
-    CROSS="❌"
-    ARROW="➤"
-    GEAR="⚙️"
-    ROCKET="🚀"
-    SUCCESS_STAR="⭐"
-    
-    # Fallback functions
-    ks_print_header() { echo -e "\n${CYAN}╔══ $1 ══╗${NC}\n"; }
-    ks_print_info() { echo -e "${BLUE}${ARROW}${NC} $1"; }
-    ks_print_success() { echo -e "${GREEN}${CHECKMARK}${NC} $1"; }
-}
+# Try multiple possible locations for format-functions.ks
+if [ -f "KickstartSnippets/format-functions.ks" ]; then
+    source KickstartSnippets/format-functions.ks
+elif [ -f "/kickstart-root/KickstartSnippets/format-functions.ks" ]; then
+    source /kickstart-root/KickstartSnippets/format-functions.ks
+else
+    # Fallback: Define all functions inline
+    export LANG=en_US.UTF-8
+    export LC_ALL=en_US.UTF-8
+
+    # Enhanced color definitions
+    readonly RED='\033[0;31m'
+    readonly GREEN='\033[0;32m'
+    readonly YELLOW='\033[1;33m'
+    readonly BLUE='\033[0;34m'
+    readonly PURPLE='\033[0;35m'
+    readonly CYAN='\033[0;36m'
+    readonly WHITE='\033[1;37m'
+    readonly BOLD='\033[1m'
+    readonly DIM='\033[2m'
+    readonly NC='\033[0m'
+
+    # Unicode symbols (fallback to ASCII if needed)
+    readonly CHECKMARK="[OK]"
+    readonly CROSS="[ERROR]"
+    readonly ARROW=">"
+    readonly GEAR="[CONFIG]"
+    readonly ROCKET="[START]"
+    readonly PACKAGE="[PKG]"
+    readonly WRENCH="[TOOL]"
+    readonly DOWNLOAD="[DOWN]"
+    readonly INSTALL="[INST]"
+    readonly CONFIG="[CONF]"
+    readonly SUCCESS_STAR="*"
+    readonly WARNING_SIGN="!"
+    readonly INFO_ICON="i"
+    readonly FIRE="[FIRE]"
+    readonly SPARKLES="[DONE]"
+
+    # Formatting functions
+    ks_print_header() {
+        local message="$1"
+        echo -e "\n${CYAN}===============================================================================${NC}"
+        printf "${CYAN}${NC} ${BOLD}${WHITE}%-76s${NC} ${CYAN}${NC}\n" "$message"
+        echo -e "${CYAN}===============================================================================${NC}\n"
+    }
+
+    ks_print_section() {
+        local message="$1"
+        echo -e "\n${PURPLE}${SUCCESS_STAR}==============================================================================${NC}"
+        echo -e "${PURPLE}${SUCCESS_STAR}${NC} ${BOLD}${WHITE}$message${NC}"
+        echo -e "${PURPLE}${SUCCESS_STAR}==============================================================================${NC}\n"
+    }
+
+    ks_print_info() {
+        local message="$1"
+        echo -e "${BLUE}${INFO_ICON}${NC} ${BOLD}$(date '+%H:%M:%S')${NC} ${message}"
+    }
+
+    ks_print_success() {
+        local message="$1"
+        echo -e "${GREEN}${CHECKMARK}${NC} ${BOLD}$(date '+%H:%M:%S')${NC} ${GREEN}${message}${NC}"
+    }
+
+    ks_print_warning() {
+        local message="$1"
+        echo -e "${YELLOW}${WARNING_SIGN}${NC} ${BOLD}$(date '+%H:%M:%S')${NC} ${YELLOW}${message}${NC}"
+    }
+
+    ks_print_error() {
+        local message="$1"
+        echo -e "${RED}${CROSS}${NC} ${BOLD}$(date '+%H:%M:%S')${NC} ${RED}${message}${NC}"
+    }
+
+    ks_print_install() {
+        local package="$1"
+        echo -e "${BLUE}${INSTALL}${NC} ${BOLD}$(date '+%H:%M:%S')${NC} Installing ${GREEN}${package}${NC}..."
+    }
+
+    ks_print_download() {
+        local item="$1"
+        echo -e "${CYAN}${DOWNLOAD}${NC} ${BOLD}$(date '+%H:%M:%S')${NC} Downloading ${GREEN}${item}${NC}..."
+    }
+
+    ks_print_configure() {
+        local component="$1"
+        echo -e "${PURPLE}${CONFIG}${NC} ${BOLD}$(date '+%H:%M:%S')${NC} Configuring ${GREEN}${component}${NC}..."
+    }
+
+    ks_print_step() {
+        local step_num="$1"
+        local total_steps="$2"
+        local description="$3"
+        echo -e "${WHITE}${BOLD}[$step_num/$total_steps]${NC} ${description}"
+    }
+
+    ks_separator() {
+        echo -e "${DIM}${WHITE}-------------------------------------------------------------------------------${NC}"
+    }
+
+    ks_completion_banner() {
+        local component="$1"
+        echo -e "\n${GREEN}${SPARKLES}${SPARKLES}${SPARKLES}${NC} ${BOLD}${GREEN}$component installation completed successfully!${NC} ${GREEN}${SPARKLES}${SPARKLES}${SPARKLES}${NC}\n"
+    }
+fi
 
 ### Update PATH
 ks_print_configure "System PATH environment"

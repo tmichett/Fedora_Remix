@@ -298,6 +298,16 @@ The refactored kickstart produces **identical results** to the original kickstar
 - **Solution**: Gracefully handle missing packages in exclusion lists
 - **Result**: Build continues without errors for non-existent packages
 
+### Formatting Function Availability
+- **Issue**: External `format-functions.ks` file may not be accessible during kickstart execution
+- **Root Cause**: File path resolution varies in different kickstart environments
+- **Solution**: 
+  - Multi-path loading attempts for external functions file
+  - Comprehensive inline fallback functions defined directly in main kickstart
+  - Individual snippet files include function availability checks
+  - ASCII fallback symbols for environments without Unicode support
+- **Benefit**: Rich formatting works in all environments with graceful degradation
+
 ## Maintenance Guidelines
 
 1. **Keep snippets focused**: Each snippet should handle one specific component
@@ -336,10 +346,24 @@ The kickstart process now provides a **dramatically improved visual experience**
 
 ## File Structure Improvements
 
-The main `FedoraRemix.ks` file was reduced from **549 lines to 332 lines** (40% reduction), making it much more readable and manageable while **adding** rich formatting capabilities.
+The main `FedoraRemix.ks` file was refactored from **549 lines to 416 lines** with:
+- **24% complexity reduction** through modularization (29 separate snippet files)
+- **Enhanced functionality** with rich formatting capabilities
+- **Robust fallbacks** ensuring compatibility across all build environments
+- **Improved maintainability** with clear separation of concerns
+
+### Smart Fallback System
+The formatting system includes multiple layers of compatibility:
+
+1. **External Function Loading**: Attempts to load `format-functions.ks`
+2. **Inline Function Definitions**: Comprehensive fallbacks defined in main kickstart
+3. **ASCII Symbol Support**: Works in environments without Unicode
+4. **Snippet-Level Checks**: Individual snippets verify function availability
+5. **Graceful Degradation**: Always provides meaningful output regardless of environment
 
 ---
 
 *Last updated: January 2025*
 *Refactoring completed: All 29 installation/configuration sections successfully modularized*
 *Enhanced formatting: Rich visual output with colors, Unicode symbols, and progress tracking*
+*Build compatibility: Comprehensive fallback system ensures reliable operation in all environments*
