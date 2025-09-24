@@ -160,4 +160,10 @@ fzf
 yazi  ## Needs repo
 dust  ## Needs repo
 
+## Networking and Diagnostic Utilities
+nmap 
+iptraf-ng
+wireshark
+
+
 %end
