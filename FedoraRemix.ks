@@ -1,13 +1,16 @@
-# Maintained by the Fedora Workstation WG:
-# http://fedoraproject.org/wiki/Workstation
-# mailto:desktop@lists.fedoraproject.org
+# Maintained by Travis Michette:
+# https://github.com/tmichett/Fedora_Remix
 
+
+
+# Fedora Remix Base Kickstart packages - Maintained by Fedora Project
 %include fedora-live-base.ks
 %include fedora-workstation-common.ks
 #
 # Disable this for now as packagekit is causing compose failures
 # by leaving a gpg-agent around holding /dev/null open.
 #
+
 #include snippets/packagekit-cached-metadata.ks
 %include FedoraRemixPackages.ks
 
@@ -23,11 +26,8 @@ part / --size 20680
 #fi
 #%post --nochroot
 #cp -P /etc/resolv.conf "$INSTALL_ROOT"/etc/resolv.conf
-/usr/bin/pip install ansible-core ansible-navigator ansible-builder ansible ansible-dev-tools ## Issues with ansible-cdk# (issues with DNS in Post)
-
-## Install Flatpaks
-#/usr/bin/flatpak install flathub com.slack.Slack -y
-#/usr/bin/flatpak install flathub us.zoom.Zoom -y
+set -x
+/usr/bin/pip install ansible-core ansible-navigator ansible-builder ansible ansible-dev-tools --no-warn-script-location --root-user-action=ignore ## Issues with ansible-cdk# (issues with DNS in Post)
 
 %end
 
@@ -35,25 +35,19 @@ part / --size 20680
 ### Fix ISOLinux
 
 %post --nochroot
+set -x
 touch "$LIVE_ROOT/isolinx/travis"
 
 %end
 
 
 %post
-### Fix added for DNS and Network fixes in Post
-### https://anaconda-installer.readthedocs.io/en/latest/common-bugs.html#missing-etc-resolv-conf-for-post-scripts
 
-#echo "nameserver 8.8.8.8" >> /etc/resolv.conf
+## Echo Start time to screen
+print_banner "🚀 TRAVIS'S FEDORA REMIX 42 BUILD STARTED" "$PURPLE"
+print_step "Build initiated at $(date)" "$CYAN"
 
-#echo "nameserver 8.8.8.8" >> $INSTALL_ROOT/etc/resolv.conf
-
-#/usr/bin/systemctl restart NetworkManager
-
-#/usr/bin/systemd-resolve --set-dns=192.168.15.1 --interface=eth0
-
-# network --device=link --bootproto=static --ip=192.168.15.15 --netmask=255.255.255.0 --gateway=192.168.15.1 --nameserver=192.168.15.1
-
+set -x
 
 cat >> /etc/rc.d/init.d/livesys << EOF
 
@@ -135,9 +129,59 @@ fi
 
 # make sure to set the right permissions and selinux contexts
 chown -R liveuser:liveuser /home/liveuser/
-restorecon -R /home/liveuser/
+/usr/sbin/restorecon-R /home/liveuser/
 
 EOF
+
+## Define colored output
+
+# Define color variables and pretty output functions
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+PURPLE='\033[0;35m'
+CYAN='\033[0;36m'
+WHITE='\033[1;37m'
+BOLD='\033[1m'
+NC='\033[0m' # No Color
+
+# Pretty output functions
+print_banner() {
+    local message="$1"
+    local color="${2:-$CYAN}"
+    echo -e "\n${color}╔════════════════════════════════════════════════════════════════════════════════╗${NC}"
+    printf "${color}║${NC} ${BOLD}%-76s${NC} ${color}║${NC}\n" "$message"
+    echo -e "${color}╚════════════════════════════════════════════════════════════════════════════════╝${NC}"
+}
+
+print_step() {
+    local message="$1"
+    local color="${2:-$GREEN}"
+    local timestamp=$(date '+%H:%M:%S')
+    echo -e "${color}●${NC} ${BOLD}[$timestamp]${NC} $message"
+}
+
+print_success() {
+    local message="$1"
+    echo -e "${GREEN}✓${NC} ${BOLD}SUCCESS:${NC} $message"
+}
+
+print_warning() {
+    local message="$1"
+    echo -e "${YELLOW}⚠${NC}  ${BOLD}WARNING:${NC} $message"
+}
+
+print_error() {
+    local message="$1"
+    echo -e "${RED}✗${NC} ${BOLD}ERROR:${NC} $message"
+}
+
+### Update PATH
+echo -e "${GREEN}Adding /usr/local/bin to the PATH... ${NC}"
+echo 'export PATH=/usr/local/bin:$PATH' >> /etc/skel/.bashrc
+
+### Downlaod Logos 
 
 wget -O /usr/share/pixmaps/login-logo.png http://localhost/files/fedorap_small.png
 
@@ -172,13 +216,14 @@ cp /usr/share/plymouth/themes/tm-fedora-remix/watermark.* /usr/share/plymouth/th
 cp /usr/share/plymouth/themes/tm-fedora-remix/logo.* /usr/share/plymouth/themes/spinner/
 
 ## Setting up Customization Pieces
-wget -P /opt -r -nH -np -R "index.htm*" http://localhost/FedoraRemixCustomize
-wget -P /opt -r -nH -np -R "index.htm*" http://localhost/FedoraRemixPXE
-wget -P /opt -r -nH -np -R "index.htm*" http://localhost/PXEServer
+wget -P /opt -r -nH -np --reject-regex "index\\.html?.*" http://localhost/FedoraRemixCustomize
+wget -P /opt -r -nH -np --reject-regex "index\\.html?.*" http://localhost/FedoraRemixPXE
+wget -P /opt -r -nH -np --reject-regex "index\\.html?.*" http://localhost/PXEServer
 
 ## Setting Theme
 
-echo "Setting Fedora Theme"
+print_banner "🎨 CONFIGURING FEDORA REMIX THEME" "$PURPLE"
+print_step "Setting Plymouth boot theme to tm-fedora-remix"
 
 /usr/sbin/plymouth-set-default-theme tm-fedora-remix -R
 
@@ -187,7 +232,8 @@ dracut -f --no-kernel
 
 ## Fix Networking
 
-echo "Attempting to setup DNS and configure networking"
+print_banner "🌐 NETWORK & DNS CONFIGURATION" "$BLUE"
+print_step "Configuring DNS servers and network settings"
 echo "nameserver 8.8.8.8" > /etc/resolv.conf
 /usr/bin/mkdir /FedoraRemix
 cat /etc/resolv.conf > /FedoraRemix/DNS.txt
@@ -205,7 +251,7 @@ cat /etc/resolv.conf > /FedoraRemix/DNS.txt
 
 
 ## Setup and Install Ansible and Ansible Navigator
-/usr/bin/pip install ansible-core ansible-navigator ansible-builder ansible ansible-dev-tools ## ansible-cdk # (issues with DNS in Post)
+/usr/bin/pip install ansible-core ansible-navigator ansible-builder ansible ansible-dev-tools --no-warn-script-location --root-user-action=ignore ## ansible-cdk # (issues with DNS in Post)
 #wget -P /opt/ -r -nH -np -R "index.htm*" http://localhost/pip_packages/
 #wget -P /opt/ http://localhost/files/python_packages.txt
 #cd /opt/pip_packages
@@ -214,23 +260,30 @@ cat /etc/resolv.conf > /FedoraRemix/DNS.txt
 
 
 ## Install Flatpaks
-echo "Attempting to install flatpaks"
-/usr/bin/flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+print_banner "📦 FLATPAK APPLICATION SETUP" "$GREEN"
+print_step "Configuring Flathub repository and installing applications"
 
-# /usr/bin/flatpak install flathub com.slack.Slack -y
-# /usr/bin/flatpak install flathub us.zoom.Zoom -y
+# Enable unprivileged user namespaces
+sudo chmod u+s /usr/bin/bwrap
+
+/usr/bin/flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
 /usr/bin/flatpak remote-add --if-not-exists --user flathub https://flathub.org/repo/flathub.flatpakrepo
 /usr/bin/flatpak install --system --noninteractive flathub io.podman_desktop.PodmanDesktop
 
+# Enable system-wide access
+flatpak override --system --filesystem=home
+
+
 ## Fix Flatpak SELinux
-restorecon -R /var/lib/flatpak
+/usr/sbin/restorecon -R /var/lib/flatpak
 
 ## Install Balena Etcher
-yum -y localinstall https://github.com/balena-io/etcher/releases/download/v1.18.11/balena-etcher-1.18.11.x86_64.rpm
+dnf -y install https://github.com/balena-io/etcher/releases/download/v1.18.11/balena-etcher-1.18.11.x86_64.rpm
 
 ## Customize Anaconda Installer
 
-echo "Customizing Anaconda"
+print_banner "⚙️  ANACONDA INSTALLER CUSTOMIZATION" "$CYAN"
+print_step "Applying custom branding and logos to installer"
 
 cd /usr/share/anaconda/pixmaps
 rm sidebar-logo.png
@@ -264,20 +317,24 @@ wget http://localhost/files/logos/fedora_darkbackground.svg
 ## END Use this in a script to fix after upgrade for desktop logo END ##
 
 
-## Customize Gnome Wallpaper
+## Customize Gnome Wallpaper for FC42
 mkdir -p /usr/share/backgrounds/f40/default/
 cd /usr/share/backgrounds/f40/default/
 rm *.png
 wget http://localhost/files/f38-01-night.png
 wget http://localhost/files/f38-01-day.png
-mv f38-01-night.png f40-01-night.png
-mv f38-01-day.png f40-01-day.png
+cd /usr/share/backgrounds/gnome
+mv f38-01-night.png f42-night.png
+mv f38-01-day.png f42-day.png
 mv /usr/share/backgrounds/gnome/adwaita-l.jpg /usr/share/backgrounds/gnome/adwaita-l.orig
-cp f40-01-day.png /usr/share/backgrounds/gnome/adwaita-l.jpg
+mv /usr/share/backgrounds/gnome/adwaita-d.jpg /usr/share/backgrounds/gnome/adwaita-d.orig
+cp f42-day.png /usr/share/backgrounds/gnome/adwaita-l.jpg
+cp f42-night.png /usr/share/backgrounds/gnome/adwaita-d.jpg
 
 ## Customize Grub Boot Menu
 
-echo "Attempting to customize GRUB"
+print_banner "🛠️  GRUB BOOTLOADER CONFIGURATION" "$YELLOW"
+print_step "Installing custom GRUB theme and configuration"
 
 /usr/bin/mkdir /boot/grub2/images
 cd /etc/default
@@ -314,8 +371,9 @@ echo /usr/bin/fedora-dynamic-motd.sh >> /etc/profile
 mkdir /opt/bash
 cd /opt/bash
 wget http://localhost/files/bashrc.append
-git clone git clone https://github.com/tmichett/bash-git-prompt.git /opt/bash/bash-git-prompt --depth=1
-echo "$(cat //opt/bash/bashrc.append)" >> /etc/skel/.bashrc 
+## Install Gitprompt
+git clone https://github.com/tmichett/bash-git-prompt.git /opt/bash-git-prompt --depth=1
+
 
 ### Removal of network fix
 #rm /etc/resolv.conf
@@ -333,13 +391,15 @@ chmod 644  /etc/systemd/system/fixgrub.service
 systemctl enable fixgrub.service
 
 ## Enable Cockpit and SSHD
-echo "Enabling Cockpit and SSHD Services"
+print_banner "🔧 SYSTEM SERVICES ACTIVATION" "$GREEN"
+print_step "Enabling Cockpit web console and SSH daemon"
 systemctl enable cockpit.socket
 systemctl enable sshd.service
 
 ## Enable YAD Scripts and Looks
 cd /opt/FedoraRemix/
-wget -r -nH -np -R "index.htm*" http://localhost/scripts/
+wget http://localhost/kickstart.py
+wget -r -nH -np --reject-regex "index\\.html?.*" http://localhost/scripts/
 wget http://localhost/files/Wallpaper.png
 cd /opt/FedoraRemix/scripts
 wget http://localhost/files/boot/fixgrub.sh
@@ -364,7 +424,8 @@ wget http://localhost/files/bashrc.append
 /usr/sbin/groupadd -g 700 ansible-user
 /usr/sbin/useradd -u 700 -g 700 -c "Ansible User" ansible-user
 echo "ansiblepass" | passwd ansible-user --stdin
-echo "ansible-user ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/ansible-user
+sudo sh -c 'echo "Defaults:ansible-user !requiretty"  > /etc/sudoers.d/ansible-user'
+echo "ansible-user ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers.d/ansible-user
 
 ## Download and Install Calibre
 sudo -v && wget -nv -O- https://download.calibre-ebook.com/linux-installer.sh | sudo sh /dev/stdin
@@ -384,21 +445,132 @@ chown root:root -R /usr/share/gnome-shell/extensions/
 chmod 755  -R /usr/share/gnome-shell/extensions
 
 ## Enabled Desktop Icons
+/usr/bin/gnome-extensions install /opt/FedoraRemixCustomize/Gnome_Shell/dingrastersoft.com.v76.shell-extension.zip
+/usr/bin/gnome-extensions install /opt/FedoraRemixCustomize/Gnome_Shell/add-to-desktoptommimon.github.com.v14.shell-extension.zip
+
+## Enable DING for All Users FC42 (4/21/2025)
+echo -e "${RED}Changing GNOME Extensions... ${NC}"
+cd /usr/share/gnome-shell/extensions
+rm -rf ding@rastersoft.com
+mkdir ding@rastersoft.com
+cd /usr/share/gnome-shell/extensions/ding@rastersoft.com
+unzip /opt/FedoraRemixCustomize/Files/dingrastersoft.com.v76.shell-extension.zip
+chown -R root:root /usr/share/gnome-shell/extensions/ding@rastersoft.com
+chmod 755 -R /usr/share/gnome-shell/extensions/ding@rastersoft.com
+dconf update
 
 ## Install UDP Cast 
+print_step "Installing UDPCast for network imaging" "$BLUE"
 mkdir -p /opt/udpcast
 cd /opt/udpcast
 wget http://localhost/udpcast-20230924-1.x86_64.rpm
 dnf install -y ./udpcast-20230924-1.x86_64.rpm 
 
-## Isntall OhMyBash
+## Install OhMyBash
+print_step "Installing OhMyBash shell enhancement" "$PURPLE"
 bash -c "$(curl -fsSL https://raw.githubusercontent.com/tmichett/oh-my-bash/master/tools/install.sh)" --prefix=/usr/local --unattended
 
-## Install Gitprompt
-git clone https://github.com/tmichett/bash-git-prompt.git ~/.bash-git-prompt --depth=1 /opt/bash-git-prompt
+## Set BASHRC Defaults
 echo "$(cat /opt/FedoraRemixCustomize/bashrc.append)" >> /etc/bashrc
 
+## Install Podman BootC from Repo (FIX ME - Not in Fedora Yet)
+print_step "Installing Podman BootC container support" "$CYAN"
+sudo dnf -y install 'dnf-command(copr)'
+sudo dnf -y copr enable gmaglione/podman-bootc
+sudo dnf -y install podman-bootc
+
 ## Update to Latest Packages
+print_banner "📦 SYSTEM UPDATES & MAINTENANCE" "$YELLOW"
+print_step "Updating all packages to latest versions"
 dnf update -y
 
+## Update Ansible Collections
+
+# Get the Python path for ansible collections
+INSTALL_PATH=$(ansible-galaxy collection list | grep ansible_collections | grep python | awk '{print $2}')
+
+# Check if the INSTALL_PATH variable is not empty
+if [ -z "$INSTALL_PATH" ]; then
+    echo "Error: Unable to determine the Python path for ansible collections."
+    exit 1
+fi
+
+echo "Using Python path: $INSTALL_PATH"
+
+# List all installed collections and loop through them
+for collection in $(ansible-galaxy collection list | awk '{print $1}' | tail -n +2); do
+  echo "Upgrading collection: $collection"
+  
+## Use ansible-galaxy to install the collection with the specified path ##
+  ansible-galaxy collection install $collection --upgrade -p "$INSTALL_PATH"
+  done
+
+## Update System Collections for Ansible Posix and others
+echo "Updating Ansible Galaxy Posix Collection"
+ansible-galaxy collection install --upgrade ansible.posix community.general containers.podman fedora.linux_system_roles  -p /usr/share/ansible/collections/ansible_collections
+
+## Create FedoraRemix Custom Tools (LMStudio) ##
+print_banner "🤖 AI & DEVELOPMENT TOOLS" "$PURPLE"
+print_step "Downloading LMStudio AI application"
+mkdir /opt/FedoraRemixApps
+cd /opt/FedoraRemixApps
+wget https://installers.lmstudio.ai/linux/x64/0.3.14-5/LM-Studio-0.3.14-5-x64.AppImage
+chmod +x /opt/FedoraRemixApps/LM-Studio-0.3.14-5-x64.AppImage
+
+## Create Desktop Icon for LMStudio
+echo "Installing LMStudio Icons"
+cd /usr/share/applications
+wget  http://localhost/files/LMStudio.desktop
+
+## Load Icons for Custom Applications
+cd /usr/share/icons
+wget http://localhost/files/logos/fedora_tools_logo.png
+wget http://localhost/files/logos/lmstudio.png
+
+## Install LogViewer
+dnf install -y https://github.com/tmichett/log_viewer/releases/download/1.1.0/LogViewer-1.1-0.x86_64.rpm
+
+## Enabled Desktop Icons from Extension
+echo "Configuring GNOME Extensions for Desktop Shortcuts"
+/usr/bin/gnome-extensions install /opt/FedoraRemixCustomize/Gnome_Shell/dingrastersoft.com.v76.shell-extension.zip --force
+/usr/bin/gnome-extensions install /opt/FedoraRemixCustomize/Gnome_Shell/add-to-desktoptommimon.github.com.v14.shell-extension.zip --force
+
+## Create TMUX Config Directory
+echo "Configuring TMUX"
+mkdir /opt/tmux
+cd /opt/tmux
+wget wget  http://localhost/files/tmux.conf
+
+## Install VeraCrypt
+print_step "Installing VeraCrypt encryption tool" "$RED"
+dnf install -y https://github.com/veracrypt/VeraCrypt/releases/download/VeraCrypt_1.26.20/veracrypt-1.26.20-Fedora-40-x86_64.rpm
+cd /usr/share/applications
+wget http://localhost/files/logos/veracrypt.png
+sed -i 's/Icon=veracrypt/Icon=\/usr\/share\/applications\/veracrypt.png/g' /usr/share/applications/veracrypt.desktop
+
+## Install and Configure Mutagen
+echo "Installing Matagen"
+cd /tmp
+wget https://github.com/mutagen-io/mutagen/releases/download/v0.18.1/mutagen_linux_amd64_v0.18.1.tar.gz
+tar xvf mutagen_linux_amd64_v0.18.1.tar.gz -C /usr/local/bin/
+rm mutagen_linux_amd64_v0.18.1.tar.gz
+
+
+## Install Cursor
+wget -O  /opt/FedoraRemixApps/Cursor.AppImage https://downloads.cursor.com/production/96e5b01ca25f8fbd4c4c10bc69b15f6228c80771/linux/x64/Cursor-0.50.5-x86_64.AppImage
+chmod +x /opt/FedoraRemixApps/Cursor.AppImage
+cd /usr/share/icons 
+wget http://localhost/files/logos/Cursor.svg
+cd /usr/share/applications
+wget http://localhost/files/Cursor.desktop
+
+## Put information in /etc regarding Fedora Remix Versions
+date "+This version of Fedora Remix 42 was created on %B %d, %Y" > /etc/fedora_remix_release
+
+## Echo Finish time to screen
+print_banner "🎉 TRAVIS'S FEDORA REMIX 42 BUILD COMPLETED!" "$GREEN"
+print_step "Build completed successfully at $(date)" "$GREEN"
+
+print_banner "🔥 STARTING ISO CREATION PROCESS" "$YELLOW"
+print_step "Preparing to build final ISO image" "$YELLOW"
 %end

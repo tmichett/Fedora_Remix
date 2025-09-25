@@ -27,8 +27,9 @@ ImageMagick
 mock
 git
 gedit
-# vlc - Temporarily disabled due to plugins conflict
-# Will be installed via flatpak or post-install script instead
+vlc
+## VLC Plugin conflicts removing plugin
+-vlc-plugins-freeworld  
 code
 tmux
 ntfs-3g
@@ -61,8 +62,7 @@ netpbm-progs
 scribus
 
 ## Video Editing and Manipulation
-# kdenlive - Temporarily disabled due to VLC plugin dependencies conflicts
-# Will be installed via post-install script or flatpak
+kdenlive
 
 ## Container Tools
 buildah
@@ -127,10 +127,6 @@ chromium
 
 ## Added packages that were removed in FC40 from default
 @Gnome-desktop
--vlc*  # Exclude all VLC packages from main installation due to plugins conflict
--phonon-qt5-backend-vlc  # Exclude VLC phonon backend to prevent plugin conflicts
--phonon-qt6-backend-vlc  # Exclude VLC phonon backend to prevent plugin conflicts
--kaffeine  # Exclude kaffeine to prevent VLC plugin dependencies
 libreoffice
 
 ## Added for Ansible and JSON Filtering
@@ -163,5 +159,11 @@ bat
 fzf
 yazi  ## Needs repo
 dust  ## Needs repo
+
+## Networking and Diagnostic Utilities
+nmap 
+iptraf-ng
+wireshark
+
 
 %end

@@ -1,0 +1,12 @@
+# Configuration file for Prepare_Web_Files.py
+
+# Fedora boot files to download for PXE boot
+fedora_boot_files:
+  - "vmlinuz"
+  - "initrd.img"
+
+# Fedora version to use for downloading boot files
+fedora_version: 42
+
+# Web root directory where files will be served
+web_root: "/var/www/html"
