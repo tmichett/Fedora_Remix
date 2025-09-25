@@ -34,6 +34,7 @@ code
 tmux
 ntfs-3g
 wget
+curl
 fedora-remix-logos
 gh
 syslinux-perl

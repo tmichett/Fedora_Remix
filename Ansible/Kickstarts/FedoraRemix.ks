@@ -71,11 +71,38 @@ set -x
 print_banner "🚀 TRAVIS'S FEDORA REMIX 42 BUILD STARTED" "$PURPLE"
 print_step "Build initiated at $(date)" "$CYAN"
 
-cat >> /etc/rc.d/init.d/livesys << EOF
+# Create separate live system customization script instead of modifying livesys
+print_step "Creating Fedora Remix live system customizations"
 
+# Create our own customization script that runs after livesys
+cat > /etc/rc.d/init.d/fedora-remix-live << 'EOF'
+#!/bin/bash
+#
+# fedora-remix-live: Fedora Remix specific live system customizations
+#
+# chkconfig: 345 01 99
+# description: Fedora Remix live system customizations
+### BEGIN INIT INFO
+# X-Start-After: livesys
+### END INIT INFO
+
+. /etc/init.d/functions
+
+if ! strstr "`cat /proc/cmdline`" rd.live.image || [ "$1" != "start" ]; then
+    exit 0
+fi
+
+if [ -e /.fedora-remix-configured ] ; then
+    exit 0
+fi
+
+exists() {
+    which $1 >/dev/null 2>&1 || return
+    $*
+}
 
 # disable gnome-software automatically downloading updates
-cat >> /usr/share/glib-2.0/schemas/org.gnome.software.gschema.override << FOE
+cat >> /usr/share/glib-2.0/schemas/org.gnome.software.gschema.override << 'FOE'
 [org.gnome.software]
 download-updates=false
 FOE
@@ -84,16 +111,12 @@ FOE
 rm -f /etc/xdg/autostart/gnome-software-service.desktop
 
 # disable the gnome-software shell search provider
-cat >> /usr/share/gnome-shell/search-providers/org.gnome.Software-search-provider.ini << FOE
+cat >> /usr/share/gnome-shell/search-providers/org.gnome.Software-search-provider.ini << 'FOE'
 DefaultDisabled=true
 FOE
 
-# don't run gnome-initial-setup
-mkdir ~liveuser/.config
-touch ~liveuser/.config/gnome-initial-setup-done
-
 # suppress anaconda spokes redundant with gnome-initial-setup
-cat >> /etc/sysconfig/anaconda << FOE
+cat >> /etc/sysconfig/anaconda << 'FOE'
 [NetworkSpoke]
 visited=1
 
@@ -107,11 +130,11 @@ FOE
 # make the installer show up
 if [ -f /usr/share/applications/liveinst.desktop ]; then
   # Show harddisk install in shell dash
-  sed -i -e 's/NoDisplay=true/NoDisplay=false/' /usr/share/applications/liveinst.desktop ""
+  sed -i -e 's/NoDisplay=true/NoDisplay=false/' /usr/share/applications/liveinst.desktop
   # need to move it to anaconda.desktop to make shell happy
   mv /usr/share/applications/liveinst.desktop /usr/share/applications/anaconda.desktop
 
-  cat >> /usr/share/glib-2.0/schemas/org.gnome.shell.gschema.override << FOE
+  cat >> /usr/share/glib-2.0/schemas/org.gnome.shell.gschema.override << 'FOE'
 [org.gnome.shell]
 favorite-apps=['firefox.desktop', 'org.gnome.Calendar.desktop', 'rhythmbox.desktop', 'org.gnome.Photos.desktop', 'org.gnome.Nautilus.desktop', 'anaconda.desktop']
 FOE
@@ -124,7 +147,7 @@ FOE
   fi
 
   # Disable GNOME welcome tour so it doesn't overlap with Fedora welcome screen
-  cat >> /usr/share/glib-2.0/schemas/org.gnome.shell.gschema.override << FOE
+  cat >> /usr/share/glib-2.0/schemas/org.gnome.shell.gschema.override << 'FOE'
 welcome-dialog-last-shown-version='4294967295'
 FOE
 
@@ -138,7 +161,7 @@ fi
 glib-compile-schemas /usr/share/glib-2.0/schemas
 
 # set up auto-login
-cat > /etc/gdm/custom.conf << FOE
+cat > /etc/gdm/custom.conf << 'FOE'
 [daemon]
 AutomaticLoginEnable=True
 AutomaticLogin=liveuser
@@ -149,9 +172,29 @@ if [ -f /etc/PackageKit/CommandNotFound.conf ]; then
   sed -i -e 's/^SoftwareSourceSearch=true/SoftwareSourceSearch=false/' /etc/PackageKit/CommandNotFound.conf
 fi
 
-# make sure to set the right permissions and selinux contexts
-chown -R liveuser:liveuser /home/liveuser/
-/usr/sbin/restorecon-R /home/liveuser/
+# Mark as configured
+touch /.fedora-remix-configured
+
+EOF
+
+# Make the script executable and enable it
+chmod 755 /etc/rc.d/init.d/fedora-remix-live
+/sbin/restorecon /etc/rc.d/init.d/fedora-remix-live
+/sbin/chkconfig --add fedora-remix-live
+
+# Ensure liveuser home directory is properly set up later
+print_step "Live system customization script created and enabled"
+
+# Add liveuser home directory setup to our custom script
+cat >> /etc/rc.d/init.d/fedora-remix-live << 'EOF'
+
+# don't run gnome-initial-setup for liveuser
+if [ -d /home/liveuser ]; then
+    mkdir -p /home/liveuser/.config
+    touch /home/liveuser/.config/gnome-initial-setup-done
+    chown -R liveuser:liveuser /home/liveuser/
+    restorecon -R /home/liveuser/ 2>/dev/null || true
+fi
 
 EOF
 
@@ -205,7 +248,80 @@ print_step "Setting Plymouth boot theme to tm-fedora-remix"
 
 /usr/sbin/plymouth-set-default-theme tm-fedora-remix -R
 
-dracut -f --no-kernel
+echo "=== Configuring dracut for live boot support ==="
+
+# Create dracut configuration to ensure livenet modules are always included
+# Note: curl and wget should already be available from base packages
+mkdir -p /etc/dracut.conf.d
+cat > /etc/dracut.conf.d/02-livenet.conf << 'EOF'
+# Ensure livenet and related modules are included for live boot
+add_dracutmodules+=" livenet network-legacy dmsquash-live url-lib "
+install_items+=" /usr/bin/curl /usr/bin/wget /usr/bin/getopt "
+# Force include networking tools and dependencies
+install_optional_items+=" /usr/bin/ping /usr/bin/dig /lib*/libnss_dns.so.* "
+# Include essential libraries for URL handling
+install_optional_items+=" /lib*/libcurl.so.* /lib*/libssl.so.* /lib*/libcrypto.so.* "
+EOF
+
+echo "=== Creating livenet URL handler functions ==="
+# Create a backup URL handler in case the dracut one fails
+cat > /usr/lib/dracut/modules.d/99local-url-handler/module-setup.sh << 'EOF'
+#!/bin/bash
+
+check() {
+    return 0
+}
+
+depends() {
+    echo livenet
+    return 0
+}
+
+install() {
+    inst_simple "$moddir/get_url_handler.sh" "/lib/get_url_handler"
+    inst_multiple curl wget
+}
+EOF
+
+mkdir -p /usr/lib/dracut/modules.d/99local-url-handler
+cat > /usr/lib/dracut/modules.d/99local-url-handler/get_url_handler.sh << 'EOF'
+#!/bin/bash
+# Backup URL handler function for livenet
+
+get_url_handler() {
+    local url="$1"
+    local target="$2"
+    
+    if command -v curl >/dev/null 2>&1; then
+        curl -L -o "$target" "$url"
+    elif command -v wget >/dev/null 2>&1; then
+        wget -O "$target" "$url"
+    else
+        return 1
+    fi
+}
+EOF
+
+chmod +x /usr/lib/dracut/modules.d/99local-url-handler/module-setup.sh
+chmod +x /usr/lib/dracut/modules.d/99local-url-handler/get_url_handler.sh
+
+echo "=== Regenerating initramfs with live boot support ==="
+# Regenerate initramfs with proper modules for live boot functionality
+# The configuration file will ensure livenet modules are included
+if [ -f /boot/vmlinuz-$(uname -r) ]; then
+    echo "Building initramfs for kernel $(uname -r)"
+    dracut -f --force /boot/initramfs-$(uname -r).img $(uname -r)
+    # Verify the modules were included
+    if lsinitrd /boot/initramfs-$(uname -r).img | grep -q livenet; then
+        echo "SUCCESS: Livenet modules successfully included in initramfs"
+    else
+        echo "WARNING: Livenet modules may not be included - trying alternative approach"
+        dracut -f -a "livenet network-legacy dmsquash-live" --install "curl wget" /boot/initramfs-$(uname -r).img $(uname -r)
+    fi
+else
+    echo "WARNING: Kernel not found, regenerating all initramfs images"
+    dracut -f --regenerate-all
+fi
 
 
 ## Fix Networking
