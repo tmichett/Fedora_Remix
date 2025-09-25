@@ -2,4 +2,4 @@
 echo "Configuring TMUX"
 mkdir /opt/tmux
 cd /opt/tmux
-wget wget  http://localhost/files/tmux.conf
+wget http://localhost/files/tmux.conf
