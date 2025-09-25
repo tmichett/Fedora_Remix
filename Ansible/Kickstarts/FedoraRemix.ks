@@ -204,6 +204,9 @@ echo 'export PATH=/usr/local/bin:$PATH' >> /etc/skel/.bashrc
 
 ### Download Logos 
 
+print_banner "🖼️ DOWNLOADING FEDORA REMIX LOGOS & BRANDING" "$CYAN"
+print_step "Downloading logos, themes, and branding assets"
+
 wget -O /usr/share/pixmaps/login-logo.png http://localhost/files/fedorap_small.png
 
 wget -O /etc/dconf/db/gdm.d/01-logo http://localhost/files/01-logo
@@ -237,6 +240,10 @@ cp /usr/share/plymouth/themes/tm-fedora-remix/watermark.* /usr/share/plymouth/th
 cp /usr/share/plymouth/themes/tm-fedora-remix/logo.* /usr/share/plymouth/themes/spinner/
 
 ## Setting up Customization Pieces
+
+print_banner "🛠️ SETTING UP CUSTOMIZATION COMPONENTS" "$BLUE"
+print_step "Downloading customization tools and configurations"
+
 wget -P /opt -r -nH -np --reject-regex "index\\.html?.*" http://localhost/FedoraRemixCustomize
 wget -P /opt -r -nH -np --reject-regex "index\\.html?.*" http://localhost/FedoraRemixPXE
 wget -P /opt -r -nH -np --reject-regex "index\\.html?.*" http://localhost/PXEServer

@@ -45,36 +45,41 @@ readonly KS_FILE="FedoraRemix.ks"
 readonly CACHE_DIR="/livecd-creator/package-cache"
 readonly BUILD_TITLE="Travis's Fedora Remix 42"
 
-# Function to print formatted messages
+# Function to print formatted messages with logging
 print_message() {
     local level="$1"
     local message="$2"
     local timestamp=$(date '+%Y-%m-%d %H:%M:%S')
+    local output=""
     
     case "$level" in
         "INFO")
-            echo -e "${BLUE}${ARROW}${NC} ${BOLD}[${timestamp}]${NC} ${message}"
+            output="${BLUE}${ARROW}${NC} ${BOLD}[${timestamp}]${NC} ${message}"
             ;;
         "SUCCESS") 
-            echo -e "${GREEN}${CHECKMARK}${NC} ${BOLD}[${timestamp}]${NC} ${GREEN}${message}${NC}"
+            output="${GREEN}${CHECKMARK}${NC} ${BOLD}[${timestamp}]${NC} ${GREEN}${message}${NC}"
             ;;
         "WARNING")
-            echo -e "${YELLOW}⚠️${NC} ${BOLD}[${timestamp}]${NC} ${YELLOW}${message}${NC}"
+            output="${YELLOW}⚠️${NC} ${BOLD}[${timestamp}]${NC} ${YELLOW}${message}${NC}"
             ;;
         "ERROR")
-            echo -e "${RED}${CROSS}${NC} ${BOLD}[${timestamp}]${NC} ${RED}${message}${NC}"
+            output="${RED}${CROSS}${NC} ${BOLD}[${timestamp}]${NC} ${RED}${message}${NC}"
             ;;
         "STAGE")
-            echo -e "\n${PURPLE}${STAR}═══════════════════════════════════════════════════════════════════════${NC}"
-            echo -e "${PURPLE}${STAR}${NC} ${BOLD}${WHITE}$message${NC}"
-            echo -e "${PURPLE}${STAR}═══════════════════════════════════════════════════════════════════════${NC}\n"
+            output="\n${PURPLE}${STAR}═══════════════════════════════════════════════════════════════════════${NC}\n${PURPLE}${STAR}${NC} ${BOLD}${WHITE}$message${NC}\n${PURPLE}${STAR}═══════════════════════════════════════════════════════════════════════${NC}\n"
             ;;
         "HEADER")
-            echo -e "\n${CYAN}╔═══════════════════════════════════════════════════════════════════════╗${NC}"
-            echo -e "${CYAN}║${NC} ${BOLD}${WHITE}$message${NC}${CYAN}║${NC}"
-            echo -e "${CYAN}╚═══════════════════════════════════════════════════════════════════════╝${NC}\n"
+            output="\n${CYAN}╔═══════════════════════════════════════════════════════════════════════╗${NC}\n${CYAN}║${NC} ${BOLD}${WHITE}$message${NC}${CYAN}║${NC}\n${CYAN}╚═══════════════════════════════════════════════════════════════════════╝${NC}\n"
             ;;
     esac
+    
+    # Display with colors to terminal
+    echo -e "$output"
+    
+    # Also log to file with colors stripped for readability
+    if [ -n "$BUILD_LOG" ]; then
+        echo -e "$output" | sed -r 's/\x1B\[[0-9;]*[mK]//g' >> "$BUILD_LOG"
+    fi
 }
 
 # Function to show progress spinner
@@ -174,23 +179,27 @@ run_build() {
     print_message "INFO" "${ROCKET} Launching build process..."
     print_message "INFO" "${TARGET} Command: $build_cmd"
     
-    # Run the build with color preservation and enhanced logging
+    # Add build command section to log
     {
-        echo "=============================================================="
-        echo "FEDORA REMIX BUILD LOG - $(date)"
-        echo "=============================================================="
-        echo ""
-        echo "Build Command: $build_cmd"
         echo ""
         echo "=============================================================="
-        echo "BUILD OUTPUT:"
+        echo "BUILD COMMAND EXECUTION:"
         echo "=============================================================="
         echo ""
     } >> "$BUILD_LOG"
     
-    # Use script to preserve colors in log while showing real-time output
-    script -qfc "$build_cmd" /dev/null 2>&1 | tee -a "$BUILD_LOG"
-    local build_exit_code=${PIPESTATUS[0]}
+    # Enhanced logging approach: capture both stdout and stderr with real-time display
+    print_message "INFO" "${GEAR} Starting livecd-creator with full output capture..."
+    
+    # Use exec to redirect all subsequent output to both terminal and log
+    exec > >(tee -a "$BUILD_LOG") 2>&1
+    
+    # Run the build command directly with proper argument handling
+    livecd-creator --cache="$CACHE_DIR" -f "$BUILD_NAME" -c "$KS_FILE" --title="$BUILD_TITLE"
+    local build_exit_code=$?
+    
+    # Restore normal output
+    exec > /dev/tty 2>&1
     
     return $build_exit_code
 }
@@ -232,6 +241,23 @@ show_build_results() {
 main() {
     local start_time=$(date +%s)
     
+    # Initialize log file with header information
+    {
+        echo "=============================================================="
+        echo "FEDORA REMIX ENHANCED BUILD LOG - $(date)"
+        echo "=============================================================="
+        echo ""
+        echo "Script: Enhanced_Remix_Build_Script.sh"
+        echo "Started: $(date)"
+        echo "User: $(whoami)"
+        echo "Working Directory: $(pwd)"
+        echo ""
+        echo "=============================================================="
+        echo "ENHANCED SCRIPT OUTPUT:"
+        echo "=============================================================="
+        echo ""
+    } > "$BUILD_LOG"
+    
     # Show header
     print_message "HEADER" "FEDORA REMIX ENHANCED BUILD SCRIPT"
     
@@ -252,6 +278,18 @@ main() {
     
     # Show results
     show_build_results $build_result $duration
+    
+    # Add final log footer
+    {
+        echo ""
+        echo "=============================================================="
+        echo "BUILD COMPLETED: $(date)"
+        echo "Exit Code: $build_result"
+        echo "Duration: ${duration} seconds"
+        echo "=============================================================="
+    } >> "$BUILD_LOG"
+    
+    print_message "INFO" "${WRENCH} Complete build log saved to: $BUILD_LOG"
     
     # Exit with same code as the build
     exit $build_result

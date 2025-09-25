@@ -105,10 +105,11 @@ def main():
     copy_file("./Prepare_Fedora_Remix_Build.yml", "/livecd-creator/FedoraRemix/Prepare_Fedora_Remix_Build.yml")
     copy_file("./Prepare_Web_Files.yml", "/livecd-creator/FedoraRemix/Prepare_Web_Files.yml")
     
-    # Copy Build Script with executable permissions
+    # Copy Build Scripts with executable permissions
     # Calculate the mode for u+rwx,g+x,o+x (0755 in octal)
     exec_mode = 0o755
     copy_file("../Remix_Build_Script.sh", "/livecd-creator/FedoraRemix/Remix_Build_Script.sh", exec_mode)
+    copy_file("./Enhanced_Remix_Build_Script.sh", "/livecd-creator/FedoraRemix/Enhanced_Remix_Build_Script.sh", exec_mode)
     
     # Copy config.yml for web files setup
     copy_file("./config.yml", "/livecd-creator/FedoraRemix/config.yml")
@@ -122,12 +123,16 @@ def main():
     print("  - Ansible playbooks:")
     print("    * Prepare_Fedora_Remix_Build.yml")
     print("    * Prepare_Web_Files.yml")
-    print("  - Remix_Build_Script.sh (executable)")
+    print("  - Build scripts (executable):")
+    print("    * Remix_Build_Script.sh (classic version)")
+    print("    * Enhanced_Remix_Build_Script.sh (enhanced with rich formatting)")
     print("  - config.yml")
     print("")
     print("Build environment is ready! You can now:")
     print("1. cd /livecd-creator/FedoraRemix")
-    print("2. Run: sudo ./Remix_Build_Script.sh")
+    print("2. Run one of:")
+    print("   - sudo ./Remix_Build_Script.sh (classic)")
+    print("   - sudo ./Enhanced_Remix_Build_Script.sh (recommended - enhanced output)")
 
 if __name__ == "__main__":
     main()
