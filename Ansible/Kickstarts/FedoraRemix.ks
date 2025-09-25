@@ -16,11 +16,19 @@
 
 #network --device=link --bootproto=static --ip=192.168.15.15 --netmask=255.255.255.0 --gateway=192.168.15.1 --nameserver=192.168.15.1
 
-part / --size 30680
+# This is set in the fedora-live-base.ks file
+# part / --size 30680  
 
 
 
 %post --nochroot
+# Set proper PATH for nochroot environment
+export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+
+# Ensure UTF-8 locale settings
+export LANG=en_US.UTF-8
+export LC_ALL=en_US.UTF-8
+
 #if [ ! -e /mnt/sysimage/etc/resolf.conf ]; then
 #  cp -P /etc/resolv.conf $INSTALL_ROOT/etc/resolv.conf
 #fi
@@ -35,22 +43,33 @@ set -x
 ### Fix ISOLinux
 
 %post --nochroot
+# Ensure UTF-8 locale settings
+export LANG=en_US.UTF-8
+export LC_ALL=en_US.UTF-8
+
 set -x
-touch "$LIVE_ROOT/isolinx/travis"
+touch "$LIVE_ROOT/isolinux/travis"
 
 %end
 
 
 %post
 
-## Echo Start time to screen
-print_banner "🚀 TRAVIS'S FEDORA REMIX 42 BUILD STARTED" "$PURPLE"
-print_step "Build initiated at $(date)" "$CYAN"
+# Set proper PATH to prevent mandb warnings and ensure all tools are available
+export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 
-set -x
+# Ensure UTF-8 locale settings
+export LANG=en_US.UTF-8
+export LC_ALL=en_US.UTF-8
 
 # Include formatting functions first for consistent output
 %include KickstartSnippets/format-functions.ks
+
+set -x
+
+## Echo Start time to screen
+print_banner "🚀 TRAVIS'S FEDORA REMIX 42 BUILD STARTED" "$PURPLE"
+print_step "Build initiated at $(date)" "$CYAN"
 
 cat >> /etc/rc.d/init.d/livesys << EOF
 
@@ -305,6 +324,25 @@ dnf update -y
 
 ## Install Cursor
 %include KickstartSnippets/install-cursor.ks
+
+## Clean up man page database to prevent warnings
+print_banner "📚 DOCUMENTATION CLEANUP" "$CYAN"
+print_step "Updating man page database and cleaning up warnings"
+
+# Ensure proper environment for mandb
+export MANPATH=/usr/share/man:/usr/local/share/man
+
+# Regenerate man database with proper error handling (English only for performance)
+if command -v mandb >/dev/null 2>&1; then
+    print_step "Regenerating man page database (English only)"
+    # Process only English man pages to reduce build time and avoid locale-specific warnings
+    export LC_ALL=C
+    mandb -c /usr/share/man 2>/dev/null || print_warning "Some man pages may have formatting issues (non-critical)"
+    # Restore UTF-8 locale
+    export LC_ALL=en_US.UTF-8
+else
+    print_warning "mandb command not found, skipping man page database update"
+fi
 
 ## Put information in /etc regarding Fedora Remix Versions
 date "+This version of Fedora Remix 42 was created on %B %d, %Y" > /etc/fedora_remix_release

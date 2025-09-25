@@ -36,8 +36,7 @@ zerombr
 # Partition clearing information
 clearpart --all
 # Disk partitioning information
-part / --fstype="ext4" --size=5120
-part / --size=20680
+part / --fstype="ext4" --size=20680
 
 %post
 # FIXME: it'd be better to get this installed from a package
@@ -321,7 +320,9 @@ fi
 #fi
 #%post --nochroot
 #cp -P /etc/resolv.conf "$INSTALL_ROOT"/etc/resolv.conf
-/usr/bin/pip install --no-cache-dir --disable-pip-version-check ansible-core ansible-navigator ansible-builder ansible ansible-dev-tools --no-warn-script-location --root-user-action=ignore ## Optimized for performance
+## Ansible packages provided by RPM - pip installation removed to prevent duplication
+## Original: /usr/bin/pip install ansible-core ansible-navigator ansible-builder ansible ansible-dev-tools
+echo "Ansible packages already installed via RPM, skipping pip installation"
 
 ## Install Flatpaks
 #/usr/bin/flatpak install flathub com.slack.Slack -y

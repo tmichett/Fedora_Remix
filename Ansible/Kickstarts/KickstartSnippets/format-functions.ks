@@ -1,6 +1,9 @@
 ## Shared Formatting Functions for Kickstart Snippets
 ## This file provides consistent formatting across all installation stages
 
+# Set proper PATH to ensure all tools are available and prevent warnings
+export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+
 # Enable UTF-8 for Unicode support
 export LANG=en_US.UTF-8
 export LC_ALL=en_US.UTF-8

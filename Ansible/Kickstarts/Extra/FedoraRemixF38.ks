@@ -23,7 +23,9 @@ part / --size 20680
 #fi
 #%post --nochroot
 #cp -P /etc/resolv.conf "$INSTALL_ROOT"/etc/resolv.conf
-/usr/bin/pip install --no-cache-dir --disable-pip-version-check ansible-core ansible-navigator ansible-builder ansible ansible-cdk --no-warn-script-location --root-user-action=ignore ## Optimized for performance
+## Ansible packages provided by RPM - pip installation removed to prevent duplication
+## Original: /usr/bin/pip install ansible-core ansible-navigator ansible-builder ansible ansible-cdk
+echo "Ansible packages already installed via RPM, skipping pip installation"
 
 ## Install Flatpaks
 #/usr/bin/flatpak install flathub com.slack.Slack -y
