@@ -1,4 +1,4 @@
-## Setup and Install Ansible and Ansible Navigator
+## Setup and Install Ansible and Ansible Navigator - Optimized Version
 # Use formatting functions if available, fallback to simple echo
 if type ks_print_section >/dev/null 2>&1; then
     ks_print_section "ANSIBLE DEVELOPMENT TOOLS INSTALLATION"
@@ -12,7 +12,10 @@ else
     echo "[INST] Installing ansible-core ansible-navigator ansible-builder ansible ansible-dev-tools..."
 fi
 
-/usr/bin/pip install ansible-core ansible-navigator ansible-builder ansible ansible-dev-tools --no-warn-script-location --root-user-action=ignore
+# Install Ansible tools with optimized flags for faster installation
+/usr/bin/pip install --no-cache-dir --disable-pip-version-check \
+    ansible-core ansible-navigator ansible-builder ansible ansible-dev-tools \
+    --no-warn-script-location --root-user-action=ignore
 
 # Verify installation with appropriate formatting
 if type ks_print_step >/dev/null 2>&1; then

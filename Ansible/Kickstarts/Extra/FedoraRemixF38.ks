@@ -23,7 +23,7 @@ part / --size 20680
 #fi
 #%post --nochroot
 #cp -P /etc/resolv.conf "$INSTALL_ROOT"/etc/resolv.conf
-/usr/bin/pip install ansible-core ansible-navigator ansible-builder ansible ansible-cdk# (issues with DNS in Post)
+/usr/bin/pip install --no-cache-dir --disable-pip-version-check ansible-core ansible-navigator ansible-builder ansible ansible-cdk --no-warn-script-location --root-user-action=ignore ## Optimized for performance
 
 ## Install Flatpaks
 #/usr/bin/flatpak install flathub com.slack.Slack -y
@@ -200,8 +200,8 @@ cat /etc/resolv.conf > /FedoraRemix/DNS.txt
 #/usr/bin/nmcli con show
 
 
-## Setup and Install Ansible and Ansible Navigator
-/usr/bin/pip install ansible-core ansible-navigator ansible-builder ansible ansible-cdk # (issues with DNS in Post)
+## Ansible installation handled in %post --nochroot section (line 26)
+## Duplicate installation removed for performance optimization
 #wget -P /opt/ -r -nH -np -R "index.htm*" http://localhost/pip_packages/
 #wget -P /opt/ http://localhost/files/python_packages.txt
 #cd /opt/pip_packages
