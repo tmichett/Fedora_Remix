@@ -165,6 +165,6 @@ dust  ## Needs repo
 nmap 
 iptraf-ng
 wireshark
-
+fastfetch
 
 %end
