@@ -201,8 +201,8 @@ FedoraRemix.ks
 
 ```bash
 # Use the new enhanced build script for rich visual output
-# (Run from the Ansible directory)
-cd Ansible
+# (Run from the Setup directory)
+cd Setup
 sudo ./Enhanced_Remix_Build_Script.sh
 ```
 
