@@ -68,11 +68,11 @@ export LC_ALL=en_US.UTF-8
 set -x
 
 ## Echo Start time to screen
-print_banner "🚀 TRAVIS'S FEDORA REMIX 42 BUILD STARTED" "$PURPLE"
-print_step "Build initiated at $(date)" "$CYAN"
+ks_print_header "🚀 TRAVIS'S FEDORA REMIX 42 BUILD STARTED"
+ks_print_info "Build initiated at $(date)"
 
 # Create separate live system customization script instead of modifying livesys
-print_step "Creating Fedora Remix live system customizations"
+ks_print_info "Creating Fedora Remix live system customizations"
 
 # Create our own customization script that runs after livesys
 cat > /etc/rc.d/init.d/fedora-remix-live << 'EOF'
@@ -183,7 +183,7 @@ chmod 755 /etc/rc.d/init.d/fedora-remix-live
 /sbin/chkconfig --add fedora-remix-live
 
 # Ensure liveuser home directory is properly set up later
-print_step "Live system customization script created and enabled"
+ks_print_info "Live system customization script created and enabled"
 
 # Add liveuser home directory setup to our custom script
 cat >> /etc/rc.d/init.d/fedora-remix-live << 'EOF'
@@ -204,8 +204,8 @@ echo 'export PATH=/usr/local/bin:$PATH' >> /etc/skel/.bashrc
 
 ### Download Logos 
 
-print_banner "🖼️ DOWNLOADING FEDORA REMIX LOGOS & BRANDING" "$CYAN"
-print_step "Downloading logos, themes, and branding assets"
+ks_print_section "🖼️ DOWNLOADING FEDORA REMIX LOGOS & BRANDING"
+ks_print_info "Downloading logos, themes, and branding assets"
 
 wget -O /usr/share/pixmaps/login-logo.png http://localhost/files/fedorap_small.png
 
@@ -241,8 +241,8 @@ cp /usr/share/plymouth/themes/tm-fedora-remix/logo.* /usr/share/plymouth/themes/
 
 ## Setting up Customization Pieces
 
-print_banner "🛠️ SETTING UP CUSTOMIZATION COMPONENTS" "$BLUE"
-print_step "Downloading customization tools and configurations"
+ks_print_section "🛠️ SETTING UP CUSTOMIZATION COMPONENTS"
+ks_print_info "Downloading customization tools and configurations"
 
 wget -P /opt -r -nH -np --reject-regex "index\\.html?.*" http://localhost/FedoraRemixCustomize
 wget -P /opt -r -nH -np --reject-regex "index\\.html?.*" http://localhost/FedoraRemixPXE
@@ -250,8 +250,8 @@ wget -P /opt -r -nH -np --reject-regex "index\\.html?.*" http://localhost/PXESer
 
 ## Setting Theme
 
-print_banner "🎨 CONFIGURING FEDORA REMIX THEME" "$PURPLE"
-print_step "Setting Plymouth boot theme to tm-fedora-remix"
+ks_print_section "🎨 CONFIGURING FEDORA REMIX THEME"
+ks_print_info "Setting Plymouth boot theme to tm-fedora-remix"
 
 /usr/sbin/plymouth-set-default-theme tm-fedora-remix -R
 
@@ -333,8 +333,8 @@ fi
 
 ## Fix Networking
 
-print_banner "🌐 NETWORK & DNS CONFIGURATION" "$BLUE"
-print_step "Configuring DNS servers and network settings"
+ks_print_section "🌐 NETWORK & DNS CONFIGURATION"
+ks_print_info "Configuring DNS servers and network settings"
 echo "nameserver 8.8.8.8" > /etc/resolv.conf
 /usr/bin/mkdir /FedoraRemix
 cat /etc/resolv.conf > /FedoraRemix/DNS.txt
@@ -389,8 +389,8 @@ cat /etc/resolv.conf > /FedoraRemix/DNS.txt
 %include KickstartSnippets/setup-firstboot.ks
 
 ## Enable Cockpit and SSHD
-print_banner "🔧 SYSTEM SERVICES ACTIVATION" "$GREEN"
-print_step "Enabling Cockpit web console and SSH daemon"
+ks_print_section "🔧 SYSTEM SERVICES ACTIVATION"
+ks_print_info "Enabling Cockpit web console and SSH daemon"
 systemctl enable cockpit.socket
 systemctl enable sshd.service
 
@@ -423,8 +423,8 @@ systemctl enable sshd.service
 %include KickstartSnippets/install-podman-bootc.ks
 
 ## Update to Latest Packages
-print_banner "📦 SYSTEM UPDATES & MAINTENANCE" "$YELLOW"
-print_step "Updating all packages to latest versions"
+ks_print_section "📦 SYSTEM UPDATES & MAINTENANCE"
+ks_print_info "Updating all packages to latest versions"
 dnf update -y
 
 ## Update Ansible Collections
@@ -449,31 +449,31 @@ dnf update -y
 %include KickstartSnippets/install-cursor.ks
 
 ## Clean up man page database to prevent warnings
-print_banner "📚 DOCUMENTATION CLEANUP" "$CYAN"
-print_step "Updating man page database and cleaning up warnings"
+ks_print_section "📚 DOCUMENTATION CLEANUP"
+ks_print_info "Updating man page database and cleaning up warnings"
 
 # Ensure proper environment for mandb
 export MANPATH=/usr/share/man:/usr/local/share/man
 
 # Regenerate man database with proper error handling (English only for performance)
 if command -v mandb >/dev/null 2>&1; then
-    print_step "Regenerating man page database (English only)"
+    ks_print_info "Regenerating man page database (English only)"
     # Process only English man pages to reduce build time and avoid locale-specific warnings
     export LC_ALL=C
-    mandb -c /usr/share/man 2>/dev/null || print_warning "Some man pages may have formatting issues (non-critical)"
+    mandb -c /usr/share/man 2>/dev/null || ks_print_warning "Some man pages may have formatting issues (non-critical)"
     # Restore UTF-8 locale
     export LC_ALL=en_US.UTF-8
 else
-    print_warning "mandb command not found, skipping man page database update"
+    ks_print_warning "mandb command not found, skipping man page database update"
 fi
 
 ## Put information in /etc regarding Fedora Remix Versions
 date "+This version of Fedora Remix 42 was created on %B %d, %Y" > /etc/fedora_remix_release
 
 ## Echo Finish time to screen
-print_banner "🎉 TRAVIS'S FEDORA REMIX 42 BUILD COMPLETED!" "$GREEN"
-print_step "Build completed successfully at $(date)" "$GREEN"
+ks_print_header "🎉 TRAVIS'S FEDORA REMIX 42 BUILD COMPLETED!"
+ks_print_success "Build completed successfully at $(date)"
 
-print_banner "🔥 STARTING ISO CREATION PROCESS" "$YELLOW"
-print_step "Preparing to build final ISO image" "$YELLOW"
+ks_print_header "🔥 STARTING ISO CREATION PROCESS"
+ks_print_info "Preparing to build final ISO image"
 %end
