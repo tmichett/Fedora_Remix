@@ -54,6 +54,7 @@ mc
 fuse-sshfs
 yum-utils
 cargo
+golang
 
 ## Image Editing and Manipulation
 inkscape
