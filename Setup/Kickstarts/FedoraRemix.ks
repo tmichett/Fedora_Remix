@@ -67,8 +67,17 @@ export LC_ALL=en_US.UTF-8
 
 set -x
 
+# Read version from config.yml if available (early definition for use throughout script)
+if [ -f "/var/www/html/Setup/config.yml" ]; then
+    FEDORA_VERSION=$(grep '^fedora_version:' /var/www/html/Setup/config.yml | awk '{print $2}' | tr -d '"')
+elif [ -f "/opt/FedoraRemix/config.yml" ]; then
+    FEDORA_VERSION=$(grep '^fedora_version:' /opt/FedoraRemix/config.yml | awk '{print $2}' | tr -d '"')
+else
+    FEDORA_VERSION="43"  # fallback default
+fi
+
 ## Echo Start time to screen
-ks_print_header "🚀 TRAVIS'S FEDORA REMIX 42 BUILD STARTED"
+ks_print_header "🚀 TRAVIS'S FEDORA REMIX ${FEDORA_VERSION} BUILD STARTED"
 ks_print_info "Build initiated at $(date)"
 
 # Create separate live system customization script instead of modifying livesys
@@ -468,10 +477,10 @@ else
 fi
 
 ## Put information in /etc regarding Fedora Remix Versions
-date "+This version of Fedora Remix 42 was created on %B %d, %Y" > /etc/fedora_remix_release
+date "+This version of Fedora Remix ${FEDORA_VERSION} was created on %B %d, %Y" > /etc/fedora_remix_release
 
 ## Echo Finish time to screen
-ks_print_header "🎉 TRAVIS'S FEDORA REMIX 42 BUILD COMPLETED!"
+ks_print_header "🎉 TRAVIS'S FEDORA REMIX ${FEDORA_VERSION} BUILD COMPLETED!"
 ks_print_success "Build completed successfully at $(date)"
 
 ks_print_header "🔥 STARTING ISO CREATION PROCESS"

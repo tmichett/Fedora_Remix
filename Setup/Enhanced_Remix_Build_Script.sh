@@ -43,7 +43,26 @@ readonly BUILD_LOG="FedoraBuild-${BUILD_DATE}.log"
 readonly BUILD_NAME="FedoraRemix"
 readonly KS_FILE="FedoraRemix.ks"
 readonly CACHE_DIR="/livecd-creator/package-cache"
-readonly BUILD_TITLE="Travis's Fedora Remix 42"
+
+# Function to read Fedora version from config.yml
+get_fedora_version() {
+    local config_file="config.yml"
+    if [ -f "$config_file" ]; then
+        # Extract fedora_version from YAML using grep and awk
+        local version=$(grep '^fedora_version:' "$config_file" | awk '{print $2}' | tr -d '"')
+        if [ -n "$version" ]; then
+            echo "$version"
+        else
+            echo "42"  # fallback default
+        fi
+    else
+        echo "42"  # fallback default if config file not found
+    fi
+}
+
+# Set build title with dynamic version
+readonly FEDORA_VERSION=$(get_fedora_version)
+readonly BUILD_TITLE="Travis's Fedora Remix ${FEDORA_VERSION}"
 
 # Function to print formatted messages with logging
 print_message() {
