@@ -210,6 +210,9 @@ run_build() {
     # Enhanced logging approach: capture both stdout and stderr with real-time display
     print_message "INFO" "${GEAR} Starting livecd-creator with full output capture..."
     
+    # Capture start time for ISO creation
+    local iso_start_time=$(date +%s)
+    
     # Use exec to redirect all subsequent output to both terminal and log
     exec > >(tee -a "$BUILD_LOG") 2>&1
     
@@ -217,22 +220,59 @@ run_build() {
     livecd-creator --cache="$CACHE_DIR" -f "$BUILD_NAME" -c "$KS_FILE" --title="$BUILD_TITLE"
     local build_exit_code=$?
     
+    # Capture end time for ISO creation
+    local iso_end_time=$(date +%s)
+    ISO_BUILD_TIME=$((iso_end_time - iso_start_time))
+    
     # Restore normal output
     exec > /dev/tty 2>&1
     
     return $build_exit_code
 }
 
+# Function to format time duration into human-readable format
+format_duration() {
+    local total_seconds=$1
+    local hours=$((total_seconds / 3600))
+    local minutes=$(( (total_seconds % 3600) / 60 ))
+    local seconds=$((total_seconds % 60))
+    
+    if [ $hours -gt 0 ]; then
+        echo "${hours}h ${minutes}m ${seconds}s"
+    elif [ $minutes -gt 0 ]; then
+        echo "${minutes}m ${seconds}s"
+    else
+        echo "${seconds}s"
+    fi
+}
+
 # Function to show build results
 show_build_results() {
     local exit_code=$1
-    local build_duration=$2
+    local total_duration=$2
+    local iso_duration=$3
     
     print_message "STAGE" "Build Results"
     
     if [ $exit_code -eq 0 ]; then
         print_message "SUCCESS" "${ROCKET} Live CD created successfully!"
-        print_message "INFO" "${CLOCK} Build completed in ${build_duration} seconds"
+        
+        # Display timing information
+        echo ""
+        echo -e "${CYAN}╔═══════════════════════════════════════════════════════════════════════╗${NC}"
+        echo -e "${CYAN}║${NC} ${BOLD}${WHITE}Build Timing Summary${NC}                                                ${CYAN}║${NC}"
+        echo -e "${CYAN}╚═══════════════════════════════════════════════════════════════════════╝${NC}"
+        echo ""
+        
+        local total_formatted=$(format_duration $total_duration)
+        local iso_formatted=$(format_duration $iso_duration)
+        local prep_duration=$((total_duration - iso_duration))
+        local prep_formatted=$(format_duration $prep_duration)
+        
+        echo -e "  ${CLOCK} ${BOLD}Total Build Time:${NC}      ${GREEN}${total_formatted}${NC} (${total_duration} seconds)"
+        echo -e "  ${GEAR} ${BOLD}Preparation Time:${NC}      ${CYAN}${prep_formatted}${NC} (${prep_duration} seconds)"
+        echo -e "  ${ROCKET} ${BOLD}ISO Creation Time:${NC}     ${YELLOW}${iso_formatted}${NC} (${iso_duration} seconds)"
+        echo ""
         
         # Show generated files
         if ls "${BUILD_NAME}".iso &>/dev/null; then
@@ -249,7 +289,7 @@ show_build_results() {
         
     else
         print_message "ERROR" "${CROSS} Live CD creation failed!"
-        print_message "ERROR" "${CLOCK} Build failed after ${build_duration} seconds"
+        print_message "ERROR" "${CLOCK} Build failed after ${total_duration} seconds"
         print_message "INFO" "${WRENCH} Check log file for details: $BUILD_LOG"
         
         print_message "HEADER" "BUILD FAILED - CHECK LOGS"
@@ -291,12 +331,12 @@ main() {
     run_build
     local build_result=$?
     
-    # Calculate build duration
+    # Calculate total build duration
     local end_time=$(date +%s)
-    local duration=$((end_time - start_time))
+    local total_duration=$((end_time - start_time))
     
-    # Show results
-    show_build_results $build_result $duration
+    # Show results with both total and ISO build times
+    show_build_results $build_result $total_duration $ISO_BUILD_TIME
     
     # Add final log footer
     {
@@ -304,7 +344,9 @@ main() {
         echo "=============================================================="
         echo "BUILD COMPLETED: $(date)"
         echo "Exit Code: $build_result"
-        echo "Duration: ${duration} seconds"
+        echo "Total Duration: ${total_duration} seconds ($(format_duration $total_duration))"
+        echo "ISO Creation: ${ISO_BUILD_TIME} seconds ($(format_duration $ISO_BUILD_TIME))"
+        echo "Preparation: $((total_duration - ISO_BUILD_TIME)) seconds ($(format_duration $((total_duration - ISO_BUILD_TIME))))"
         echo "=============================================================="
     } >> "$BUILD_LOG"
     
