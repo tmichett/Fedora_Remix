@@ -167,4 +167,8 @@ iptraf-ng
 wireshark
 fastfetch
 
+## Fedora Remix Packages
+dyff
+LogViewer
+
 %end

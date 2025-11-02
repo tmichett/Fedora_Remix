@@ -442,9 +442,6 @@ dnf update -y
 ## Create FedoraRemix Custom Tools (LMStudio)
 %include KickstartSnippets/install-lmstudio.ks
 
-## Install LogViewer
-%include KickstartSnippets/install-logviewer.ks
-
 ## Create TMUX Config Directory
 %include KickstartSnippets/setup-tmux.ks
 
