@@ -6,7 +6,7 @@ fedora_boot_files:
   - "initrd.img"
 
 # Fedora version to use for downloading boot files
-fedora_version: 42
+fedora_version: 43
 
 # Web root directory where files will be served
 web_root: "/var/www/html"

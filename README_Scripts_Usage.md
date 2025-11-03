@@ -62,7 +62,7 @@ sudo dnf install -y ansible-core
 - Copies the build script with proper permissions
 - Sets up the Ansible playbook for automated deployment
 
-**Location**: `Ansible/Prepare_Fedora_Remix_Build.py`
+**Location**: `Setup/Prepare_Fedora_Remix_Build.py`
 
 ### 2. Prepare_Web_Files.py
 
@@ -77,8 +77,8 @@ sudo dnf install -y ansible-core
 - Copies VSCode extensions and other tools
 - Sets up scripts and customization files
 
-**Location**: `Ansible/Prepare_Web_Files.py`
-**Configuration**: Uses `Ansible/config.yml` for settings
+**Location**: `Setup/Prepare_Web_Files.py`
+**Configuration**: Uses `Setup/config.yml` for settings
 
 ### 3. Remix_Build_Script.sh
 
@@ -97,7 +97,7 @@ sudo dnf install -y ansible-core
 
 ### Web Files Configuration (config.yml)
 
-The `Prepare_Web_Files.py` script uses a YAML configuration file located at `Ansible/config.yml`:
+The `Prepare_Web_Files.py` script uses a YAML configuration file located at `Setup/config.yml`:
 
 ```yaml
 # Fedora boot files to download for PXE boot
@@ -126,7 +126,7 @@ The main kickstart file is `FedoraRemix.ks`, which defines:
 - System configurations
 - Desktop environment setup
 
-Additional kickstart files are located in `Ansible/Kickstarts/`:
+Additional kickstart files are located in `Setup/Kickstarts/`:
 - `fedora-live-base.ks` - Base live system configuration
 - `fedora-workstation-common.ks` - Common workstation packages
 - `FedoraRemixPackages.ks` - Custom package selections
@@ -176,8 +176,8 @@ flowchart TD
 ### Step 1: Prepare Build Environment
 
 ```bash
-# Navigate to the Ansible directory
-cd /path/to/Fedora_Remix/Ansible
+# Navigate to the Setup directory
+cd /path/to/Fedora_Remix/Setup
 
 # Run the Python build preparation script as root
 sudo python3 Prepare_Fedora_Remix_Build.py
@@ -192,8 +192,8 @@ sudo python3 Prepare_Fedora_Remix_Build.py
 ### Step 2: Set Up Web Hosting (Optional)
 
 ```bash
-# Ensure you're in the Ansible directory
-cd /path/to/Fedora_Remix/Ansible
+# Ensure you're in the Setup directory
+cd /path/to/Fedora_Remix/Setup
 
 # Edit configuration if needed
 vim config.yml
@@ -243,7 +243,7 @@ The Ansible playbooks perform the same functions as the Python scripts but requi
 
 ```
 Fedora_Remix/
-├── Ansible/
+├── Setup/
 │   ├── config.yml                          # Web configuration
 │   ├── Prepare_Fedora_Remix_Build.py      # Build environment setup (PRIMARY)
 │   ├── Prepare_Fedora_Remix_Build.yml     # Ansible playbook alternative
@@ -346,10 +346,10 @@ nslookup download.fedoraproject.org
 
 #### 6. Configuration File Not Found
 **Problem**: `Prepare_Web_Files.py` can't find `config.yml`.
-**Solution**: Ensure you run the script from the `Ansible/` directory or create the config file.
+**Solution**: Ensure you run the script from the `Setup/` directory or create the config file.
 
 ```bash
-cd Fedora_Remix/Ansible/
+cd Fedora_Remix/Setup/
 sudo python3 Prepare_Web_Files.py
 ```
 
@@ -385,14 +385,14 @@ curl http://localhost/
 ### Customizing the ISO
 
 #### 1. Modify Kickstart Files
-Edit kickstart files in `Ansible/Kickstarts/` to customize:
+Edit kickstart files in `Setup/Kickstarts/` to customize:
 - Package selections
 - User accounts
 - System configurations
 - Post-installation scripts
 
 #### 2. Add Custom Files
-Place custom files in `Ansible/files/` directory to include them in the web hosting setup.
+Place custom files in `Setup/files/` directory to include them in the web hosting setup.
 
 #### 3. Modify Build Parameters
 Edit `Remix_Build_Script.sh` to change:
@@ -414,7 +414,7 @@ The Python scripts provide the primary automation method and can be easily scrip
 
 ```bash
 # Automated Python script execution
-cd /path/to/Fedora_Remix/Ansible
+cd /path/to/Fedora_Remix/Setup
 
 # Setup build environment
 sudo python3 Prepare_Fedora_Remix_Build.py

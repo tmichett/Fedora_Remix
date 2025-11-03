@@ -5,7 +5,7 @@
 #
 
 # Source the formatting functions
-source Ansible/Kickstarts/KickstartSnippets/format-functions.ks
+source Setup/Kickstarts/KickstartSnippets/format-functions.ks
 
 echo "Testing Enhanced Kickstart Formatting..."
 echo ""

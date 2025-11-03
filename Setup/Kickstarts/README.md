@@ -34,7 +34,6 @@ Kickstarts/
     ├── install-flatpaks.ks
     ├── install-gnome-tweaks.ks
     ├── install-lmstudio.ks
-    ├── install-logviewer.ks
     ├── install-mutagen.ks
     ├── install-ohmybash.ks
     ├── install-podman-bootc.ks
@@ -110,7 +109,6 @@ The kickstart system now features **dramatically improved visual output** with:
 | `install-cursor.ks` | Downloads Cursor AppImage and creates desktop integration | Lines 528-534 |
 | `install-flatpaks.ks` | Configures Flatpak, adds Flathub repo, installs Podman Desktop | Lines 237-252 |
 | `install-lmstudio.ks` | Downloads LM Studio AppImage and creates desktop integration | Lines 482-497 |
-| `install-logviewer.ks` | Installs custom log viewer application from GitHub | Line 500 |
 | `install-mutagen.ks` | Downloads and installs Mutagen file synchronization tool | Lines 521-526 |
 | `install-ohmybash.ks` | Installs Oh My Bash shell enhancement framework | Lines 441-442 |
 | `install-podman-bootc.ks` | Installs Podman BootC from COPR repository | Lines 448-451 |
@@ -183,7 +181,6 @@ FedoraRemix.ks
     ├── install-podman-bootc.ks
     ├── update-ansible-collections.ks
     ├── install-lmstudio.ks
-    ├── install-logviewer.ks
     ├── setup-desktop-icons.ks
     ├── setup-tmux.ks
     ├── install-veracrypt.ks
@@ -201,8 +198,8 @@ FedoraRemix.ks
 
 ```bash
 # Use the new enhanced build script for rich visual output
-# (Run from the Ansible directory)
-cd Ansible
+# (Run from the Setup directory)
+cd Setup
 sudo ./Enhanced_Remix_Build_Script.sh
 ```
 

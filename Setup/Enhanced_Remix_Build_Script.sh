@@ -43,7 +43,26 @@ readonly BUILD_LOG="FedoraBuild-${BUILD_DATE}.log"
 readonly BUILD_NAME="FedoraRemix"
 readonly KS_FILE="FedoraRemix.ks"
 readonly CACHE_DIR="/livecd-creator/package-cache"
-readonly BUILD_TITLE="Travis's Fedora Remix 42"
+
+# Function to read Fedora version from config.yml
+get_fedora_version() {
+    local config_file="config.yml"
+    if [ -f "$config_file" ]; then
+        # Extract fedora_version from YAML using grep and awk
+        local version=$(grep '^fedora_version:' "$config_file" | awk '{print $2}' | tr -d '"')
+        if [ -n "$version" ]; then
+            echo "$version"
+        else
+            echo "42"  # fallback default
+        fi
+    else
+        echo "42"  # fallback default if config file not found
+    fi
+}
+
+# Set build title with dynamic version (ISO 9660 compliant)
+readonly FEDORA_VERSION=$(get_fedora_version)
+readonly BUILD_TITLE="FEDORA_REMIX_${FEDORA_VERSION}"
 
 # Function to print formatted messages with logging
 print_message() {
@@ -191,6 +210,9 @@ run_build() {
     # Enhanced logging approach: capture both stdout and stderr with real-time display
     print_message "INFO" "${GEAR} Starting livecd-creator with full output capture..."
     
+    # Clean any existing timestamp file from previous builds
+    rm -f /tmp/iso_creation_start_time.txt
+    
     # Use exec to redirect all subsequent output to both terminal and log
     exec > >(tee -a "$BUILD_LOG") 2>&1
     
@@ -201,19 +223,78 @@ run_build() {
     # Restore normal output
     exec > /dev/tty 2>&1
     
+    # Calculate actual ISO creation time from log file
+    # The kickstart outputs a timestamp right before ISO creation starts
+    # Look for the timestamp in the log (appears as "+ echo 1234567890" in bash debug output)
+    if [ -f "$BUILD_LOG" ]; then
+        # Extract the epoch timestamp from log - look for "+ echo [timestamp]" after "Preparing to build final ISO image"
+        local iso_start_time=$(grep -A 10 "Preparing to build final ISO image" "$BUILD_LOG" | grep '+ echo [0-9]' | grep -o '[0-9]\{10\}' | head -1)
+        
+        if [ -n "$iso_start_time" ]; then
+            local iso_end_time=$(date +%s)
+            ISO_BUILD_TIME=$((iso_end_time - iso_start_time))
+        else
+            # Fallback if timestamp not found in log
+            ISO_BUILD_TIME=0
+        fi
+    else
+        # Fallback if log file not accessible
+        ISO_BUILD_TIME=0
+    fi
+    
     return $build_exit_code
+}
+
+# Function to format time duration into human-readable format
+format_duration() {
+    local total_seconds=$1
+    local hours=$((total_seconds / 3600))
+    local minutes=$(( (total_seconds % 3600) / 60 ))
+    local seconds=$((total_seconds % 60))
+    
+    if [ $hours -gt 0 ]; then
+        echo "${hours}h ${minutes}m ${seconds}s"
+    elif [ $minutes -gt 0 ]; then
+        echo "${minutes}m ${seconds}s"
+    else
+        echo "${seconds}s"
+    fi
 }
 
 # Function to show build results
 show_build_results() {
     local exit_code=$1
-    local build_duration=$2
+    local total_duration=$2
+    local iso_duration=$3
     
     print_message "STAGE" "Build Results"
     
     if [ $exit_code -eq 0 ]; then
         print_message "SUCCESS" "${ROCKET} Live CD created successfully!"
-        print_message "INFO" "${CLOCK} Build completed in ${build_duration} seconds"
+        
+        # Display timing information
+        echo ""
+        echo -e "${CYAN}╔═══════════════════════════════════════════════════════════════════════╗${NC}"
+        echo -e "${CYAN}║${NC} ${BOLD}${WHITE}Build Timing Summary${NC}                                                ${CYAN}║${NC}"
+        echo -e "${CYAN}╚═══════════════════════════════════════════════════════════════════════╝${NC}"
+        echo ""
+        
+        local total_formatted=$(format_duration $total_duration)
+        
+        # Only show detailed breakdown if we have valid ISO timing
+        if [ $iso_duration -gt 0 ]; then
+            local iso_formatted=$(format_duration $iso_duration)
+            local package_install_duration=$((total_duration - iso_duration))
+            local package_install_formatted=$(format_duration $package_install_duration)
+            
+            echo -e "  ${CLOCK} ${BOLD}Total Build Time:${NC}          ${GREEN}${total_formatted}${NC} (${total_duration} seconds)"
+            echo -e "  ${PACKAGE} ${BOLD}Package Installation:${NC}     ${CYAN}${package_install_formatted}${NC} (${package_install_duration} seconds)"
+            echo -e "  ${ROCKET} ${BOLD}ISO File Creation:${NC}        ${YELLOW}${iso_formatted}${NC} (${iso_duration} seconds)"
+        else
+            echo -e "  ${CLOCK} ${BOLD}Total Build Time:${NC}          ${GREEN}${total_formatted}${NC} (${total_duration} seconds)"
+            echo -e "  ${GEAR} ${BOLD}Note:${NC}                      Detailed timing unavailable (kickstart timestamp not found)"
+        fi
+        echo ""
         
         # Show generated files
         if ls "${BUILD_NAME}".iso &>/dev/null; then
@@ -230,7 +311,7 @@ show_build_results() {
         
     else
         print_message "ERROR" "${CROSS} Live CD creation failed!"
-        print_message "ERROR" "${CLOCK} Build failed after ${build_duration} seconds"
+        print_message "ERROR" "${CLOCK} Build failed after ${total_duration} seconds"
         print_message "INFO" "${WRENCH} Check log file for details: $BUILD_LOG"
         
         print_message "HEADER" "BUILD FAILED - CHECK LOGS"
@@ -272,12 +353,12 @@ main() {
     run_build
     local build_result=$?
     
-    # Calculate build duration
+    # Calculate total build duration
     local end_time=$(date +%s)
-    local duration=$((end_time - start_time))
+    local total_duration=$((end_time - start_time))
     
-    # Show results
-    show_build_results $build_result $duration
+    # Show results with both total and ISO build times
+    show_build_results $build_result $total_duration $ISO_BUILD_TIME
     
     # Add final log footer
     {
@@ -285,7 +366,13 @@ main() {
         echo "=============================================================="
         echo "BUILD COMPLETED: $(date)"
         echo "Exit Code: $build_result"
-        echo "Duration: ${duration} seconds"
+        echo "Total Duration: ${total_duration} seconds ($(format_duration $total_duration))"
+        if [ $ISO_BUILD_TIME -gt 0 ]; then
+            echo "Package Installation + Post Scripts: $((total_duration - ISO_BUILD_TIME)) seconds ($(format_duration $((total_duration - ISO_BUILD_TIME))))"
+            echo "Actual ISO File Creation: ${ISO_BUILD_TIME} seconds ($(format_duration $ISO_BUILD_TIME))"
+        else
+            echo "Note: Detailed timing breakdown unavailable"
+        fi
         echo "=============================================================="
     } >> "$BUILD_LOG"
     

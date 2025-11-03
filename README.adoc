@@ -19,7 +19,7 @@ endif::[]
 
 == Fedora Remix Creation Quickstart
 
-This quickstart will provide a quick method to download a pre-built Fedora Remix as well as creating your own Fedora Remix Building system. The https://github.com/tmichett/Fedora_Remix has been created with Ansible playbooks that will setup a Fedora Remix Building system using the Fedora Remix installed from the liveCD provided (https://drive.google.com/drive/folders/1UAT07AJIrTdMk3ke_QE6S6vz-qn6qGtR). The requirements are relatively simply to build and the system has Fedora Remix customization scripts and self-launching menu to assist with the initial setup. The quickstart and documentation are also available at the following link: https://tmichett.github.io/Fedora_Remix/.
+This quickstart will provide a quick method to download a pre-built Fedora Remix as well as creating your own Fedora Remix Building system. The https://github.com/tmichett/Fedora_Remix has been created with Python automation scripts that will setup a Fedora Remix Building system using the Fedora Remix installed from the liveCD provided (https://drive.google.com/drive/folders/1UAT07AJIrTdMk3ke_QE6S6vz-qn6qGtR). The requirements are relatively simply to build and the system has Fedora Remix customization scripts and self-launching menu to assist with the initial setup. The quickstart and documentation are also available at the following link: https://tmichett.github.io/Fedora_Remix/.
 
 .*Building your own Fedora Remix - Overview*
 
@@ -27,9 +27,9 @@ This quickstart will provide a quick method to download a pre-built Fedora Remix
 .. Setup a local user and ensure it is in the SUDOERS file
 .. Run some the Fedora Remix customize scripts to create SSH keys and SUDO with no password
 . Clone https://github.com/tmichett/Fedora_Remix
-. Run the Ansible playbooks with the "sudo" command
-.. Prepare_Web_Files.yml
-.. Prepare_Fedora_Remix_Build.yml
+. Run the Python automation scripts with the "sudo" command
+.. Prepare_Web_Files.py
+.. Prepare_Fedora_Remix_Build.py
 . Modify the Kickstart files in */livecd-creator/FedoraRemix*
 .. FedoraRemix.ks - To control various setup components and run commands
 .. FedoraRemixPackages.ks - To control RPM packages that are installed as part of your Remix
@@ -111,12 +111,12 @@ remote: Enumerating objects: 1949, done
 Resolving deltas: 100% (1042/1042), done.
 ----
 
-. Prepare the Fedora Remix build environment by running the Python scripts from the *Ansible* directory as the root user.
+. Prepare the Fedora Remix build environment by running the Python scripts from the *Setup* directory as the root user.
 +
 [source,bash]
 .Create */livecd-creator/FedoraRemix* Assets
 ----
-travis@localhost-fedoraremix-live [~/Fedora_Remix/Ansible] | (05/09/25 @ 15:57)  | main ✓ |
+travis@localhost-fedoraremix-live [~/Fedora_Remix/Setup] | (05/09/25 @ 15:57)  | main ✓ |
 $ sudo python Prepare_Fedora_Remix_Build.py
 
 ... OUTPUT OMITTED ...
@@ -128,7 +128,7 @@ Setup complete!
 [source,bash]
 .Create httpd server and repository assets
 ----
-travis@localhost-fedoraremix-live [~/Fedora_Remix/Ansible] | (05/09/25 @ 15:59)  | main ✓ |
+travis@localhost-fedoraremix-live [~/Fedora_Remix/Setup] | (05/09/25 @ 15:59)  | main ✓ |
 $ sudo python Prepare_Web_Files.py
 Installing packages: httpd
 Running command: dnf install -y httpd

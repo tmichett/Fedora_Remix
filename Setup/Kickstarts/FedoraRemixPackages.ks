@@ -54,6 +54,7 @@ mc
 fuse-sshfs
 yum-utils
 cargo
+golang
 
 ## Image Editing and Manipulation
 inkscape
@@ -166,5 +167,9 @@ nmap
 iptraf-ng
 wireshark
 fastfetch
+
+## Fedora Remix Packages
+dyff
+LogViewer
 
 %end
