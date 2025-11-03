@@ -13,8 +13,8 @@ chown root:root -R /usr/share/gnome-shell/extensions/
 chmod 755  -R /usr/share/gnome-shell/extensions
 
 ## Enabled Desktop Icons (GNOME 47 Compatible)
-/usr/bin/gnome-extensions install /opt/FedoraRemixCustomize/Gnome_Shell/dingrastersoft.com.v80.shell-extension.zip
-/usr/bin/gnome-extensions install /opt/FedoraRemixCustomize/Gnome_Shell/add-to-desktoptommimon.github.com.v15.shell-extension.zip
+/usr/bin/gnome-extensions install /opt/FedoraRemixCustomize/Files/dingrastersoft.com.v80.shell-extension.zip
+/usr/bin/gnome-extensions install /opt/FedoraRemixCustomize/Files/add-to-desktoptommimon.github.com.v15.shell-extension.zip
 
 ## Enable DING for All Users FC42 (4/21/2025)
 ks_print_configure "GNOME Desktop Extensions (DING)"
