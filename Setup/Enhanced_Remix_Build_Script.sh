@@ -210,8 +210,8 @@ run_build() {
     # Enhanced logging approach: capture both stdout and stderr with real-time display
     print_message "INFO" "${GEAR} Starting livecd-creator with full output capture..."
     
-    # Capture start time for ISO creation
-    local iso_start_time=$(date +%s)
+    # Clean any existing timestamp file from previous builds
+    rm -f /tmp/iso_creation_start_time.txt
     
     # Use exec to redirect all subsequent output to both terminal and log
     exec > >(tee -a "$BUILD_LOG") 2>&1
@@ -220,12 +220,20 @@ run_build() {
     livecd-creator --cache="$CACHE_DIR" -f "$BUILD_NAME" -c "$KS_FILE" --title="$BUILD_TITLE"
     local build_exit_code=$?
     
-    # Capture end time for ISO creation
-    local iso_end_time=$(date +%s)
-    ISO_BUILD_TIME=$((iso_end_time - iso_start_time))
-    
     # Restore normal output
     exec > /dev/tty 2>&1
+    
+    # Calculate actual ISO creation time from kickstart timestamp
+    # The kickstart writes this timestamp at the start of actual ISO creation
+    if [ -f /tmp/iso_creation_start_time.txt ]; then
+        local iso_start_time=$(cat /tmp/iso_creation_start_time.txt)
+        local iso_end_time=$(date +%s)
+        ISO_BUILD_TIME=$((iso_end_time - iso_start_time))
+        rm -f /tmp/iso_creation_start_time.txt
+    else
+        # Fallback if timestamp file not found
+        ISO_BUILD_TIME=0
+    fi
     
     return $build_exit_code
 }
@@ -265,13 +273,20 @@ show_build_results() {
         echo ""
         
         local total_formatted=$(format_duration $total_duration)
-        local iso_formatted=$(format_duration $iso_duration)
-        local prep_duration=$((total_duration - iso_duration))
-        local prep_formatted=$(format_duration $prep_duration)
         
-        echo -e "  ${CLOCK} ${BOLD}Total Build Time:${NC}      ${GREEN}${total_formatted}${NC} (${total_duration} seconds)"
-        echo -e "  ${GEAR} ${BOLD}Preparation Time:${NC}      ${CYAN}${prep_formatted}${NC} (${prep_duration} seconds)"
-        echo -e "  ${ROCKET} ${BOLD}ISO Creation Time:${NC}     ${YELLOW}${iso_formatted}${NC} (${iso_duration} seconds)"
+        # Only show detailed breakdown if we have valid ISO timing
+        if [ $iso_duration -gt 0 ]; then
+            local iso_formatted=$(format_duration $iso_duration)
+            local package_install_duration=$((total_duration - iso_duration))
+            local package_install_formatted=$(format_duration $package_install_duration)
+            
+            echo -e "  ${CLOCK} ${BOLD}Total Build Time:${NC}          ${GREEN}${total_formatted}${NC} (${total_duration} seconds)"
+            echo -e "  ${PACKAGE} ${BOLD}Package Installation:${NC}     ${CYAN}${package_install_formatted}${NC} (${package_install_duration} seconds)"
+            echo -e "  ${ROCKET} ${BOLD}ISO File Creation:${NC}        ${YELLOW}${iso_formatted}${NC} (${iso_duration} seconds)"
+        else
+            echo -e "  ${CLOCK} ${BOLD}Total Build Time:${NC}          ${GREEN}${total_formatted}${NC} (${total_duration} seconds)"
+            echo -e "  ${GEAR} ${BOLD}Note:${NC}                      Detailed timing unavailable (kickstart timestamp not found)"
+        fi
         echo ""
         
         # Show generated files
@@ -345,8 +360,12 @@ main() {
         echo "BUILD COMPLETED: $(date)"
         echo "Exit Code: $build_result"
         echo "Total Duration: ${total_duration} seconds ($(format_duration $total_duration))"
-        echo "ISO Creation: ${ISO_BUILD_TIME} seconds ($(format_duration $ISO_BUILD_TIME))"
-        echo "Preparation: $((total_duration - ISO_BUILD_TIME)) seconds ($(format_duration $((total_duration - ISO_BUILD_TIME))))"
+        if [ $ISO_BUILD_TIME -gt 0 ]; then
+            echo "Package Installation + Post Scripts: $((total_duration - ISO_BUILD_TIME)) seconds ($(format_duration $((total_duration - ISO_BUILD_TIME))))"
+            echo "Actual ISO File Creation: ${ISO_BUILD_TIME} seconds ($(format_duration $ISO_BUILD_TIME))"
+        else
+            echo "Note: Detailed timing breakdown unavailable"
+        fi
         echo "=============================================================="
     } >> "$BUILD_LOG"
     

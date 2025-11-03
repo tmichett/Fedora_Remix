@@ -482,4 +482,7 @@ ks_print_success "Build completed successfully at $(date)"
 
 ks_print_header "🔥 STARTING ISO CREATION PROCESS"
 ks_print_info "Preparing to build final ISO image"
+
+# Write timestamp for ISO creation start (used by Enhanced build script for timing)
+echo $(date +%s) > /tmp/iso_creation_start_time.txt
 %end
