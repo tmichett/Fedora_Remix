@@ -27,4 +27,5 @@ FEDORA_VERSION=$(get_fedora_version)
 setenforce 0
 
 # Use tee to capture output (simpler alternative to script command)
-livecd-creator --cache=/livecd-creator/package-cache -f FedoraRemix -c FedoraRemix.ks --title="Travis's Fedora Remix ${FEDORA_VERSION}" 2>&1 | tee FedoraBuild-$(date +%m%d%y-%k%M).out
+# ISO 9660 compliant volume ID (uppercase, underscores only, no spaces/special chars)
+livecd-creator --cache=/livecd-creator/package-cache -f FedoraRemix -c FedoraRemix.ks --title="FEDORA_REMIX_${FEDORA_VERSION}" 2>&1 | tee FedoraBuild-$(date +%m%d%y-%k%M).out

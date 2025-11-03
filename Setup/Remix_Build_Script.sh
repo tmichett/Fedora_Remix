@@ -25,8 +25,8 @@ FEDORA_VERSION=$(get_fedora_version)
 
 setenforce 0
 
-# Use script to capture output with colors
-script -c "livecd-creator --cache=/livecd-creator/package-cache -f FedoraRemix -c FedoraRemix.ks --title=\"Travis's Fedora Remix ${FEDORA_VERSION}\" 2>&1" FedoraBuild-$(date +%m%d%y-%k%M).out
+# Use script to capture output with colors (ISO 9660 compliant volume ID)
+script -c "livecd-creator --cache=/livecd-creator/package-cache -f FedoraRemix -c FedoraRemix.ks --title=\"FEDORA_REMIX_${FEDORA_VERSION}\" 2>&1" FedoraBuild-$(date +%m%d%y-%k%M).out
 
 
 #livecd-creator --cache=/livecd-creator/package-cache -f FedoraRemix -c FedoraRemix.ks --title="Travis's Fedora Remix" 2>&1 | tee FedoraBuild-$(date +%m%d%y-%k%M).out

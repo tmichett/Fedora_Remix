@@ -60,9 +60,9 @@ get_fedora_version() {
     fi
 }
 
-# Set build title with dynamic version
+# Set build title with dynamic version (ISO 9660 compliant)
 readonly FEDORA_VERSION=$(get_fedora_version)
-readonly BUILD_TITLE="Travis's Fedora Remix ${FEDORA_VERSION}"
+readonly BUILD_TITLE="FEDORA_REMIX_${FEDORA_VERSION}"
 
 # Function to print formatted messages with logging
 print_message() {

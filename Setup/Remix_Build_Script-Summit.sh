@@ -6,5 +6,6 @@
 
 setenforce 0
 
-livecd-creator --cache=/livecd-creator/package-cache -f SummitFedoraRemix -c FedoraRemix-Summit.ks --title="2025 Summit Fedora Remix" 2>&1 | tee FedoraBuildi-$(date +%m%d%y-%k%M).out
+# ISO 9660 compliant volume ID
+livecd-creator --cache=/livecd-creator/package-cache -f SummitFedoraRemix -c FedoraRemix-Summit.ks --title="SUMMIT_FEDORA_RMX_2025" 2>&1 | tee FedoraBuildi-$(date +%m%d%y-%k%M).out
 
