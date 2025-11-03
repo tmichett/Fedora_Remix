@@ -468,7 +468,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <h2 id="_fedora_remix_creation_quickstart">Fedora Remix Creation Quickstart</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>This quickstart will provide a quick method to download a pre-built Fedora Remix as well as creating your own Fedora Remix Building system. The <a href="https://github.com/tmichett/Fedora_Remix" class="bare">https://github.com/tmichett/Fedora_Remix</a> has been created with Ansible playbooks that will setup a Fedora Remix Building system using the Fedora Remix installed from the liveCD provided (<a href="https://drive.google.com/drive/folders/1UAT07AJIrTdMk3ke_QE6S6vz-qn6qGtR" class="bare">https://drive.google.com/drive/folders/1UAT07AJIrTdMk3ke_QE6S6vz-qn6qGtR</a>). The requirements are relatively simply to build and the system has Fedora Remix customization scripts and self-launching menu to assist with the initial setup. The quickstart and documentation are also available at the following link: <a href="https://tmichett.github.io/Fedora_Remix/" class="bare">https://tmichett.github.io/Fedora_Remix/</a>.</p>
+<p>This quickstart will provide a quick method to download a pre-built Fedora Remix as well as creating your own Fedora Remix Building system. The <a href="https://github.com/tmichett/Fedora_Remix" class="bare">https://github.com/tmichett/Fedora_Remix</a> has been created with Python automation scripts that will setup a Fedora Remix Building system using the Fedora Remix installed from the liveCD provided (<a href="https://drive.google.com/drive/folders/1UAT07AJIrTdMk3ke_QE6S6vz-qn6qGtR" class="bare">https://drive.google.com/drive/folders/1UAT07AJIrTdMk3ke_QE6S6vz-qn6qGtR</a>). The requirements are relatively simply to build and the system has Fedora Remix customization scripts and self-launching menu to assist with the initial setup. The quickstart and documentation are also available at the following link: <a href="https://tmichett.github.io/Fedora_Remix/" class="bare">https://tmichett.github.io/Fedora_Remix/</a>.</p>
 </div>
 <div class="olist arabic">
 <div class="title"><strong>Building your own Fedora Remix - Overview</strong></div>
@@ -490,14 +490,14 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <p>Clone <a href="https://github.com/tmichett/Fedora_Remix" class="bare">https://github.com/tmichett/Fedora_Remix</a></p>
 </li>
 <li>
-<p>Run the Ansible playbooks with the "sudo" command</p>
+<p>Run the Python automation scripts with the "sudo" command</p>
 <div class="olist loweralpha">
 <ol class="loweralpha" type="a">
 <li>
-<p>Prepare_Web_Files.yml</p>
+<p>Prepare_Web_Files.py</p>
 </li>
 <li>
-<p>Prepare_Fedora_Remix_Build.yml</p>
+<p>Prepare_Fedora_Remix_Build.py</p>
 </li>
 </ol>
 </div>
@@ -679,11 +679,11 @@ Resolving deltas: 100% (1042/1042), done.</code></pre>
 </div>
 </li>
 <li>
-<p>Prepare the Fedora Remix build environment by running the Python scripts from the <strong>Ansible</strong> directory as the root user.</p>
+<p>Prepare the Fedora Remix build environment by running the Python scripts from the <strong>Setup</strong> directory as the root user.</p>
 <div class="listingblock">
 <div class="title">Listing 2. Create <strong>/livecd-creator/FedoraRemix</strong> Assets</div>
 <div class="content">
-<pre class="highlight"><code class="language-bash" data-lang="bash">travis@localhost-fedoraremix-live [~/Fedora_Remix/Ansible] | (05/09/25 @ 15:57)  | main ✓ |
+<pre class="highlight"><code class="language-bash" data-lang="bash">travis@localhost-fedoraremix-live [~/Fedora_Remix/Setup] | (05/09/25 @ 15:57)  | main ✓ |
 $ sudo python Prepare_Fedora_Remix_Build.py
 
 ... OUTPUT OMITTED ...
@@ -695,7 +695,7 @@ Setup complete!</code></pre>
 <div class="listingblock">
 <div class="title">Listing 3. Create httpd server and repository assets</div>
 <div class="content">
-<pre class="highlight"><code class="language-bash" data-lang="bash">travis@localhost-fedoraremix-live [~/Fedora_Remix/Ansible] | (05/09/25 @ 15:59)  | main ✓ |
+<pre class="highlight"><code class="language-bash" data-lang="bash">travis@localhost-fedoraremix-live [~/Fedora_Remix/Setup] | (05/09/25 @ 15:59)  | main ✓ |
 $ sudo python Prepare_Web_Files.py
 Installing packages: httpd
 Running command: dnf install -y httpd
@@ -910,7 +910,7 @@ TypeError: quote() doesn't support 'encoding' for bytes</code></pre>
 <div id="footer">
 <div id="footer-text">
 Version 1.0<br>
-Last updated 2025-09-26 01:52:02 UTC
+Last updated 2025-11-03 19:53:14 UTC
 </div>
 </div>
 </body>
