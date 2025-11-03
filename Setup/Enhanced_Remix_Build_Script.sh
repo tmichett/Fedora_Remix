@@ -223,15 +223,22 @@ run_build() {
     # Restore normal output
     exec > /dev/tty 2>&1
     
-    # Calculate actual ISO creation time from kickstart timestamp
-    # The kickstart writes this timestamp at the start of actual ISO creation
-    if [ -f /tmp/iso_creation_start_time.txt ]; then
-        local iso_start_time=$(cat /tmp/iso_creation_start_time.txt)
-        local iso_end_time=$(date +%s)
-        ISO_BUILD_TIME=$((iso_end_time - iso_start_time))
-        rm -f /tmp/iso_creation_start_time.txt
+    # Calculate actual ISO creation time from log file
+    # The kickstart outputs a timestamp right before ISO creation starts
+    # Look for the timestamp in the log (appears as "+ echo 1234567890" in bash debug output)
+    if [ -f "$BUILD_LOG" ]; then
+        # Extract the epoch timestamp from log - look for "+ echo [timestamp]" after "Preparing to build final ISO image"
+        local iso_start_time=$(grep -A 10 "Preparing to build final ISO image" "$BUILD_LOG" | grep '+ echo [0-9]' | grep -o '[0-9]\{10\}' | head -1)
+        
+        if [ -n "$iso_start_time" ]; then
+            local iso_end_time=$(date +%s)
+            ISO_BUILD_TIME=$((iso_end_time - iso_start_time))
+        else
+            # Fallback if timestamp not found in log
+            ISO_BUILD_TIME=0
+        fi
     else
-        # Fallback if timestamp file not found
+        # Fallback if log file not accessible
         ISO_BUILD_TIME=0
     fi
     
