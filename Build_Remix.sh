@@ -11,11 +11,12 @@ if [ ! -f "config.yml" ]; then
 fi
 
 # Extract values from config.yml
-SSH_KEY_LOCATION=$(grep -A 3 "Container_Properties:" config.yml | grep "SSH_Key_Location:" | awk '{print $2}' | tr -d '"')
-FEDORA_REMIX_LOCATION=$(grep -A 3 "Container_Properties:" config.yml | grep "Fedora_Remix_Location:" | awk '{print $2}' | tr -d '"')
+SSH_KEY_LOCATION=$(grep -A 10 "Container_Properties:" config.yml | grep "SSH_Key_Location:" | awk '{print $2}' | tr -d '"')
+FEDORA_REMIX_LOCATION=$(grep -A 10 "Container_Properties:" config.yml | grep "Fedora_Remix_Location:" | awk '{print $2}' | tr -d '"')
+IMAGE_NAME=$(grep -A 10 "Container_Properties:" config.yml | grep "Image_Name:" | awk '{print $2}' | tr -d '"')
 
-if [ -z "$SSH_KEY_LOCATION" ] || [ -z "$FEDORA_REMIX_LOCATION" ]; then
-    echo "Error: Could not extract SSH_Key_Location or Fedora_Remix_Location from config.yml"
+if [ -z "$SSH_KEY_LOCATION" ] || [ -z "$FEDORA_REMIX_LOCATION" ] || [ -z "$IMAGE_NAME" ]; then
+    echo "Error: Could not extract SSH_Key_Location, Fedora_Remix_Location, or Image_Name from config.yml"
     exit 1
 fi
 
@@ -39,6 +40,7 @@ if [ ! -d "$FEDORA_REMIX_LOCATION" ]; then
 fi
 
 echo "Running container with:"
+echo "  Image: $IMAGE_NAME"
 echo "  SSH Key: $SSH_KEY_LOCATION -> ~/github_id"
 echo "  Fedora Remix: $FEDORA_REMIX_LOCATION -> /livecd-creator"
 echo "  Workspace: $CURRENT_DIR -> ~/workspace"
@@ -61,5 +63,5 @@ podman run --rm -it \
     -v "$SSH_KEY_LOCATION:/root/github_id:ro" \
     -v "$FEDORA_REMIX_LOCATION:/livecd-creator:rw" \
     -v "$CURRENT_DIR:/root/workspace:rw" \
-    fedora-remix-builder:latest
+    "$IMAGE_NAME"
 
