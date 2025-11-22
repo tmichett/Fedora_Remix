@@ -54,12 +54,39 @@ if podman ps -a --format "{{.Names}}" | grep -q "^${CONTAINER_NAME}$"; then
     podman rm -f "$CONTAINER_NAME" 2>/dev/null || true
 fi
 
+# Detect if we need to use sudo for podman (required for loop device access on Linux)
+PODMAN_CMD="podman"
+EXTRA_ARGS=()
+
+if [ "$(id -u)" -ne 0 ]; then
+    # Not running as root
+    # Check if we're on Linux (macOS podman works differently)
+    if [ "$(uname -s)" = "Linux" ]; then
+        echo "⚠️  Loop device creation requires elevated privileges on Linux."
+        echo "    Using sudo to run podman with proper device access..."
+        echo ""
+        PODMAN_CMD="sudo podman"
+        EXTRA_ARGS=("--device-cgroup-rule=b 7:* rmw")
+    else
+        # macOS or other - rootless should work
+        EXTRA_ARGS=("--device" "/dev/loop-control")
+        for i in {0..7}; do
+            if [ -e "/dev/loop$i" ]; then
+                EXTRA_ARGS+=("--device" "/dev/loop$i")
+            fi
+        done
+    fi
+else
+    # Running as root
+    EXTRA_ARGS=("--device-cgroup-rule=b 7:* rmw")
+fi
+
 # Run the container with systemd support and loop device access
-podman run --rm -it \
+$PODMAN_CMD run --rm -it \
     --name "$CONTAINER_NAME" \
     --systemd=always \
     --privileged \
-    --device-cgroup-rule='b 7:* rmw' \
+    "${EXTRA_ARGS[@]}" \
     -v "$SSH_KEY_LOCATION:/root/github_id:ro" \
     -v "$FEDORA_REMIX_LOCATION:/livecd-creator:rw" \
     -v "$CURRENT_DIR:/root/workspace:rw" \
