@@ -52,11 +52,16 @@ CONTAINER_NAME="remix-builder"
 # Check with both regular podman and sudo podman since containers might have been created with either
 if podman ps -a --format "{{.Names}}" 2>/dev/null | grep -q "^${CONTAINER_NAME}$"; then
     echo "Removing existing container: $CONTAINER_NAME"
+    podman kill "$CONTAINER_NAME" 2>/dev/null || true
+    sleep 1
     podman rm -f "$CONTAINER_NAME" 2>/dev/null || true
 fi
 if sudo podman ps -a --format "{{.Names}}" 2>/dev/null | grep -q "^${CONTAINER_NAME}$"; then
     echo "Removing existing container (sudo): $CONTAINER_NAME"
+    sudo podman kill "$CONTAINER_NAME" 2>/dev/null || true
+    sleep 2
     sudo podman rm -f "$CONTAINER_NAME" 2>/dev/null || true
+    sleep 1
 fi
 
 # Detect if we need to use sudo for podman (required for loop device access on Linux)
@@ -88,8 +93,10 @@ fi
 
 # Run the container with systemd support and loop device access
 # Note: --security-opt label=disable helps with SELinux-related mount warnings
-# The unmount error during ISO creation is a known livecd-tools issue but usually doesn't prevent completion
+# --replace will automatically replace any existing container with the same name
+# The /sys unmount issue is now handled gracefully by Enhanced_Remix_Build_Script.sh
 $PODMAN_CMD run --rm -it \
+    --replace \
     --name "$CONTAINER_NAME" \
     --systemd=always \
     --privileged \

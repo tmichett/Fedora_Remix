@@ -209,6 +209,13 @@ def main():
     else:
         print(f"Warning: {kickstart_file} not found")
     
+    # Copy imgcreate fs.py Fix (for /sys unmount issue in systemd containers)
+    fs_file = "files/Fixes/fs.py"
+    if os.path.exists(fs_file):
+        rsync(fs_file, f"{web_root}/")
+    else:
+        print(f"Warning: {fs_file} not found")
+    
     # Enable HTTPD Service
     enable_service("httpd")
     

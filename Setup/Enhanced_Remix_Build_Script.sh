@@ -156,6 +156,43 @@ prepare_environment() {
     print_message "INFO" "${GEAR} Setting SELinux to permissive mode..."
     setenforce 0
     
+    print_message "INFO" "${WRENCH} Installing imgcreate Python patches..."
+    
+    # Detect Python site-packages location dynamically
+    PYTHON_IMGCREATE_PATH=$(python3 -c "import imgcreate; import os; print(os.path.dirname(imgcreate.__file__))" 2>/dev/null)
+    if [ -z "$PYTHON_IMGCREATE_PATH" ]; then
+        print_message "ERROR" "Could not find imgcreate module location!"
+        exit 1
+    fi
+    print_message "INFO" "  Python imgcreate location: $PYTHON_IMGCREATE_PATH"
+    
+    # Install patched kickstart.py (if available)
+    if [ -f "/var/www/html/kickstart.py" ]; then
+        cp /var/www/html/kickstart.py "$PYTHON_IMGCREATE_PATH/kickstart.py" 2>/dev/null || true
+        print_message "INFO" "  Installed kickstart.py patch"
+    fi
+    
+    # Install patched fs.py (fixes /sys unmount issue in systemd containers)
+    if [ -f "/var/www/html/fs.py" ]; then
+        cp /var/www/html/fs.py "$PYTHON_IMGCREATE_PATH/fs.py" 2>/dev/null || true
+        print_message "INFO" "  Installed fs.py patch (systemd /sys unmount fix)"
+    fi
+    
+    # Clear Python bytecode cache to force reimport of patched modules
+    print_message "INFO" "  Clearing Python cache..."
+    rm -rf "$PYTHON_IMGCREATE_PATH/__pycache__"/*.pyc 2>/dev/null || true
+    rm -f "$PYTHON_IMGCREATE_PATH"/*.pyc 2>/dev/null || true
+    
+    # Verify patches are installed
+    if grep -q "Ignore unmount errors for /sys" "$PYTHON_IMGCREATE_PATH/fs.py" 2>/dev/null; then
+        patch_count=$(grep -c "Ignore unmount errors for /sys" "$PYTHON_IMGCREATE_PATH/fs.py")
+        print_message "SUCCESS" "  ✓ Verified: fs.py patch active ($patch_count locations)"
+    else
+        print_message "ERROR" "  ✗ WARNING: fs.py patch NOT found in installed location!"
+        print_message "ERROR" "  Expected location: $PYTHON_IMGCREATE_PATH/fs.py"
+        exit 1
+    fi
+    
     print_message "INFO" "${PACKAGE} Creating cache directory..."
     mkdir -p "$CACHE_DIR"
     
@@ -213,6 +250,9 @@ run_build() {
     # Clean any existing timestamp file from previous builds
     rm -f /tmp/iso_creation_start_time.txt
     
+    # Save original stdout and stderr file descriptors
+    exec 3>&1 4>&2
+    
     # Use exec to redirect all subsequent output to both terminal and log
     exec > >(tee -a "$BUILD_LOG") 2>&1
     
@@ -220,8 +260,9 @@ run_build() {
     livecd-creator --cache="$CACHE_DIR" -f "$BUILD_NAME" -c "$KS_FILE" --title="$BUILD_TITLE"
     local build_exit_code=$?
     
-    # Restore normal output
-    exec > /dev/tty 2>&1
+    # Restore normal output (use saved file descriptors instead of /dev/tty)
+    exec 1>&3 2>&4
+    exec 3>&- 4>&-
     
     # Calculate actual ISO creation time from log file
     # The kickstart outputs a timestamp right before ISO creation starts
