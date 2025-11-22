@@ -55,11 +55,14 @@ if podman ps -a --format "{{.Names}}" | grep -q "^${CONTAINER_NAME}$"; then
 fi
 
 # Run the container with systemd support and loop device access
+# Note: --security-opt label=disable helps with SELinux-related mount warnings
+# The unmount error during ISO creation is a known livecd-tools issue but usually doesn't prevent completion
 podman run --rm -it \
     --name "$CONTAINER_NAME" \
     --systemd=always \
     --privileged \
     --device-cgroup-rule='b 7:* rmw' \
+    --security-opt label=disable \
     -v "$SSH_KEY_LOCATION:/root/github_id:ro" \
     -v "$FEDORA_REMIX_LOCATION:/livecd-creator:rw" \
     -v "$CURRENT_DIR:/root/workspace:rw" \
