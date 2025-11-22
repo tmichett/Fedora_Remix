@@ -49,9 +49,14 @@ echo "  Workspace: $CURRENT_DIR -> ~/workspace"
 CONTAINER_NAME="remix-builder"
 
 # Remove existing container with the same name if it exists
-if podman ps -a --format "{{.Names}}" | grep -q "^${CONTAINER_NAME}$"; then
+# Check with both regular podman and sudo podman since containers might have been created with either
+if podman ps -a --format "{{.Names}}" 2>/dev/null | grep -q "^${CONTAINER_NAME}$"; then
     echo "Removing existing container: $CONTAINER_NAME"
     podman rm -f "$CONTAINER_NAME" 2>/dev/null || true
+fi
+if sudo podman ps -a --format "{{.Names}}" 2>/dev/null | grep -q "^${CONTAINER_NAME}$"; then
+    echo "Removing existing container (sudo): $CONTAINER_NAME"
+    sudo podman rm -f "$CONTAINER_NAME" 2>/dev/null || true
 fi
 
 # Detect if we need to use sudo for podman (required for loop device access on Linux)
