@@ -1,7 +1,7 @@
 Container_Properties:
   Fedora_Version: "43"
   SSH_Key_Location: "~/.ssh/github_id"
-  Fedora_Remix_Location: "/home/travis/Remix_Builder"
+  Fedora_Remix_Location: "/Users/travis/Documents/Fedora_Remix"
   GitHub_Registry_Owner: "tmichett"
-  Image_Name: "ghcr.io/tmichett/fedora-remix-builder:latest"
+  Image_Name: "ghcr.io/tmichett/fedora-remix-builder:43"
 
