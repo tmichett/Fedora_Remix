@@ -168,6 +168,11 @@ iptraf-ng
 wireshark
 fastfetch
 
+## Remote Access
+remmina
+
+
+
 ## Fedora Remix Packages
 dyff
 LogViewer
