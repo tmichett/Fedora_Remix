@@ -23,6 +23,11 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # Default output directory
 OUTPUT_DIR="${1:-${SCRIPT_DIR}/../files/VSCode}"
 
+# Arrays to track downloads and deletions for summary
+DOWNLOADED_FILES=()
+DELETED_FILES=()
+FAILED_EXTENSIONS=()
+
 # Extensions to download (format: publisher.extension-name)
 EXTENSIONS=(
     # Code Quality & Formatting
@@ -69,6 +74,63 @@ print_warning() {
 
 print_error() {
     echo -e "${RED}[ERROR]${NC} $1"
+}
+
+# Function to remove older versions of an extension
+cleanup_old_versions() {
+    local publisher="$1"
+    local extension_name="$2"
+    local new_filename="$3"
+    
+    # Find all existing versions of this extension (standard pattern)
+    local pattern="${OUTPUT_DIR}/${publisher}.${extension_name}-*.vsix"
+    
+    for old_file in ${pattern}; do
+        # Skip if no files match (glob returns the pattern itself)
+        [[ -e "$old_file" ]] || continue
+        
+        # Get just the filename
+        local old_basename=$(basename "$old_file")
+        
+        # Skip if it's the new file we just downloaded
+        if [[ "$old_basename" == "$new_filename" ]]; then
+            continue
+        fi
+        
+        # Remove the old version and track it
+        DELETED_FILES+=("${old_basename}")
+        rm -f "$old_file"
+    done
+    
+    # Also check for files with different naming patterns (e.g., missing publisher prefix)
+    # Handle cases like "asciidoctor-vscode-3.4.2.vsix" vs "asciidoctor.asciidoctor-vscode-3.4.5.vsix"
+    local alt_pattern="${OUTPUT_DIR}/${extension_name}-*.vsix"
+    for old_file in ${alt_pattern}; do
+        [[ -e "$old_file" ]] || continue
+        local old_basename=$(basename "$old_file")
+        
+        # Only remove if it doesn't have a publisher prefix (old naming style)
+        if [[ "$old_basename" != *"."*"."* ]]; then
+            DELETED_FILES+=("${old_basename}")
+            rm -f "$old_file"
+        fi
+    done
+    
+    # Handle platform-specific suffixes (e.g., @linux-x64, @darwin-arm64)
+    # These files have format: publisher.extension-version@platform.vsix
+    local platform_pattern="${OUTPUT_DIR}/${publisher}.${extension_name}-*@*.vsix"
+    for old_file in ${platform_pattern}; do
+        [[ -e "$old_file" ]] || continue
+        local old_basename=$(basename "$old_file")
+        
+        # Skip if it's the new file
+        if [[ "$old_basename" == "$new_filename" ]]; then
+            continue
+        fi
+        
+        DELETED_FILES+=("${old_basename}")
+        rm -f "$old_file"
+    done
 }
 
 # Function to download a VSCode extension from the marketplace
@@ -133,10 +195,17 @@ download_extension() {
         # Move to output directory
         mv "${temp_vsix}" "${output_path}"
         
+        # Clean up older versions of this extension
+        cleanup_old_versions "${publisher}" "${extension_name}" "${filename}"
+        
+        # Track the downloaded file
+        DOWNLOADED_FILES+=("${filename}")
+        
         print_success "Downloaded: ${filename}"
         return 0
     else
         rm -f "${temp_gz}" "${temp_vsix}"
+        FAILED_EXTENSIONS+=("${extension_id}")
         print_error "Failed to download: ${extension_id} (HTTP ${http_code})"
         return 1
     fi
@@ -181,15 +250,43 @@ main() {
     echo "=========================================="
     echo "  Download Summary"
     echo "=========================================="
-    print_success "Successfully downloaded: ${success_count}"
-    if [[ $fail_count -gt 0 ]]; then
-        print_error "Failed downloads: ${fail_count}"
-    fi
     echo ""
     
-    # List downloaded files
-    print_info "Files in output directory:"
-    ls -la "${OUTPUT_DIR}"/*.vsix 2>/dev/null || print_warning "No .vsix files found"
+    # Print downloaded extensions
+    if [[ ${#DOWNLOADED_FILES[@]} -gt 0 ]]; then
+        print_success "Downloaded Extensions (${#DOWNLOADED_FILES[@]}):"
+        for file in "${DOWNLOADED_FILES[@]}"; do
+            echo -e "  ${GREEN}✓${NC} ${file}"
+        done
+        echo ""
+    fi
+    
+    # Print deleted old versions
+    if [[ ${#DELETED_FILES[@]} -gt 0 ]]; then
+        print_warning "Removed Old Versions (${#DELETED_FILES[@]}):"
+        for file in "${DELETED_FILES[@]}"; do
+            echo -e "  ${YELLOW}✗${NC} ${file}"
+        done
+        echo ""
+    fi
+    
+    # Print failed downloads
+    if [[ ${#FAILED_EXTENSIONS[@]} -gt 0 ]]; then
+        print_error "Failed Downloads (${#FAILED_EXTENSIONS[@]}):"
+        for ext in "${FAILED_EXTENSIONS[@]}"; do
+            echo -e "  ${RED}✗${NC} ${ext}"
+        done
+        echo ""
+    fi
+    
+    # Print totals
+    echo "=========================================="
+    echo -e "  ${GREEN}Downloaded:${NC} ${#DOWNLOADED_FILES[@]}"
+    echo -e "  ${YELLOW}Cleaned up:${NC} ${#DELETED_FILES[@]}"
+    if [[ ${#FAILED_EXTENSIONS[@]} -gt 0 ]]; then
+        echo -e "  ${RED}Failed:${NC}     ${#FAILED_EXTENSIONS[@]}"
+    fi
+    echo "=========================================="
 }
 
 # Run main function
