@@ -20,8 +20,9 @@ Kickstarts/
 │   ├── FedoraRemix_Demo.ks
 │   ├── FedoraRemix-Summit.ks
 │   └── ...
-└── KickstartSnippets/                # Modular installation snippets (30 files)
-    ├── format-functions.ks          # 🎨 Shared formatting functions (NEW)
+└── KickstartSnippets/                # Modular installation snippets (31 files)
+    ├── format-functions.ks          # 🎨 Shared formatting functions
+    ├── enable-wifi-pxeboot.ks       # 📶 WiFi support for PXE boot (NEW)
     ├── create-ansible-user.ks
     ├── customize-anaconda.ks
     ├── customize-bash-shell.ks
@@ -134,6 +135,12 @@ The kickstart system now features **dramatically improved visual output** with:
 | `setup-desktop-icons.ks` | Configures GNOME extensions for desktop shortcuts | Lines 502-505 |
 | `setup-gnome-extensions.ks` | Installs and configures GNOME shell extensions (DING, etc.) | Lines 404-431 |
 
+### Networking & Connectivity (1 snippet)
+
+| Snippet File | Description | Original Location |
+|--------------|-------------|-------------------|
+| `enable-wifi-pxeboot.ks` | Enables WiFi support for PXE boot clients alongside wired connection | New - December 2025 |
+
 ### System Setup & Configuration (8 snippets)
 
 | Snippet File | Description | Original Location |
@@ -187,7 +194,8 @@ FedoraRemix.ks
     ├── install-mutagen.ks
     ├── install-cursor.ks
     ├── install-vlc.ks
-    └── install-kdenlive.ks
+    ├── install-kdenlive.ks
+    └── enable-wifi-pxeboot.ks
 ```
 
 ## Usage
