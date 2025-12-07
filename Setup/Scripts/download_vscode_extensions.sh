@@ -240,9 +240,9 @@ main() {
     
     for extension in "${EXTENSIONS[@]}"; do
         if download_extension "${extension}"; then
-            ((success_count++))
+            ((success_count++)) || true
         else
-            ((fail_count++))
+            ((fail_count++)) || true
         fi
     done
     
