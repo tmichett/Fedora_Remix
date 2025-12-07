@@ -192,6 +192,8 @@ def main():
     vscode_dir = "files/VSCode"
     if os.path.exists(vscode_dir):
         rsync(vscode_dir, f"{web_root}/")
+        # Fix permissions for web server access
+        run_command(f"chmod 644 {web_root}/VSCode/*.vsix", shell=True)
     else:
         print(f"Warning: {vscode_dir} directory not found")
     

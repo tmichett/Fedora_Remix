@@ -192,8 +192,9 @@ download_extension() {
         local filename="${publisher}.${extension_name}-${version}.vsix"
         local output_path="${OUTPUT_DIR}/${filename}"
         
-        # Move to output directory
+        # Move to output directory and set readable permissions
         mv "${temp_vsix}" "${output_path}"
+        chmod 644 "${output_path}"
         
         # Clean up older versions of this extension
         cleanup_old_versions "${publisher}" "${extension_name}" "${filename}"
