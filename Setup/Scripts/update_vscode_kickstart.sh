@@ -62,7 +62,7 @@ HEADER
 
 # Add wget commands for each extension
 for vsix in "${vsix_files[@]}"; do
-    echo "wget -q http://localhost/VSCode/${vsix}" >> "$KICKSTART_FILE"
+    echo "wget http://localhost/VSCode/${vsix}" >> "$KICKSTART_FILE"
 done
 
 echo -e "${GREEN}[SUCCESS]${NC} Updated: $KICKSTART_FILE"
