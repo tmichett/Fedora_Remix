@@ -367,6 +367,9 @@ cat /etc/resolv.conf > /FedoraRemix/DNS.txt
 #/usr/bin/pip3 install -r /opt/python_packages.txt
 
 
+## Enable WiFi Support for PXE Boot Clients
+%include KickstartSnippets/enable-wifi-pxeboot.ks
+
 ## Install Flatpaks
 %include KickstartSnippets/install-flatpaks.ks
 
