@@ -6,17 +6,17 @@
 mkdir -p /opt/FedoraRemix/VSCode
 cd /opt/FedoraRemix/VSCode
 
-wget -q http://localhost/VSCode/ChrisChinchilla.vale-vscode-0.32.0.vsix
-wget -q http://localhost/VSCode/Codeium.codeium-1.49.2.vsix
-wget -q http://localhost/VSCode/Gruntfuggly.todo-tree-0.0.226.vsix
-wget -q http://localhost/VSCode/MS-vsliveshare.vsliveshare-1.0.5959.vsix
 wget -q http://localhost/VSCode/aaron-bond.better-comments-3.0.2.vsix
 wget -q http://localhost/VSCode/adpyke.codesnap-1.3.4.vsix
 wget -q http://localhost/VSCode/asciidoctor.asciidoctor-vscode-3.4.5.vsix
+wget -q http://localhost/VSCode/ChrisChinchilla.vale-vscode-0.32.0.vsix
+wget -q http://localhost/VSCode/Codeium.codeium-1.49.2.vsix
 wget -q http://localhost/VSCode/eamodio.gitlens-2025.12.604.vsix
 wget -q http://localhost/VSCode/esbenp.prettier-vscode-11.0.2.vsix
 wget -q http://localhost/VSCode/flobilosaurus.vscode-asciidoc-slides-1.3.0.vsix
+wget -q http://localhost/VSCode/Gruntfuggly.todo-tree-0.0.226.vsix
 wget -q http://localhost/VSCode/ms-python.python-2025.19.2025120401.vsix
+wget -q http://localhost/VSCode/MS-vsliveshare.vsliveshare-1.0.5959.vsix
 wget -q http://localhost/VSCode/peterjonsson.kickstart-language-support-0.0.14.vsix
 wget -q http://localhost/VSCode/pnp.polacode-0.3.4.vsix
 wget -q http://localhost/VSCode/redhat.ansible-25.12.1.vsix
