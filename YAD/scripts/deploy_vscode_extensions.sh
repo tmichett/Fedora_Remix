@@ -1,13 +1,62 @@
-
-
 #!/bin/bash
-code --install-extension /opt/FedoraRemix/VSCode/aaron-bond.better-comments-3.0.2.vsix
-code --install-extension /opt/FedoraRemix/VSCode/adpyke.codesnap-1.3.4.vsix
-code --install-extension /opt/FedoraRemix/VSCode/asciidoctor-vscode-3.4.2.vsix
-code --install-extension /opt/FedoraRemix/VSCode/ChrisChinchilla.vale-vscode-0.21.0.vsix redhat.ansible-24.9.320163.vsix
-code --install-extension /opt/FedoraRemix/VSCode/flobilosaurus.vscode-asciidoc-slides-1.3.0.vsix
-code --install-extension /opt/FedoraRemix/VSCode/ms-python.python-2025.4.0.vsix
-code --install-extension /opt/FedoraRemix/VSCode/MS-vsliveshare.vsliveshare-1.0.5936.vsix
-code --install-extension /opt/FedoraRemix/VSCode/redhat.ansible-25.3.1.vsix
-code --install-extension /opt/FedoraRemix/VSCode/redhat.vscode-xml-0.28.2025031108@linux-x64.vsix
-code --install-extension /opt/FedoraRemix/VSCode/redhat.vscode-yaml-1.15.0.vsix
+#
+# Deploy VSCode Extensions Script
+# Installs all VSCode extensions from the FedoraRemix VSCode directory
+# Automatically finds the latest version of each extension
+#
+
+VSCODE_DIR="/opt/FedoraRemix/VSCode"
+
+# Function to find and install an extension by its base name
+install_extension() {
+    local extension_pattern="$1"
+    local extension_file
+    
+    # Find the extension file matching the pattern (get the newest if multiple exist)
+    extension_file=$(ls -t "${VSCODE_DIR}/${extension_pattern}"*.vsix 2>/dev/null | head -1)
+    
+    if [[ -n "$extension_file" && -f "$extension_file" ]]; then
+        echo "Installing: $(basename "$extension_file")"
+        code --install-extension "$extension_file"
+    else
+        echo "Warning: Extension not found matching pattern: ${extension_pattern}*.vsix"
+    fi
+}
+
+echo "=========================================="
+echo "  Deploying VSCode Extensions"
+echo "=========================================="
+echo ""
+
+# Code Quality & Formatting
+install_extension "aaron-bond.better-comments-"
+install_extension "esbenp.prettier-vscode-"
+install_extension "ChrisChinchilla.vale-vscode-"
+
+# Code Screenshots & Sharing
+install_extension "adpyke.codesnap-"
+install_extension "pnp.polacode-"
+
+# Git & Collaboration
+install_extension "eamodio.gitlens-"
+install_extension "MS-vsliveshare.vsliveshare-"
+
+# AsciiDoc
+install_extension "asciidoctor.asciidoctor-vscode-"
+install_extension "flobilosaurus.vscode-asciidoc-slides-"
+
+# Language Support
+install_extension "peterjonsson.kickstart-language-support-"
+install_extension "ms-python.python-"
+install_extension "redhat.ansible-"
+install_extension "redhat.vscode-xml-"
+install_extension "redhat.vscode-yaml-"
+
+# Productivity
+install_extension "Gruntfuggly.todo-tree-"
+install_extension "Codeium.codeium-"
+
+echo ""
+echo "=========================================="
+echo "  Extension deployment complete!"
+echo "=========================================="
