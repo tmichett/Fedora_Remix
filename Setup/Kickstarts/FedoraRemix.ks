@@ -443,6 +443,29 @@ dnf update -y
 ks_print_info "Ensuring anaconda-webui has the locale-id fix"
 dnf update -y anaconda-webui anaconda anaconda-live
 
+## Fix locale data for anaconda installer - regenerate locale-archive
+## This fixes "Locale with code XX_XX.UTF-8 not found" errors that cause locale-id crash
+ks_print_info "Regenerating locale data for installer compatibility"
+# Ensure glibc-langpack packages are installed for common locales
+dnf install -y glibc-langpack-en glibc-langpack-de glibc-langpack-fr glibc-langpack-es glibc-langpack-ja glibc-langpack-zh glibc-langpack-ru glibc-langpack-ar 2>/dev/null || true
+# Rebuild the locale archive to ensure all locales are properly indexed
+if [ -x /usr/sbin/build-locale-archive ]; then
+    ks_print_info "Building locale archive..."
+    /usr/sbin/build-locale-archive
+fi
+# Generate specific UTF-8 locales if localedef is available
+if command -v localedef >/dev/null 2>&1; then
+    ks_print_info "Generating UTF-8 locales..."
+    localedef -i en_US -f UTF-8 en_US.UTF-8 2>/dev/null || true
+    localedef -i de_DE -f UTF-8 de_DE.UTF-8 2>/dev/null || true
+    localedef -i fr_FR -f UTF-8 fr_FR.UTF-8 2>/dev/null || true
+    localedef -i es_ES -f UTF-8 es_ES.UTF-8 2>/dev/null || true
+    localedef -i ja_JP -f UTF-8 ja_JP.UTF-8 2>/dev/null || true
+    localedef -i zh_CN -f UTF-8 zh_CN.UTF-8 2>/dev/null || true
+    localedef -i ru_RU -f UTF-8 ru_RU.UTF-8 2>/dev/null || true
+    localedef -i ar_EG -f UTF-8 ar_EG.UTF-8 2>/dev/null || true
+fi
+
 ## Update Ansible Collections
 %include KickstartSnippets/update-ansible-collections.ks
 

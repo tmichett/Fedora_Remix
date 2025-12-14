@@ -59,6 +59,15 @@ dracut-live
 
 # anaconda needs the locales available to run for different locales
 glibc-all-langpacks
+# Specific langpacks to ensure common locales are available for anaconda-webui
+glibc-langpack-en
+glibc-langpack-de
+glibc-langpack-fr
+glibc-langpack-es
+glibc-langpack-ja
+glibc-langpack-zh
+glibc-langpack-ru
+glibc-langpack-ar
 
 # no longer in @core since 2018-10, but needed for livesys script
 initscripts
