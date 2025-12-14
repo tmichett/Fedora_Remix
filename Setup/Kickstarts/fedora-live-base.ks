@@ -42,6 +42,7 @@ kernel-modules-extra
 anaconda
 anaconda-install-env-deps
 anaconda-live
+anaconda-webui
 @anaconda-tools
 memtest86+
 # Anaconda has a weak dep on this and we don't want it on livecds, see

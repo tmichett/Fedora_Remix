@@ -439,6 +439,10 @@ ks_print_section "📦 SYSTEM UPDATES & MAINTENANCE"
 ks_print_info "Updating all packages to latest versions"
 dnf update -y
 
+## Ensure anaconda-webui is updated to fix locale-id bug (rhinstaller/anaconda-webui commit 82438d4)
+ks_print_info "Ensuring anaconda-webui has the locale-id fix"
+dnf update -y anaconda-webui anaconda anaconda-live
+
 ## Update Ansible Collections
 %include KickstartSnippets/update-ansible-collections.ks
 
