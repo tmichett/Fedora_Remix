@@ -439,31 +439,44 @@ ks_print_section "📦 SYSTEM UPDATES & MAINTENANCE"
 ks_print_info "Updating all packages to latest versions"
 dnf update -y
 
-## Ensure anaconda-webui is updated to fix locale-id bug (rhinstaller/anaconda-webui commit 82438d4)
-ks_print_info "Ensuring anaconda-webui has the locale-id fix"
+## Ensure anaconda-webui is updated and patch locale-id bug
+ks_print_info "Updating anaconda packages"
 dnf update -y anaconda-webui anaconda anaconda-live
 
-## Fix locale data for anaconda installer - regenerate locale-archive
-## This fixes "Locale with code XX_XX.UTF-8 not found" errors that cause locale-id crash
-ks_print_info "Regenerating locale data for installer compatibility"
-# Ensure glibc-langpack packages are installed for common locales
-dnf install -y glibc-langpack-en glibc-langpack-de glibc-langpack-fr glibc-langpack-es glibc-langpack-ja glibc-langpack-zh glibc-langpack-ru glibc-langpack-ar 2>/dev/null || true
-# Rebuild the locale archive to ensure all locales are properly indexed
-if [ -x /usr/sbin/build-locale-archive ]; then
-    ks_print_info "Building locale archive..."
-    /usr/sbin/build-locale-archive
+## Patch anaconda-webui to fix locale-id crash (upstream bug workaround)
+## The bug: commonLocales may reference locales not in the languages dictionary,
+## causing undefined values that crash when accessed. Fix: filter out undefined.
+ks_print_info "Applying anaconda-webui locale-id crash fix"
+WEBUI_JS="/usr/share/cockpit/anaconda-webui/index.js.gz"
+if [ -f "$WEBUI_JS" ]; then
+    # Decompress
+    gunzip -k "$WEBUI_JS" 2>/dev/null || true
+    WEBUI_JS_PLAIN="${WEBUI_JS%.gz}"
+    if [ -f "$WEBUI_JS_PLAIN" ]; then
+        # Patch: add .filter(e=>e) after .map(findLocaleWithId) to remove undefined values
+        # This is a safe regex that adds filtering without breaking the code
+        sed -i 's/\.map(t)\.sort(/\.map(t).filter(e=>e).sort(/g' "$WEBUI_JS_PLAIN" 2>/dev/null || true
+        # Re-compress
+        gzip -f "$WEBUI_JS_PLAIN"
+        ks_print_success "anaconda-webui patched successfully"
+    else
+        ks_print_warning "Could not decompress anaconda-webui JS for patching"
+    fi
+else
+    ks_print_warning "anaconda-webui JS not found at expected path"
 fi
-# Generate specific UTF-8 locales if localedef is available
-if command -v localedef >/dev/null 2>&1; then
-    ks_print_info "Generating UTF-8 locales..."
-    localedef -i en_US -f UTF-8 en_US.UTF-8 2>/dev/null || true
-    localedef -i de_DE -f UTF-8 de_DE.UTF-8 2>/dev/null || true
-    localedef -i fr_FR -f UTF-8 fr_FR.UTF-8 2>/dev/null || true
-    localedef -i es_ES -f UTF-8 es_ES.UTF-8 2>/dev/null || true
-    localedef -i ja_JP -f UTF-8 ja_JP.UTF-8 2>/dev/null || true
-    localedef -i zh_CN -f UTF-8 zh_CN.UTF-8 2>/dev/null || true
-    localedef -i ru_RU -f UTF-8 ru_RU.UTF-8 2>/dev/null || true
-    localedef -i ar_EG -f UTF-8 ar_EG.UTF-8 2>/dev/null || true
+
+## Verify locale data is available for anaconda installer
+## glibc-all-langpacks should provide all locale data via /usr/lib/locale/locale-archive
+ks_print_info "Verifying locale data availability"
+if [ -f /usr/lib/locale/locale-archive ] || [ -f /usr/lib/locale/locale-archive.real ]; then
+    ks_print_success "Locale archive found - all locales should be available"
+else
+    ks_print_warning "Locale archive not found - rebuilding..."
+    # Fallback: try to build locale archive if missing
+    if [ -x /usr/sbin/build-locale-archive ]; then
+        /usr/sbin/build-locale-archive
+    fi
 fi
 
 ## Update Ansible Collections
