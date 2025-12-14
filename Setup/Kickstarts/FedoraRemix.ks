@@ -443,6 +443,21 @@ dnf update -y
 ks_print_info "Updating anaconda packages"
 dnf update -y anaconda-webui anaconda anaconda-live
 
+## Fix anaconda WebUI browser crash (slitherer segfaults in VMs with VirtIO GPU)
+## The slitherer Qt WebEngine browser crashes during GPU initialization in virtual machines
+## Force use of Firefox which is more stable across different graphics configurations
+ks_print_info "Configuring anaconda to use Firefox for WebUI (fixes VM compatibility)"
+mkdir -p /etc/anaconda/conf.d
+cat > /etc/anaconda/conf.d/99-use-firefox-webui.conf << 'ANACONDA_CONF'
+# Override web engine to use Firefox instead of slitherer
+# Slitherer (Qt WebEngine) crashes with SIGSEGV in VMs due to GPU initialization issues
+# Firefox is more stable and compatible across different graphics configurations
+
+[User Interface]
+webui_web_engine = firefox
+ANACONDA_CONF
+ks_print_success "Anaconda configured to use Firefox for installer WebUI"
+
 ## Patch anaconda-webui to fix locale-id crash (upstream bug workaround)
 ## The bug: commonLocales may reference locales not in the languages dictionary,
 ## causing undefined values that crash when accessed. Fix: filter out undefined.
@@ -453,9 +468,10 @@ if [ -f "$WEBUI_JS" ]; then
     gunzip -k "$WEBUI_JS" 2>/dev/null || true
     WEBUI_JS_PLAIN="${WEBUI_JS%.gz}"
     if [ -f "$WEBUI_JS_PLAIN" ]; then
-        # Patch: add .filter(e=>e) after .map(findLocaleWithId) to remove undefined values
-        # This is a safe regex that adds filtering without breaking the code
-        sed -i 's/\.map(t)\.sort(/\.map(t).filter(e=>e).sort(/g' "$WEBUI_JS_PLAIN" 2>/dev/null || true
+        # Patch: add .filter(e=>e) after .map(X) where X is the findLocaleWithId function
+        # The minified variable name changes between builds (could be r, t, etc.)
+        # Use a regex that matches any single letter variable: .map(X).sort( -> .map(X).filter(e=>e).sort(
+        sed -i 's/\.map(\([a-z]\))\.sort(/\.map(\1).filter(e=>e).sort(/g' "$WEBUI_JS_PLAIN" 2>/dev/null || true
         # Re-compress
         gzip -f "$WEBUI_JS_PLAIN"
         ks_print_success "anaconda-webui patched successfully"

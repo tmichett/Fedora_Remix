@@ -1,4 +1,4 @@
-# Fedora 43 Remix Installation Issue: Anaconda WebUI Locale-ID Crash
+# Fedora 43 Remix Installation Issues
 
 **Date:** December 14, 2025  
 **Affected Version:** Fedora 43 Remix  
@@ -8,15 +8,119 @@
 
 ## Executive Summary
 
-The Fedora 43 Remix installation was failing with a JavaScript error in the Anaconda WebUI installer. The root cause was identified as an upstream bug in `anaconda-webui` where the language selection screen crashes when trying to access locale data for languages that aren't available in the system's translation files.
+The Fedora 43 Remix installation was failing with multiple issues that prevented the Anaconda installer from launching properly. Two distinct problems were identified and fixed:
+
+1. **Slitherer Browser Crash (Primary Issue):** The Slitherer browser (Qt WebEngine-based) used by Anaconda to display the WebUI crashes with a segmentation fault during GPU initialization, particularly in virtual machine environments using VirtIO GPU.
+
+2. **Locale-ID JavaScript Error (Secondary Issue):** A bug in `anaconda-webui` where the language selection screen crashes when trying to access locale data for languages that aren't available in the system's translation files.
 
 ---
+
+# Issue 1: Slitherer Browser Segmentation Fault
 
 ## Error Description
 
 ### Symptoms
 
-When attempting to install Fedora 43 Remix, the installation would fail immediately upon launching the Anaconda installer with the following error:
+When attempting to launch the Anaconda installer, the WebUI desktop script would crash immediately with a segmentation fault, before the installer could even display.
+
+### Error Messages
+
+From `journal.log`:
+```
+/usr/libexec/anaconda/webui-desktop: line 202: 5437 Segmentation fault (core dumped) HOME="$BROWSER_HOME" XDG_CURRENT_DESKTOP=GNOME pkexec --user $INSTALLER_USER env DISPLAY=$DISPLAY "${user_environment[@]}" "${BROWSER[@]}" http://"$WEBUI_ADDRESS""$URL_PATH"
+```
+
+```
+anaconda: ui.webui: web-ui: the webui-desktop script ended abruptly!
+```
+
+### Coredump Analysis
+
+```
+Command Line: slitherer http://127.0.0.1/cockpit/@localhost/anaconda-webui/index.html
+Executable: /usr/bin/slitherer
+Signal: 11 (SEGV)
+
+Stack trace of thread 5437:
+#0  _ZN15QtWebEngineCore15ContentClientQt10SetGpuInfoERKN3gpu7GPUInfoE (libQt6WebEngineCore.so.6)
+#1  _ZN7content25GpuDataManagerImplPrivate13UpdateGpuInfoERKN3gpu7GPUInfoERKSt8optionalIS2_E
+...
+```
+
+## Root Cause
+
+The crash occurs in `QtWebEngineCore::ContentClientQt::SetGpuInfo()` during GPU initialization. This is a known compatibility issue between:
+
+- **Slitherer** - A Qt WebEngine-based lightweight browser used by Anaconda
+- **VirtIO GPU** - The virtual GPU driver used in libvirt/QEMU/KVM virtual machines
+- **Qt6 WebEngine** - The Chromium-based rendering engine
+
+The Qt WebEngine component has difficulty initializing correctly with the VirtIO GPU driver, leading to a segmentation fault.
+
+### Environment
+
+The crash was observed on:
+- **GPU:** Red Hat, Inc. Virtio 1.0 GPU (VirtIO)
+- **VM Platform:** libvirt/QEMU/KVM
+- **Slitherer Version:** 0~git20251108.d230dba-1.fc43
+
+## Solution
+
+### Fix: Use Firefox Instead of Slitherer
+
+The Fedora profile defaults to using `slitherer` for the WebUI, but the Workstation profile uses `firefox`. Firefox is more stable and compatible across different graphics configurations.
+
+**File:** `Setup/Kickstarts/FedoraRemix.ks`
+
+Added configuration to override the web engine:
+
+```bash
+## Fix anaconda WebUI browser crash (slitherer segfaults in VMs with VirtIO GPU)
+ks_print_info "Configuring anaconda to use Firefox for WebUI (fixes VM compatibility)"
+mkdir -p /etc/anaconda/conf.d
+cat > /etc/anaconda/conf.d/99-use-firefox-webui.conf << 'ANACONDA_CONF'
+# Override web engine to use Firefox instead of slitherer
+# Slitherer (Qt WebEngine) crashes with SIGSEGV in VMs due to GPU initialization issues
+
+[User Interface]
+webui_web_engine = firefox
+ANACONDA_CONF
+```
+
+### Configuration Comparison
+
+| Profile | Configuration File | Web Engine Setting |
+|---------|-------------------|-------------------|
+| Fedora (default) | `/etc/anaconda/profile.d/fedora.conf` | `webui_web_engine = slitherer` |
+| Fedora Workstation | `/etc/anaconda/profile.d/fedora-workstation.conf` | `webui_web_engine = firefox` |
+| **Fedora Remix (fixed)** | `/etc/anaconda/conf.d/99-use-firefox-webui.conf` | `webui_web_engine = firefox` |
+
+### Manual Fix for Existing Live Systems
+
+If you have an existing live system experiencing this issue, you can apply the fix manually:
+
+```bash
+sudo mkdir -p /etc/anaconda/conf.d
+sudo tee /etc/anaconda/conf.d/99-use-firefox-webui.conf << 'EOF'
+[User Interface]
+webui_web_engine = firefox
+EOF
+```
+
+Then restart the installer.
+
+---
+
+# Issue 2: Anaconda WebUI Locale-ID JavaScript Crash
+
+**Note:** This issue may only manifest after Issue 1 (Slitherer crash) is resolved by switching to Firefox.
+
+## Error Description
+
+### Symptoms
+
+When the Anaconda installer successfully launches with Firefox, it would then fail on the language selection screen with a JavaScript error:
 
 ```
 TypeError: Cannot read properties of undefined (reading 'locale-id')
@@ -182,8 +286,10 @@ if [ -f "$WEBUI_JS" ]; then
     gunzip -k "$WEBUI_JS" 2>/dev/null || true
     WEBUI_JS_PLAIN="${WEBUI_JS%.gz}"
     if [ -f "$WEBUI_JS_PLAIN" ]; then
-        # Patch: add .filter(e=>e) after .map(findLocaleWithId) to remove undefined values
-        sed -i 's/\.map(t)\.sort(/\.map(t).filter(e=>e).sort(/g' "$WEBUI_JS_PLAIN" 2>/dev/null || true
+        # Patch: add .filter(e=>e) after .map(X) where X is the findLocaleWithId function
+        # The minified variable name changes between builds (could be r, t, etc.)
+        # Use a regex that matches any single letter variable
+        sed -i 's/\.map(\([a-z]\))\.sort(/\.map(\1).filter(e=>e).sort(/g' "$WEBUI_JS_PLAIN" 2>/dev/null || true
         # Re-compress
         gzip -f "$WEBUI_JS_PLAIN"
         ks_print_success "anaconda-webui patched successfully"
@@ -193,11 +299,14 @@ fi
 
 **What the patch does:**
 
-| Original Code | Patched Code |
-|--------------|--------------|
-| `.map(findLocaleWithId).sort(...)` | `.map(findLocaleWithId).filter(e=>e).sort(...)` |
+| Original Code (minified) | Patched Code |
+|--------------------------|--------------|
+| `.map(r).sort(...)` | `.map(r).filter(e=>e).sort(...)` |
+| `.map(t).sort(...)` | `.map(t).filter(e=>e).sort(...)` |
 
 The `.filter(e=>e)` removes any `undefined` or `null` values from the array before the sort operation, preventing the downstream crash.
+
+**Important:** The regex pattern `\([a-z]\)` matches any single lowercase letter variable name, because the JavaScript minifier can use different variable names (`r`, `t`, `s`, etc.) in different builds. The `\1` back-reference ensures the same variable name is preserved in the replacement.
 
 **Rationale:** Since we cannot modify the upstream anaconda-webui package directly, this patch modifies the bundled JavaScript during the ISO build process to add the missing null check.
 
@@ -208,7 +317,13 @@ The `.filter(e=>e)` removes any `undefined` or `null` values from the array befo
 | File | Changes |
 |------|---------|
 | `Setup/Kickstarts/fedora-live-base.ks` | Simplified locale packages to only `glibc-all-langpacks` |
-| `Setup/Kickstarts/FedoraRemix.ks` | Added locale verification and anaconda-webui JavaScript patch |
+| `Setup/Kickstarts/FedoraRemix.ks` | Added: Firefox override config, locale verification, and anaconda-webui JavaScript patch |
+
+### Summary of All Fixes in FedoraRemix.ks
+
+1. **Firefox WebUI Configuration** - Creates `/etc/anaconda/conf.d/99-use-firefox-webui.conf` to use Firefox instead of Slitherer
+2. **Locale Verification** - Checks that `/usr/lib/locale/locale-archive` exists and rebuilds if missing
+3. **JavaScript Patch** - Patches the WebUI to filter out undefined locales
 
 ---
 
