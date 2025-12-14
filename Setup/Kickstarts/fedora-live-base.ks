@@ -42,6 +42,7 @@ kernel-modules-extra
 anaconda
 anaconda-install-env-deps
 anaconda-live
+anaconda-webui
 @anaconda-tools
 memtest86+
 # Anaconda has a weak dep on this and we don't want it on livecds, see
@@ -57,6 +58,8 @@ dracut-live
 # syslinux is in @x86-baremetal-tools
 
 # anaconda needs the locales available to run for different locales
+# glibc-all-langpacks provides ALL locale data including ar_EG, fr_FR, etc.
+# required by langtable.list_common_locales() used by anaconda-webui
 glibc-all-langpacks
 
 # no longer in @core since 2018-10, but needed for livesys script
