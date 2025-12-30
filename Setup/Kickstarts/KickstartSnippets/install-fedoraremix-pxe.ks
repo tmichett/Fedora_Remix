@@ -5,29 +5,61 @@
 # Use formatting functions if available, fallback to simple echo
 if type ks_print_section >/dev/null 2>&1; then
     ks_print_section "🌐 FEDORA REMIX PXE TOOLS INSTALLATION"
-    ks_print_step 1 4 "Creating directory structure"
+    ks_print_step 1 5 "Configuring network for downloads"
 else
     echo "* =============================================================================="
     echo "* FEDORA REMIX PXE TOOLS INSTALLATION"
     echo "* =============================================================================="
-    echo "[1/4] Creating directory structure"
+    echo "[1/5] Configuring network for downloads"
+fi
+
+# Ensure DNS is configured for external downloads
+# Save current resolv.conf if it exists
+if [ -f /etc/resolv.conf ]; then
+    cp /etc/resolv.conf /etc/resolv.conf.pxe-backup 2>/dev/null || true
+fi
+
+# Configure DNS for GitHub access
+echo "nameserver 8.8.8.8" > /etc/resolv.conf
+echo "nameserver 1.1.1.1" >> /etc/resolv.conf
+
+if type ks_print_info >/dev/null 2>&1; then
+    ks_print_info "DNS configured for external downloads"
+else
+    echo "[INFO] DNS configured for external downloads"
 fi
 
 # Create target directory
+if type ks_print_step >/dev/null 2>&1; then
+    ks_print_step 2 5 "Creating directory structure"
+else
+    echo "[2/5] Creating directory structure"
+fi
+
 mkdir -p /opt/FedoraRemixPXETools
 
 # Download specific scripts from GitHub
 if type ks_print_step >/dev/null 2>&1; then
-    ks_print_step 2 4 "Downloading PXE tools from GitHub"
+    ks_print_step 3 5 "Downloading PXE tools from GitHub"
     ks_print_download "run-pxe-server.py"
 else
-    echo "[2/4] Downloading PXE tools from GitHub"
+    echo "[3/5] Downloading PXE tools from GitHub"
     echo "[DOWNLOAD] run-pxe-server.py..."
 fi
 
 # Download run-pxe-server.py
-curl -fsSL -o /opt/FedoraRemixPXETools/run-pxe-server.py \
-    "https://raw.githubusercontent.com/tmichett/FedoraRemixPXE/main/run-pxe-server.py"
+curl -fsSL --connect-timeout 30 --retry 3 -o /opt/FedoraRemixPXETools/run-pxe-server.py \
+    "https://raw.githubusercontent.com/tmichett/FedoraRemixPXE/main/run-pxe-server.py" 2>/dev/null
+
+if [ $? -ne 0 ]; then
+    if type ks_print_warning >/dev/null 2>&1; then
+        ks_print_warning "curl failed, trying wget..."
+    else
+        echo "[WARN] curl failed, trying wget..."
+    fi
+    wget -q --timeout=30 --tries=3 -O /opt/FedoraRemixPXETools/run-pxe-server.py \
+        "https://raw.githubusercontent.com/tmichett/FedoraRemixPXE/main/run-pxe-server.py" 2>/dev/null || true
+fi
 
 if type ks_print_download >/dev/null 2>&1; then
     ks_print_download "show-dhcp-clients.sh"
@@ -36,8 +68,13 @@ else
 fi
 
 # Download show-dhcp-clients.sh
-curl -fsSL -o /opt/FedoraRemixPXETools/show-dhcp-clients.sh \
-    "https://raw.githubusercontent.com/tmichett/FedoraRemixPXE/main/show-dhcp-clients.sh"
+curl -fsSL --connect-timeout 30 --retry 3 -o /opt/FedoraRemixPXETools/show-dhcp-clients.sh \
+    "https://raw.githubusercontent.com/tmichett/FedoraRemixPXE/main/show-dhcp-clients.sh" 2>/dev/null
+
+if [ $? -ne 0 ]; then
+    wget -q --timeout=30 --tries=3 -O /opt/FedoraRemixPXETools/show-dhcp-clients.sh \
+        "https://raw.githubusercontent.com/tmichett/FedoraRemixPXE/main/show-dhcp-clients.sh" 2>/dev/null || true
+fi
 
 if type ks_print_download >/dev/null 2>&1; then
     ks_print_download "test-services.sh"
@@ -46,14 +83,19 @@ else
 fi
 
 # Download test-services.sh
-curl -fsSL -o /opt/FedoraRemixPXETools/test-services.sh \
-    "https://raw.githubusercontent.com/tmichett/FedoraRemixPXE/main/test-services.sh"
+curl -fsSL --connect-timeout 30 --retry 3 -o /opt/FedoraRemixPXETools/test-services.sh \
+    "https://raw.githubusercontent.com/tmichett/FedoraRemixPXE/main/test-services.sh" 2>/dev/null
+
+if [ $? -ne 0 ]; then
+    wget -q --timeout=30 --tries=3 -O /opt/FedoraRemixPXETools/test-services.sh \
+        "https://raw.githubusercontent.com/tmichett/FedoraRemixPXE/main/test-services.sh" 2>/dev/null || true
+fi
 
 # Verify downloads
 if type ks_print_step >/dev/null 2>&1; then
-    ks_print_step 3 4 "Verifying downloads and setting permissions"
+    ks_print_step 4 5 "Verifying downloads and setting permissions"
 else
-    echo "[3/4] Verifying downloads and setting permissions"
+    echo "[4/5] Verifying downloads and setting permissions"
 fi
 
 # Check if files were downloaded successfully
@@ -81,9 +123,9 @@ chmod +x /opt/FedoraRemixPXETools/*.py 2>/dev/null || true
 
 # Create symlinks in /usr/local/bin for easy access
 if type ks_print_step >/dev/null 2>&1; then
-    ks_print_step 4 4 "Creating convenience symlinks in /usr/local/bin"
+    ks_print_step 5 5 "Creating convenience symlinks in /usr/local/bin"
 else
-    echo "[4/4] Creating convenience symlinks in /usr/local/bin"
+    echo "[5/5] Creating convenience symlinks in /usr/local/bin"
 fi
 
 # Create symlinks
@@ -101,6 +143,11 @@ else
     echo "  run-pxe-server      -> /opt/FedoraRemixPXETools/run-pxe-server.py"
     echo "  show-dhcp-clients   -> /opt/FedoraRemixPXETools/show-dhcp-clients.sh"
     echo "  test-pxe-services   -> /opt/FedoraRemixPXETools/test-services.sh"
+fi
+
+# Restore original resolv.conf if we backed it up
+if [ -f /etc/resolv.conf.pxe-backup ]; then
+    mv /etc/resolv.conf.pxe-backup /etc/resolv.conf 2>/dev/null || true
 fi
 
 # Display completion message
