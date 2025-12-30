@@ -171,7 +171,10 @@ fastfetch
 ## Remote Access
 remmina
 
-
+## New Tools
+procs
+duf
+httpie
 
 ## Fedora Remix Packages
 dyff

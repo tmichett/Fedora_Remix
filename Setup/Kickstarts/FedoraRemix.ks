@@ -254,8 +254,10 @@ ks_print_section "🛠️ SETTING UP CUSTOMIZATION COMPONENTS"
 ks_print_info "Downloading customization tools and configurations"
 
 wget -P /opt -r -nH -np --reject-regex "index\\.html?.*" http://localhost/FedoraRemixCustomize
-wget -P /opt -r -nH -np --reject-regex "index\\.html?.*" http://localhost/FedoraRemixPXE
 wget -P /opt -r -nH -np --reject-regex "index\\.html?.*" http://localhost/PXEServer
+
+## Clone FedoraRemixPXE from GitHub (containerized PXE server)
+%include KickstartSnippets/install-fedoraremix-pxe.ks
 
 ## Setting Theme
 
