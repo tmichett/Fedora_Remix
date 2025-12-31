@@ -1,0 +1,24 @@
+name: Generate PDFs
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build-pdfs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Convert Markdown to PDF
+        uses: tmichett/gh-md2pdf-action@main  # Use published action
+        with:
+          files: Notes/Fedora_Remix_Quickstart.md
+          output_dir: Docs
+      
+      - name: Upload PDFs
+        uses: actions/upload-artifact@v4
+        with:
+          name: documentation-pdfs
+          path: Docs/*.pdf

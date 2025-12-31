@@ -254,8 +254,13 @@ ks_print_section "🛠️ SETTING UP CUSTOMIZATION COMPONENTS"
 ks_print_info "Downloading customization tools and configurations"
 
 wget -P /opt -r -nH -np --reject-regex "index\\.html?.*" http://localhost/FedoraRemixCustomize
-wget -P /opt -r -nH -np --reject-regex "index\\.html?.*" http://localhost/FedoraRemixPXE
 wget -P /opt -r -nH -np --reject-regex "index\\.html?.*" http://localhost/PXEServer
+
+## Clone FedoraRemixPXE from GitHub (containerized PXE server)
+%include KickstartSnippets/install-fedoraremix-pxe.ks
+
+## Pull PXE Server Container Image (pre-cache for offline use)
+%include KickstartSnippets/pull-pxe-container.ks
 
 ## Setting Theme
 
@@ -367,6 +372,9 @@ cat /etc/resolv.conf > /FedoraRemix/DNS.txt
 #/usr/bin/pip3 install -r /opt/python_packages.txt
 
 
+## Enable WiFi Support for PXE Boot Clients
+%include KickstartSnippets/enable-wifi-pxeboot.ks
+
 ## Install Flatpaks
 %include KickstartSnippets/install-flatpaks.ks
 
@@ -435,6 +443,62 @@ systemctl enable sshd.service
 ks_print_section "📦 SYSTEM UPDATES & MAINTENANCE"
 ks_print_info "Updating all packages to latest versions"
 dnf update -y
+
+## Ensure anaconda-webui is updated and patch locale-id bug
+ks_print_info "Updating anaconda packages"
+dnf update -y anaconda-webui anaconda anaconda-live
+
+## Fix anaconda WebUI browser crash (slitherer segfaults in VMs with VirtIO GPU)
+## The slitherer Qt WebEngine browser crashes during GPU initialization in virtual machines
+## Force use of Firefox which is more stable across different graphics configurations
+ks_print_info "Configuring anaconda to use Firefox for WebUI (fixes VM compatibility)"
+mkdir -p /etc/anaconda/conf.d
+cat > /etc/anaconda/conf.d/99-use-firefox-webui.conf << 'ANACONDA_CONF'
+# Override web engine to use Firefox instead of slitherer
+# Slitherer (Qt WebEngine) crashes with SIGSEGV in VMs due to GPU initialization issues
+# Firefox is more stable and compatible across different graphics configurations
+
+[User Interface]
+webui_web_engine = firefox
+ANACONDA_CONF
+ks_print_success "Anaconda configured to use Firefox for installer WebUI"
+
+## Patch anaconda-webui to fix locale-id crash (upstream bug workaround)
+## The bug: commonLocales may reference locales not in the languages dictionary,
+## causing undefined values that crash when accessed. Fix: filter out undefined.
+ks_print_info "Applying anaconda-webui locale-id crash fix"
+WEBUI_JS="/usr/share/cockpit/anaconda-webui/index.js.gz"
+if [ -f "$WEBUI_JS" ]; then
+    # Decompress
+    gunzip -k "$WEBUI_JS" 2>/dev/null || true
+    WEBUI_JS_PLAIN="${WEBUI_JS%.gz}"
+    if [ -f "$WEBUI_JS_PLAIN" ]; then
+        # Patch: add .filter(e=>e) after .map(X) where X is the findLocaleWithId function
+        # The minified variable name changes between builds (could be r, t, etc.)
+        # Use a regex that matches any single letter variable: .map(X).sort( -> .map(X).filter(e=>e).sort(
+        sed -i 's/\.map(\([a-z]\))\.sort(/\.map(\1).filter(e=>e).sort(/g' "$WEBUI_JS_PLAIN" 2>/dev/null || true
+        # Re-compress
+        gzip -f "$WEBUI_JS_PLAIN"
+        ks_print_success "anaconda-webui patched successfully"
+    else
+        ks_print_warning "Could not decompress anaconda-webui JS for patching"
+    fi
+else
+    ks_print_warning "anaconda-webui JS not found at expected path"
+fi
+
+## Verify locale data is available for anaconda installer
+## glibc-all-langpacks should provide all locale data via /usr/lib/locale/locale-archive
+ks_print_info "Verifying locale data availability"
+if [ -f /usr/lib/locale/locale-archive ] || [ -f /usr/lib/locale/locale-archive.real ]; then
+    ks_print_success "Locale archive found - all locales should be available"
+else
+    ks_print_warning "Locale archive not found - rebuilding..."
+    # Fallback: try to build locale archive if missing
+    if [ -x /usr/sbin/build-locale-archive ]; then
+        /usr/sbin/build-locale-archive
+    fi
+fi
 
 ## Update Ansible Collections
 %include KickstartSnippets/update-ansible-collections.ks
