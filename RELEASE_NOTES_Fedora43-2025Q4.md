@@ -202,3 +202,4 @@ nmcli device wifi connect <SSID> password <password>
 
 **Full Changelog**: https://github.com/tmichett/Fedora_Remix/compare/Fedora43-Nov2025...Fedora43-2025Q4
 
+
