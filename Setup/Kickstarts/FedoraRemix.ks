@@ -259,6 +259,9 @@ wget -P /opt -r -nH -np --reject-regex "index\\.html?.*" http://localhost/PXESer
 ## Clone FedoraRemixPXE from GitHub (containerized PXE server)
 %include KickstartSnippets/install-fedoraremix-pxe.ks
 
+## Pull PXE Server Container Image (pre-cache for offline use)
+%include KickstartSnippets/pull-pxe-container.ks
+
 ## Setting Theme
 
 ks_print_section "🎨 CONFIGURING FEDORA REMIX THEME"
