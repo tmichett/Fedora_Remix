@@ -3,6 +3,109 @@ set -e
 
 # Script to run the Fedora Remix Builder container using Podman
 # Reads SSH_Key_Location and Fedora_Remix_Location from config.yml
+# Supports building different Remix variants (FedoraRemix, FedoraRemixCosmic, etc.)
+
+# Function to show usage
+show_usage() {
+    echo "Usage: $0 [OPTIONS]"
+    echo ""
+    echo "Options:"
+    echo "  -k, --kickstart <name>   Specify kickstart to build (without .ks extension)"
+    echo "                           Examples: FedoraRemix, FedoraRemixCosmic"
+    echo "  -l, --list               List available kickstart files"
+    echo "  -h, --help               Show this help message"
+    echo ""
+    echo "If no kickstart is specified, you will be prompted to choose."
+}
+
+# Function to list available kickstarts
+list_kickstarts() {
+    local remix_location="$1"
+    echo "Available Kickstart files:"
+    echo ""
+    for ks in "$remix_location"/Setup/Kickstarts/FedoraRemix*.ks; do
+        if [ -f "$ks" ]; then
+            basename "$ks" .ks
+        fi
+    done
+}
+
+# Function to show interactive menu
+show_menu() {
+    local remix_location="$1"
+    local kickstarts=()
+    local default_index=0
+    local i=1
+    
+    echo ""
+    echo "╔═══════════════════════════════════════════════════════════════╗"
+    echo "║         🚀 Fedora Remix Builder - Kickstart Selection         ║"
+    echo "╠═══════════════════════════════════════════════════════════════╣"
+    
+    for ks in "$remix_location"/Setup/Kickstarts/FedoraRemix*.ks; do
+        if [ -f "$ks" ]; then
+            local name=$(basename "$ks" .ks)
+            kickstarts+=("$name")
+            # Mark the default (FedoraRemix) with an asterisk
+            if [ "$name" = "FedoraRemix" ]; then
+                default_index=$((i-1))
+                printf "║  %d) %-51s [DEFAULT] ║\n" "$i" "$name"
+            else
+                printf "║  %d) %-55s ║\n" "$i" "$name"
+            fi
+            ((i++))
+        fi
+    done
+    
+    echo "╚═══════════════════════════════════════════════════════════════╝"
+    echo ""
+    
+    while true; do
+        read -p "Select kickstart to build (1-${#kickstarts[@]}) [Enter=default]: " choice
+        # If user just presses Enter, use default (FedoraRemix)
+        if [ -z "$choice" ]; then
+            SELECTED_KICKSTART="FedoraRemix"
+            echo "Using default: FedoraRemix"
+            break
+        elif [[ "$choice" =~ ^[0-9]+$ ]] && [ "$choice" -ge 1 ] && [ "$choice" -le "${#kickstarts[@]}" ]; then
+            SELECTED_KICKSTART="${kickstarts[$((choice-1))]}"
+            break
+        else
+            echo "Invalid selection. Please enter a number between 1 and ${#kickstarts[@]}, or press Enter for default"
+        fi
+    done
+}
+
+# Parse command line arguments
+SELECTED_KICKSTART=""
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        -k|--kickstart)
+            SELECTED_KICKSTART="$2"
+            shift 2
+            ;;
+        -l|--list)
+            # We need to parse config first to get the remix location
+            if [ ! -f "config.yml" ]; then
+                echo "Error: config.yml not found in current directory"
+                exit 1
+            fi
+            FEDORA_REMIX_LOCATION=$(grep -A 10 "Container_Properties:" config.yml | grep "Fedora_Remix_Location:" | awk '{print $2}' | tr -d '"')
+            FEDORA_REMIX_LOCATION="${FEDORA_REMIX_LOCATION/#\~/$HOME}"
+            list_kickstarts "$FEDORA_REMIX_LOCATION"
+            exit 0
+            ;;
+        -h|--help)
+            show_usage
+            exit 0
+            ;;
+        *)
+            echo "Unknown option: $1"
+            show_usage
+            exit 1
+            ;;
+    esac
+done
 
 # Check if config.yml exists
 if [ ! -f "config.yml" ]; then
@@ -39,11 +142,31 @@ if [ ! -d "$FEDORA_REMIX_LOCATION" ]; then
     exit 1
 fi
 
-echo "Running container with:"
-echo "  Image: $IMAGE_NAME"
-echo "  SSH Key: $SSH_KEY_LOCATION -> ~/github_id"
-echo "  Fedora Remix: $FEDORA_REMIX_LOCATION -> /livecd-creator"
-echo "  Workspace: $CURRENT_DIR -> ~/workspace"
+# If no kickstart specified, show interactive menu
+if [ -z "$SELECTED_KICKSTART" ]; then
+    show_menu "$FEDORA_REMIX_LOCATION"
+fi
+
+# Validate that the selected kickstart exists
+if [ ! -f "$FEDORA_REMIX_LOCATION/Setup/Kickstarts/${SELECTED_KICKSTART}.ks" ]; then
+    echo "Error: Kickstart file not found: ${SELECTED_KICKSTART}.ks"
+    echo "Available kickstarts:"
+    list_kickstarts "$FEDORA_REMIX_LOCATION"
+    exit 1
+fi
+
+echo ""
+echo "╔═══════════════════════════════════════════════════════════════╗"
+echo "║              🚀 Fedora Remix Builder Configuration            ║"
+echo "╠═══════════════════════════════════════════════════════════════╣"
+printf "║  %-60s ║\n" "Image: $IMAGE_NAME"
+printf "║  %-60s ║\n" "Kickstart: ${SELECTED_KICKSTART}.ks"
+printf "║  %-60s ║\n" "Output ISO: ${SELECTED_KICKSTART}.iso"
+printf "║  %-60s ║\n" "SSH Key: $SSH_KEY_LOCATION"
+printf "║  %-60s ║\n" "Fedora Remix: $FEDORA_REMIX_LOCATION"
+printf "║  %-60s ║\n" "Workspace: $CURRENT_DIR"
+echo "╚═══════════════════════════════════════════════════════════════╝"
+echo ""
 
 # Container name
 CONTAINER_NAME="remix-builder"
@@ -95,6 +218,7 @@ fi
 # Note: --security-opt label=disable helps with SELinux-related mount warnings
 # --replace will automatically replace any existing container with the same name
 # The /sys unmount issue is now handled gracefully by Enhanced_Remix_Build_Script.sh
+# Pass the selected kickstart as an environment variable
 $PODMAN_CMD run --rm -it \
     --replace \
     --name "$CONTAINER_NAME" \
@@ -102,6 +226,7 @@ $PODMAN_CMD run --rm -it \
     --privileged \
     "${EXTRA_ARGS[@]}" \
     --security-opt label=disable \
+    -e "REMIX_KICKSTART=$SELECTED_KICKSTART" \
     -v "$SSH_KEY_LOCATION:/root/github_id:ro" \
     -v "$FEDORA_REMIX_LOCATION:/livecd-creator:rw" \
     -v "$CURRENT_DIR:/root/workspace:rw" \
