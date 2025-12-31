@@ -5,8 +5,9 @@
 -@gnome-desktop
 -@gnome-software-development
 
-# Add the COSMIC Desktop Environment group
-@cosmic-desktop-environment
+# Add the COSMIC Desktop Environment groups
+@cosmic-desktop
+@cosmic-desktop-apps
 
 # Optional: Add common workstation tools that are usually pulled by GNOME
 @base-x

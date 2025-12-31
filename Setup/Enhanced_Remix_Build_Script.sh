@@ -40,14 +40,25 @@ readonly STAR="⭐"
 # Build configuration
 readonly BUILD_DATE=$(date +%m%d%y-%H%M)
 
+# Debug: Show environment variable value
+echo "DEBUG: REMIX_KICKSTART environment variable = '${REMIX_KICKSTART}'"
+
 # Support for multiple kickstart variants via REMIX_KICKSTART environment variable
+# Also check fallback file (for systemd mode where env vars may not propagate)
+if [ -z "$REMIX_KICKSTART" ] && [ -f /tmp/remix_kickstart.txt ]; then
+    REMIX_KICKSTART=$(cat /tmp/remix_kickstart.txt)
+    echo "DEBUG: Read REMIX_KICKSTART from fallback file: ${REMIX_KICKSTART}"
+fi
+
 # Defaults to FedoraRemix if not specified
 if [ -n "$REMIX_KICKSTART" ]; then
     readonly BUILD_NAME="$REMIX_KICKSTART"
     readonly KS_FILE="${REMIX_KICKSTART}.ks"
+    echo "DEBUG: Using kickstart: BUILD_NAME=$BUILD_NAME, KS_FILE=$KS_FILE"
 else
     readonly BUILD_NAME="FedoraRemix"
     readonly KS_FILE="FedoraRemix.ks"
+    echo "DEBUG: Using default kickstart: BUILD_NAME=$BUILD_NAME, KS_FILE=$KS_FILE"
 fi
 
 readonly BUILD_LOG="${BUILD_NAME}-Build-${BUILD_DATE}.log"
