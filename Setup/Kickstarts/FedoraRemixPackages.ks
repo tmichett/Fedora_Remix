@@ -152,6 +152,8 @@ ttyd
 python-qt5
 python-pyyaml
 util-linux-script
+copr-cli
+
 
 ## Artur's CLI Utils
 zoxide
@@ -177,7 +179,9 @@ duf
 httpie
 
 ## Fedora Remix Packages
+## Comes from COPR Repository
 dyff
 LogViewer
+fedora_remix_tools
 
 %end
