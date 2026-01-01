@@ -9,24 +9,27 @@ This directory contains the refactored Fedora Remix kickstart configuration, whi
 ```
 Kickstarts/
 ├── README.md                           # This documentation file
-├── FedoraRemix.ks                     # Main kickstart file (refactored)
+├── FedoraRemix.ks                     # Main kickstart file - GNOME (default)
+├── FedoraRemixCosmic.ks               # Main kickstart file - COSMIC desktop
 ├── fedora-live-base.ks               # Base live system configuration
 ├── fedora-workstation-common.ks      # Workstation-specific packages
 ├── fedora-repo.ks                    # Repository definitions
 ├── fedora-repo-not-rawhide.ks       # Stable repository mirrors
-├── FedoraRemixPackages.ks            # Custom package selections
+├── FedoraRemixPackages.ks            # GNOME package selections
+├── FedoraRemixCosmicPackages.ks      # COSMIC package selections
 ├── FedoraRemixRepos.ks               # Additional third-party repositories
 ├── Extra/                            # Alternative kickstart configurations
 │   ├── FedoraRemix_Demo.ks
 │   ├── FedoraRemix-Summit.ks
 │   └── ...
-└── KickstartSnippets/                # Modular installation snippets (31 files)
+└── KickstartSnippets/                # Modular installation snippets
     ├── format-functions.ks          # 🎨 Shared formatting functions
-    ├── enable-wifi-pxeboot.ks       # 📶 WiFi support for PXE boot (NEW)
+    ├── enable-wifi-pxeboot.ks       # 📶 WiFi support for PXE boot
+    ├── customize-gnome-wallpaper.ks # 🖼️ GNOME wallpaper setup
+    ├── customize-cosmic-wallpaper.ks # 🖼️ COSMIC wallpaper setup (NEW)
     ├── create-ansible-user.ks
     ├── customize-anaconda.ks
     ├── customize-bash-shell.ks
-    ├── customize-gnome-wallpaper.ks
     ├── customize-grub.ks
     ├── install-ansible.ks
     ├── install-balena-etcher.ks
@@ -50,6 +53,29 @@ Kickstarts/
     ├── setup-vscode-extensions.ks
     ├── setup-yad-scripts.ks
     └── update-ansible-collections.ks
+```
+
+## Available Remix Variants
+
+The Fedora Remix project supports multiple desktop environment variants:
+
+| Variant | Main Kickstart | Packages Kickstart | Desktop Environment |
+|---------|---------------|-------------------|---------------------|
+| **GNOME** (Default) | `FedoraRemix.ks` | `FedoraRemixPackages.ks` | GNOME with extensions |
+| **COSMIC** | `FedoraRemixCosmic.ks` | `FedoraRemixCosmicPackages.ks` | System76 COSMIC (Fedora 43+) |
+
+### COSMIC Desktop Variant
+
+The COSMIC variant (`FedoraRemixCosmic.ks`) provides System76's new Rust-based desktop:
+
+- **Package Groups**: `@cosmic-desktop`, `@cosmic-desktop-apps`
+- **Display Manager**: `greetd` with auto-login support
+- **Wallpapers**: Custom Fedora Remix wallpapers via `customize-cosmic-wallpaper.ks`
+- **No GNOME Dependencies**: GNOME-specific snippets (extensions, tweaks, desktop icons) are excluded
+
+**Build the COSMIC variant:**
+```bash
+./Build_Remix.sh -k FedoraRemixCosmic
 ```
 
 ## Refactoring Overview
@@ -118,13 +144,14 @@ The kickstart system now features **dramatically improved visual output** with:
 | `install-vlc.ks` | Installs VLC Media Player with freeworld plugins for enhanced codec support | Post-install (added during refactoring) |
 | `install-kdenlive.ks` | Installs KDEnlive video editor after VLC is configured | Post-install (moved to prevent conflicts) |
 
-### System Customizations (4 snippets)
+### System Customizations (5 snippets)
 
 | Snippet File | Description | Original Location |
 |--------------|-------------|-------------------|
 | `customize-anaconda.ks` | Customizes Anaconda installer branding and logos | Lines 257-290 |
 | `customize-bash-shell.ks` | Sets up custom bash prompts and git integration | Lines 342-347 |
-| `customize-gnome-wallpaper.ks` | Configures custom GNOME wallpapers for FC42 | Lines 292-305 |
+| `customize-gnome-wallpaper.ks` | Configures custom GNOME wallpapers | Lines 292-305 |
+| `customize-cosmic-wallpaper.ks` | Configures custom COSMIC wallpapers (RON format) | New - December 2025 |
 | `customize-grub.ks` | Customizes GRUB boot menu appearance and themes | Lines 307-318 |
 
 ### GNOME/Desktop Configuration (3 snippets)
@@ -156,7 +183,7 @@ The kickstart system now features **dramatically improved visual output** with:
 
 ## Include Hierarchy
 
-The main `FedoraRemix.ks` file includes other kickstart files in the following hierarchy:
+### GNOME Variant (FedoraRemix.ks)
 
 ```
 FedoraRemix.ks
@@ -166,37 +193,40 @@ FedoraRemix.ks
 │       └── FedoraRemixRepos.ks
 ├── fedora-workstation-common.ks
 ├── FedoraRemixPackages.ks
-└── KickstartSnippets/ (27 files)
+└── KickstartSnippets/
+    ├── customize-gnome-wallpaper.ks    # GNOME-specific
+    ├── install-gnome-tweaks.ks         # GNOME-specific
+    ├── setup-gnome-extensions.ks       # GNOME-specific
+    ├── setup-desktop-icons.ks          # GNOME-specific
     ├── install-ansible.ks
     ├── install-flatpaks.ks
-    ├── install-balena-etcher.ks
-    ├── customize-anaconda.ks
-    ├── customize-gnome-wallpaper.ks
-    ├── customize-grub.ks
-    ├── setup-vscode-extensions.ks
-    ├── setup-dynamic-motd.ks
-    ├── customize-bash-shell.ks
-    ├── setup-firstboot.ks
-    ├── setup-yad-scripts.ks
-    ├── install-gnome-tweaks.ks
-    ├── create-ansible-user.ks
-    ├── install-calibre.ks
-    ├── setup-gnome-extensions.ks
-    ├── install-udpcast.ks
-    ├── install-ohmybash.ks
-    ├── set-bash-defaults.ks
-    ├── install-podman-bootc.ks
-    ├── update-ansible-collections.ks
-    ├── install-lmstudio.ks
-    ├── setup-desktop-icons.ks
-    ├── setup-tmux.ks
-    ├── install-veracrypt.ks
-    ├── install-mutagen.ks
-    ├── install-cursor.ks
-    ├── install-vlc.ks
-    ├── install-kdenlive.ks
+    ├── ... (shared snippets)
     └── enable-wifi-pxeboot.ks
 ```
+
+### COSMIC Variant (FedoraRemixCosmic.ks)
+
+```
+FedoraRemixCosmic.ks
+├── fedora-live-base.ks
+│   └── fedora-repo.ks
+│       ├── fedora-repo-not-rawhide.ks
+│       └── FedoraRemixRepos.ks
+├── fedora-workstation-common.ks
+├── FedoraRemixCosmicPackages.ks        # COSMIC packages (replaces FedoraRemixPackages.ks)
+└── KickstartSnippets/
+    ├── customize-cosmic-wallpaper.ks   # COSMIC-specific
+    ├── install-ansible.ks
+    ├── install-flatpaks.ks
+    ├── ... (shared snippets, no GNOME-specific)
+    └── enable-wifi-pxeboot.ks
+```
+
+**Key Differences:**
+- COSMIC uses `FedoraRemixCosmicPackages.ks` with `@cosmic-desktop` and `@cosmic-desktop-apps`
+- COSMIC excludes GNOME-specific snippets (extensions, tweaks, desktop icons)
+- COSMIC uses `greetd` instead of GDM for display manager
+- COSMIC includes `customize-cosmic-wallpaper.ks` for RON-format wallpaper config
 
 ## Usage
 
@@ -370,7 +400,8 @@ The formatting system includes multiple layers of compatibility:
 
 ---
 
-*Last updated: January 2025*
-*Refactoring completed: All 29 installation/configuration sections successfully modularized*
+*Last updated: December 2025*
+*Refactoring completed: All installation/configuration sections successfully modularized*
+*COSMIC variant: New System76 COSMIC desktop spin added (Fedora 43+)*
 *Enhanced formatting: Rich visual output with colors, Unicode symbols, and progress tracking*
 *Build compatibility: Comprehensive fallback system ensures reliable operation in all environments*

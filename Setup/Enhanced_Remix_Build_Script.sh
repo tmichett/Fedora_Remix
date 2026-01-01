@@ -39,9 +39,29 @@ readonly STAR="⭐"
 
 # Build configuration
 readonly BUILD_DATE=$(date +%m%d%y-%H%M)
-readonly BUILD_LOG="FedoraBuild-${BUILD_DATE}.log"
-readonly BUILD_NAME="FedoraRemix"
-readonly KS_FILE="FedoraRemix.ks"
+
+# Debug: Show environment variable value
+echo "DEBUG: REMIX_KICKSTART environment variable = '${REMIX_KICKSTART}'"
+
+# Support for multiple kickstart variants via REMIX_KICKSTART environment variable
+# Also check fallback file (for systemd mode where env vars may not propagate)
+if [ -z "$REMIX_KICKSTART" ] && [ -f /tmp/remix_kickstart.txt ]; then
+    REMIX_KICKSTART=$(cat /tmp/remix_kickstart.txt)
+    echo "DEBUG: Read REMIX_KICKSTART from fallback file: ${REMIX_KICKSTART}"
+fi
+
+# Defaults to FedoraRemix if not specified
+if [ -n "$REMIX_KICKSTART" ]; then
+    readonly BUILD_NAME="$REMIX_KICKSTART"
+    readonly KS_FILE="${REMIX_KICKSTART}.ks"
+    echo "DEBUG: Using kickstart: BUILD_NAME=$BUILD_NAME, KS_FILE=$KS_FILE"
+else
+    readonly BUILD_NAME="FedoraRemix"
+    readonly KS_FILE="FedoraRemix.ks"
+    echo "DEBUG: Using default kickstart: BUILD_NAME=$BUILD_NAME, KS_FILE=$KS_FILE"
+fi
+
+readonly BUILD_LOG="${BUILD_NAME}-Build-${BUILD_DATE}.log"
 readonly CACHE_DIR="/livecd-creator/package-cache"
 
 # Function to read Fedora version from config.yml
@@ -62,7 +82,16 @@ get_fedora_version() {
 
 # Set build title with dynamic version (ISO 9660 compliant)
 readonly FEDORA_VERSION=$(get_fedora_version)
-readonly BUILD_TITLE="FEDORA_REMIX_${FEDORA_VERSION}"
+# Create ISO-9660 compliant title (uppercase, underscores, max 32 chars)
+# For variants like FedoraRemixCosmic, extract the variant name
+if [ "$BUILD_NAME" = "FedoraRemix" ]; then
+    readonly BUILD_TITLE="FEDORA_REMIX_${FEDORA_VERSION}"
+else
+    # Extract variant suffix (e.g., "Cosmic" from "FedoraRemixCosmic")
+    VARIANT_SUFFIX=$(echo "$BUILD_NAME" | sed 's/FedoraRemix//')
+    VARIANT_UPPER=$(echo "$VARIANT_SUFFIX" | tr '[:lower:]' '[:upper:]')
+    readonly BUILD_TITLE="FEDORA_${VARIANT_UPPER}_${FEDORA_VERSION}"
+fi
 
 # Function to print formatted messages with logging
 print_message() {
