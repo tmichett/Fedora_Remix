@@ -44,6 +44,7 @@ python-pyyaml
 
 ## Ansible Roles
 linux-system-roles
+sshpass
 
 ## For Wifi and Networking
 @hardware-support
