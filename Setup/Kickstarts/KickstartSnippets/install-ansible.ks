@@ -3,18 +3,19 @@
 if type ks_print_section >/dev/null 2>&1; then
     ks_print_section "ANSIBLE DEVELOPMENT TOOLS INSTALLATION"
     ks_print_step 1 3 "Installing Ansible core components"
-    ks_print_install "ansible-core ansible-navigator ansible-builder ansible ansible-dev-tools"
+    ks_print_install "ansible-core ansible-navigator ansible-builder ansible ansible-dev-tools gdown"
 else
     echo "* =============================================================================="
     echo "* ANSIBLE DEVELOPMENT TOOLS INSTALLATION"
     echo "* =============================================================================="
     echo "[1/3] Installing Ansible core components"
-    echo "[INST] Installing ansible-core ansible-navigator ansible-builder ansible ansible-dev-tools..."
+    echo "[INST] Installing ansible-core ansible-navigator ansible-builder ansible ansible-dev-tools gdown..."
 fi
 
 # Install Ansible tools with optimized flags for faster installation
 /usr/bin/pip install --no-cache-dir --disable-pip-version-check \
     ansible-core ansible-navigator ansible-builder ansible ansible-dev-tools \
+    gdown \
     --no-warn-script-location --root-user-action=ignore
 
 # Verify installation with appropriate formatting
