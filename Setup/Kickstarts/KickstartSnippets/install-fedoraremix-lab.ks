@@ -5,12 +5,12 @@
 # Use formatting functions if available, fallback to simple echo
 if type ks_print_section >/dev/null 2>&1; then
     ks_print_section "🧪 FEDORA REMIX LAB ENVIRONMENT"
-    ks_print_step 1 5 "Creating Fedora Remix Lab directory"
+    ks_print_step 1 6 "Creating Fedora Remix Lab directory"
 else
     echo "* =============================================================================="
     echo "* FEDORA REMIX LAB ENVIRONMENT"
     echo "* =============================================================================="
-    echo "[1/5] Creating Fedora Remix Lab directory"
+    echo "[1/6] Creating Fedora Remix Lab directory"
 fi
 
 # Create the lab directory
@@ -18,9 +18,9 @@ mkdir -p /opt/FedoraRemixLab
 
 # Download lab files from GitHub
 if type ks_print_step >/dev/null 2>&1; then
-    ks_print_step 2 5 "Downloading Fedora Remix Lab files from GitHub"
+    ks_print_step 2 6 "Downloading Fedora Remix Lab files from GitHub"
 else
-    echo "[2/5] Downloading Fedora Remix Lab files from GitHub"
+    echo "[2/6] Downloading Fedora Remix Lab files from GitHub"
 fi
 
 GITHUB_RAW="https://raw.githubusercontent.com/tmichett/Fedora_Remix_Lab/main"
@@ -35,6 +35,13 @@ LAB_FILES=(
     "download-image.sh"
     "inventory"
     "README.md"
+    "QUICKSTART.md"
+)
+
+# PDF documentation files in Docs folder
+DOC_FILES=(
+    "README.pdf"
+    "QUICKSTART.pdf"
 )
 
 # Download each file
@@ -45,11 +52,22 @@ for file in "${LAB_FILES[@]}"; do
     echo "  WARNING: Failed to download ${file}"
 done
 
+# Create Docs directory and download PDF documentation
+echo "  Creating Docs directory..."
+mkdir -p /opt/FedoraRemixLab/Docs
+
+for doc in "${DOC_FILES[@]}"; do
+    echo "  Downloading: Docs/${doc}"
+    curl -sL -o "/opt/FedoraRemixLab/Docs/${doc}" "${GITHUB_RAW}/Docs/${doc}" || \
+    wget -q -O "/opt/FedoraRemixLab/Docs/${doc}" "${GITHUB_RAW}/Docs/${doc}" || \
+    echo "  WARNING: Failed to download Docs/${doc}"
+done
+
 # Make scripts executable
 if type ks_print_step >/dev/null 2>&1; then
-    ks_print_step 3 5 "Setting permissions and creating symlinks"
+    ks_print_step 3 6 "Setting permissions and creating symlinks"
 else
-    echo "[3/5] Setting permissions and creating symlinks"
+    echo "[3/6] Setting permissions and creating symlinks"
 fi
 
 chmod +x /opt/FedoraRemixLab/*.sh 2>/dev/null || true
@@ -80,11 +98,33 @@ for script in "${SCRIPT_FILES[@]}"; do
     fi
 done
 
+# Create desktop shortcut for Lab Quickstart
+if type ks_print_step >/dev/null 2>&1; then
+    ks_print_step 4 6 "Creating desktop shortcut for Lab Quickstart"
+else
+    echo "[4/6] Creating desktop shortcut for Lab Quickstart"
+fi
+
+# Create a symlink to the PDF on the desktop - no trust issues with symlinks!
+# This opens directly in the default PDF viewer when clicked
+mkdir -p /etc/skel/Desktop
+ln -sf /opt/FedoraRemixLab/Docs/QUICKSTART.pdf /etc/skel/Desktop/LabQuickstart.pdf
+
+# Also create for liveuser if it exists
+if id liveuser &>/dev/null; then
+    mkdir -p /home/liveuser/Desktop
+    ln -sf /opt/FedoraRemixLab/Docs/QUICKSTART.pdf /home/liveuser/Desktop/LabQuickstart.pdf
+    chown -h liveuser:liveuser /home/liveuser/Desktop/LabQuickstart.pdf
+    echo "  Desktop shortcut created for liveuser"
+fi
+
+echo "  Created desktop shortcut: LabQuickstart.pdf"
+
 # Download the base QCOW2 image to libvirt images directory
 if type ks_print_step >/dev/null 2>&1; then
-    ks_print_step 4 5 "Downloading Fedora Lab base image (this may take a while)"
+    ks_print_step 5 6 "Downloading Fedora Lab base image (this may take a while)"
 else
-    echo "[4/5] Downloading Fedora Lab base image (this may take a while)"
+    echo "[5/6] Downloading Fedora Lab base image (this may take a while)"
 fi
 
 LIBVIRT_IMAGES="/var/lib/libvirt/images"
@@ -109,9 +149,9 @@ fi
 
 # Verify installation
 if type ks_print_step >/dev/null 2>&1; then
-    ks_print_step 5 5 "Verifying Fedora Remix Lab installation"
+    ks_print_step 6 6 "Verifying Fedora Remix Lab installation"
 else
-    echo "[5/5] Verifying Fedora Remix Lab installation"
+    echo "[6/6] Verifying Fedora Remix Lab installation"
 fi
 
 echo ""
@@ -124,6 +164,12 @@ echo "    lab-reset-lab         - Reset lab environment"
 echo "    lab-status            - Show lab status"
 echo "    lab-manage-hosts      - Manage /etc/hosts entries"
 echo "    lab-download-image    - Download base QCOW2 image"
+echo ""
+echo "  Documentation:"
+echo "    /opt/FedoraRemixLab/QUICKSTART.md  - Quick start guide"
+echo "    /opt/FedoraRemixLab/README.md      - Full documentation"
+echo "    /opt/FedoraRemixLab/Docs/          - PDF documentation"
+echo "    Desktop: LabQuickstart.pdf         - Quick start PDF (click to open)"
 echo ""
 
 if [ -f "${LIBVIRT_IMAGES}/Fedora43Lab.qcow2" ]; then
