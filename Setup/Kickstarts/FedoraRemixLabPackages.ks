@@ -19,6 +19,9 @@ google-chrome-stable
 git
 gedit
 tmux
+wget
+curl
+unzip
 fedora-remix-logos
 gh
 syslinux-perl

@@ -80,22 +80,31 @@ for script in "${SCRIPT_FILES[@]}"; do
     fi
 done
 
-# Download the base QCOW2 image
+# Download the base QCOW2 image to libvirt images directory
 if type ks_print_step >/dev/null 2>&1; then
     ks_print_step 4 5 "Downloading Fedora Lab base image (this may take a while)"
 else
     echo "[4/5] Downloading Fedora Lab base image (this may take a while)"
 fi
 
+LIBVIRT_IMAGES="/var/lib/libvirt/images"
+mkdir -p "${LIBVIRT_IMAGES}"
+
 # Check if gdown is available
 if command -v gdown >/dev/null 2>&1; then
     echo "  Using gdown to download Fedora43Lab.qcow2..."
-    cd /opt/FedoraRemixLab
+    echo "  Destination: ${LIBVIRT_IMAGES}/Fedora43Lab.qcow2"
+    cd "${LIBVIRT_IMAGES}"
     # Google Drive file ID for Fedora43Lab.qcow2
-    gdown "1aMNna4AhHaRvQoEEK5XL8rGINnSEgTIN" -O "Fedora43Lab.qcow2" || \
-        echo "  WARNING: Failed to download base image. Run 'lab-download-image' later."
+    if gdown "1aMNna4AhHaRvQoEEK5XL8rGINnSEgTIN" -O "Fedora43Lab.qcow2"; then
+        chown qemu:qemu "${LIBVIRT_IMAGES}/Fedora43Lab.qcow2"
+        chmod 644 "${LIBVIRT_IMAGES}/Fedora43Lab.qcow2"
+        echo "  Base image downloaded successfully"
+    else
+        echo "  WARNING: Failed to download base image. Run 'sudo lab-download-image' later."
+    fi
 else
-    echo "  WARNING: gdown not available. Run 'lab-download-image' after boot to download the base image."
+    echo "  WARNING: gdown not available. Run 'sudo lab-download-image' after boot to download the base image."
 fi
 
 # Verify installation
@@ -117,8 +126,8 @@ echo "    lab-manage-hosts      - Manage /etc/hosts entries"
 echo "    lab-download-image    - Download base QCOW2 image"
 echo ""
 
-if [ -f "/opt/FedoraRemixLab/Fedora43Lab.qcow2" ]; then
-    IMAGE_SIZE=$(du -h /opt/FedoraRemixLab/Fedora43Lab.qcow2 | cut -f1)
+if [ -f "${LIBVIRT_IMAGES}/Fedora43Lab.qcow2" ]; then
+    IMAGE_SIZE=$(du -h ${LIBVIRT_IMAGES}/Fedora43Lab.qcow2 | cut -f1)
     if type ks_print_success >/dev/null 2>&1; then
         ks_print_success "Fedora Remix Lab installed successfully (base image: ${IMAGE_SIZE})"
     else
@@ -126,9 +135,9 @@ if [ -f "/opt/FedoraRemixLab/Fedora43Lab.qcow2" ]; then
     fi
 else
     if type ks_print_warning >/dev/null 2>&1; then
-        ks_print_warning "Fedora Remix Lab installed (base image not downloaded - run 'lab-download-image' later)"
+        ks_print_warning "Fedora Remix Lab installed (base image not downloaded - run 'sudo lab-download-image' later)"
     else
-        echo "[WARN] Fedora Remix Lab installed (base image not downloaded - run 'lab-download-image' later)"
+        echo "[WARN] Fedora Remix Lab installed (base image not downloaded - run 'sudo lab-download-image' later)"
     fi
 fi
 
