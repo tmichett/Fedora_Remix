@@ -415,6 +415,9 @@ systemctl enable sshd.service
 ## Create Ansible-User with Password and Add to Sudoers
 %include KickstartSnippets/create-ansible-user.ks
 
+## Install Fedora Remix Lab Environment (VM management scripts)
+%include KickstartSnippets/install-fedoraremix-lab.ks
+
 ## Attempt to Install Gnome Extensions and Setup Desktop Icons
 %include KickstartSnippets/setup-gnome-extensions.ks
 %include KickstartSnippets/setup-desktop-icons.ks
