@@ -35,7 +35,8 @@ export LC_ALL=en_US.UTF-8
 #%post --nochroot
 #cp -P /etc/resolv.conf "$INSTALL_ROOT"/etc/resolv.conf
 set -x
-%include KickstartSnippets/install-ansible.ks
+
+# Note: Ansible installation moved to main %post section where pip is available
 
 %end
 
@@ -364,12 +365,8 @@ cat /etc/resolv.conf > /FedoraRemix/DNS.txt
 
 #/usr/bin/nmcli con show
 
-## Ansible installation handled by KickstartSnippets/install-ansible.ks in %post --nochroot section
-## Duplicate installation removed to improve performance
-#wget -P /opt/ -r -nH -np -R "index.htm*" http://localhost/pip_packages/
-#wget -P /opt/ http://localhost/files/python_packages.txt
-#cd /opt/pip_packages
-#/usr/bin/pip3 install -r /opt/python_packages.txt
+## Install Ansible and related tools via pip (must be in main %post section where pip is available)
+%include KickstartSnippets/install-ansible.ks
 
 
 ## Enable WiFi Support for PXE Boot Clients
@@ -414,6 +411,9 @@ systemctl enable sshd.service
 
 ## Create Ansible-User with Password and Add to Sudoers
 %include KickstartSnippets/create-ansible-user.ks
+
+## Install Fedora Remix Lab Environment (VM management scripts)
+%include KickstartSnippets/install-fedoraremix-lab.ks
 
 ## Attempt to Install Gnome Extensions and Setup Desktop Icons
 %include KickstartSnippets/setup-gnome-extensions.ks

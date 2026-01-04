@@ -56,6 +56,7 @@ tmux
 ntfs-3g
 wget
 curl
+unzip
 fedora-remix-logos
 gh
 syslinux-perl
@@ -115,6 +116,7 @@ speech-dispatcher-utils
 
 ## Ansible Roles
 linux-system-roles
+sshpass
 
 ## For Wifi and Networking
 NetworkManager-wifi 
