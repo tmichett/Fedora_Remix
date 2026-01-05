@@ -193,8 +193,20 @@ cat >> /etc/rc.d/init.d/fedora-remix-live << 'EOF'
 # Setup liveuser home directory for COSMIC
 if [ -d /home/liveuser ]; then
     mkdir -p /home/liveuser/.config
+    
     # Skip gnome-initial-setup if it's present (from any GNOME dependencies)
     touch /home/liveuser/.config/gnome-initial-setup-done
+    
+    # Skip COSMIC initial-setup wizard
+    # The cosmic-initial-setup binary checks for ~/.config/cosmic-initial-setup-done
+    touch /home/liveuser/.config/cosmic-initial-setup-done
+    
+    # Copy COSMIC configuration from /etc/skel if not already present
+    if [ -d /etc/skel/.config/cosmic ]; then
+        cp -a /etc/skel/.config/cosmic /home/liveuser/.config/ 2>/dev/null || true
+    fi
+    
+    # Fix ownership for liveuser
     chown -R liveuser:liveuser /home/liveuser/
     restorecon -R /home/liveuser/ 2>/dev/null || true
 fi
@@ -383,6 +395,9 @@ cat /etc/resolv.conf > /FedoraRemix/DNS.txt
 
 ## Customize COSMIC Desktop Wallpaper
 %include KickstartSnippets/customize-cosmic-wallpaper.ks
+
+## Skip COSMIC Initial Setup Wizard and Set Dark Mode
+%include KickstartSnippets/customize-cosmic-initial-setup.ks
 
 ## Customize Grub Boot Menu
 %include KickstartSnippets/customize-grub.ks

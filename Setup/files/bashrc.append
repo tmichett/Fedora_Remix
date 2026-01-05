@@ -1,8 +1,15 @@
-source /usr/local/share/oh-my-bash/bashrc
+# Fedora Remix Shell Customizations
+# Source OhMyBash if available and not already loaded in THIS shell
+# We check if OSH is set (OhMyBash sets this) to avoid double-sourcing
+if [ -z "$OSH" ] && [ -f /usr/local/share/oh-my-bash/bashrc ]; then
+    source /usr/local/share/oh-my-bash/bashrc
+fi
 
-if [ -f "$HOME/.bash-git-prompt/gitprompt.sh" ]; then
+# Git prompt for repositories (only if not already loaded)
+if [ -z "$__GIT_PROMPT_DIR" ] && [ -f "$HOME/.bash-git-prompt/gitprompt.sh" ]; then
     GIT_PROMPT_ONLY_IN_REPO=1
     source "$HOME/.bash-git-prompt/gitprompt.sh"
 fi
 
+# Tmux web terminal alias
 alias tmux-web="tmux -f /opt/tmux/tmux.conf new-session -A -s web_terminal"
