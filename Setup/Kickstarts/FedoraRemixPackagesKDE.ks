@@ -75,7 +75,7 @@ podman-machine
 ## Telecon and Media
 obs-studio
 
-## Remove GNOME packages
+## Remove GNOME packages that might be pulled in
 -gnome-tour
 -gnome-shell
 -gnome-shell-extension*
@@ -83,28 +83,10 @@ obs-studio
 -gdm
 -gnome-control-center
 -gnome-terminal
--gedit
 -@gnome-desktop
 
-## Add KDE Plasma Desktop
-@kde-desktop
-@kde-apps
-@kde-media
-sddm
-sddm-breeze
-sddm-kcm
-plasma-workspace
-plasma-desktop
-dolphin
-konsole
-kate
-ark
-gwenview
-okular
-spectacle
-kwrite
-kcalc
-kfind
+## Note: KDE Desktop packages are included via fedora-kde-common.ks
+## Only add specific KDE packages not in the base KDE groups here if needed
 
 ## Course and Classroom Building DLE-DOIT
 python3-devel
@@ -156,8 +138,7 @@ zd1211-firmware
 firefox
 chromium
 
-## LibreOffice
-libreoffice
+## Note: LibreOffice is included via fedora-kde-common.ks
 
 ## Added for Ansible and JSON Filtering
 python-jmespath

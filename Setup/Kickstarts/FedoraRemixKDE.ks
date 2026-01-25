@@ -68,6 +68,26 @@ export LC_ALL=en_US.UTF-8
 
 set -x
 
+# Set livesys session type to KDE
+if [ -f /etc/sysconfig/livesys ]; then
+    sed -i 's/^livesys_session=.*/livesys_session="kde"/' /etc/sysconfig/livesys
+else
+    echo 'livesys_session="kde"' > /etc/sysconfig/livesys
+fi
+
+# set default GTK+ theme for root (see Fedora bug reports)
+cat > /root/.gtkrc-2.0 << 'GTKRC'
+include "/usr/share/themes/Adwaita/gtk-2.0/gtkrc"
+include "/etc/gtk-2.0/gtkrc"
+gtk-theme-name="Adwaita"
+GTKRC
+
+mkdir -p /root/.config/gtk-3.0
+cat > /root/.config/gtk-3.0/settings.ini << 'GTK3'
+[Settings]
+gtk-theme-name = Adwaita
+GTK3
+
 # Read version from config.yml if available (early definition for use throughout script)
 if [ -f "/var/www/html/Setup/config.yml" ]; then
     FEDORA_VERSION=$(grep '^fedora_version:' /var/www/html/Setup/config.yml | awk '{print $2}' | tr -d '"')
