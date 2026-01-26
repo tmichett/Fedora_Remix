@@ -185,7 +185,6 @@ rg
 fzf
 whereis
 prgrep
-broot
 fio
 f3
 
