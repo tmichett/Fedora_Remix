@@ -143,6 +143,9 @@ fi
 # don't autostart plasma-discover update notifier
 rm -f /etc/xdg/autostart/org.kde.discover.notifier.desktop
 
+# don't autostart plasma welcome center
+rm -f /etc/xdg/autostart/org.kde.plasma-welcome.desktop
+
 # suppress anaconda spokes redundant with initial-setup
 cat >> /etc/sysconfig/anaconda << 'FOE'
 [NetworkSpoke]
@@ -213,6 +216,12 @@ if [ -d /home/liveuser ]; then
 [KDE]
 WelcomeShown=true
 KDERCEOF
+    # Disable Plasma Welcome Center
+    mkdir -p /home/liveuser/.config/autostart
+    cat > /home/liveuser/.config/autostart/org.kde.plasma-welcome.desktop << 'WELCOMEEOF'
+[Desktop Entry]
+Hidden=true
+WELCOMEEOF
     chown -R liveuser:liveuser /home/liveuser/
     restorecon -R /home/liveuser/ 2>/dev/null || true
 fi

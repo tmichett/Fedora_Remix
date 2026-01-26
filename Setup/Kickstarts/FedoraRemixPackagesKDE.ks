@@ -145,7 +145,6 @@ python-jmespath
 
 ## Added for Hardware Testing and Looking
 lshw
-pciutils
 
 ## Added for VSCode Packages
 xclip
@@ -156,7 +155,6 @@ plocate
 ## Added for Fedora Remix Tools
 ttyd
 python-qt5
-python-pyyaml
 util-linux-script
 copr-cli
 
@@ -166,7 +164,6 @@ zoxide
 eza ## Needs repo
 btop
 bat
-fzf
 yazi  ## Needs repo
 dust  ## Needs repo
 
@@ -183,6 +180,14 @@ remmina
 procs
 duf
 httpie
+fd
+rg
+fzf
+whereis
+prgrep
+broot
+fio
+f3
 
 ## Fedora Remix Packages
 ## Comes from COPR Repository
