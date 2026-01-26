@@ -180,7 +180,7 @@ remmina
 procs
 duf
 httpie
-fd
+fd-find
 ripgrep
 fzf
 util-linux
