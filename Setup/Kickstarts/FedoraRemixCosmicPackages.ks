@@ -185,10 +185,9 @@ procs
 duf
 httpie
 fd
-rg
+ripgrep
 fzf
 whereis
-prgrep
 fio
 f3
 
