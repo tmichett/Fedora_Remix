@@ -183,7 +183,7 @@ httpie
 fd
 ripgrep
 fzf
-whereis
+util-linux
 fio
 f3
 
