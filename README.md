@@ -2,6 +2,9 @@
 
 A customized Fedora Linux live ISO with pre-configured packages, themes, and utilities.
 
+> **Latest Updates:** See [CHANGELOG.md](CHANGELOG.md) for recent fixes and improvements.  
+> **Linux Compatibility:** See [LINUX_BUILD_FIX.md](LINUX_BUILD_FIX.md) for known issues and solutions.
+
 ## Quick Start
 
 ### Prerequisites

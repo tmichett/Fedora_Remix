@@ -1,4 +1,40 @@
-# Fedora Remix Builder - Linux Compatibility Fix
+# Fedora Remix Builder - Linux Compatibility Fixes
+
+**Last Updated:** February 22, 2026  
+**Status:** RESOLVED
+
+## Fix History
+
+### Fix #2: SELinux Permission Denied on /tmp/remix_kickstart.txt (February 22, 2026)
+
+**Issue:** Container fails to start with permission denied error when trying to write to `/tmp/remix_kickstart.txt`
+
+**Error Message:**
+```
+/entrypoint.sh: line 42: /tmp/remix_kickstart.txt: Permission denied
+[FAILED] Failed to start remix-builder.service - Run Remix Builder Entrypoint.
+```
+
+**Root Cause:** 
+- Build_Remix.sh was bind-mounting a host temp file to `/tmp/remix_kickstart.txt` in the container
+- SELinux (in Enforcing mode) was blocking write operations to the bind-mounted file
+- Even with `:rw` permissions, SELinux prevented the container from modifying the file
+
+**Solution:**
+- Removed the temp file bind mount from Build_Remix.sh
+- Container now creates `/tmp/remix_kickstart.txt` in its own tmpfs filesystem
+- Relies on `REMIX_KICKSTART` environment variable as the primary method
+- Added graceful error handling in entrypoint.sh for file write failures
+
+**Files Modified:**
+- `Build_Remix.sh` (lines 261-279): Removed temp file creation and bind mount
+- `RemixBuilder/entrypoint.sh` (line 46): Added error handling for file write
+
+**Result:** ✅ Builds now start successfully on systems with SELinux enforcing mode
+
+---
+
+### Fix #1: systemd /sys Filesystem Unmount Errors (November 22, 2025)
 
 **Date:** November 22, 2025  
 **Issue:** Build failures on Linux due to systemd `/sys` filesystem unmount errors  

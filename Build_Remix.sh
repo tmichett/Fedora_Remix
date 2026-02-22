@@ -258,17 +258,11 @@ else
     EXTRA_ARGS=("--device-cgroup-rule=b 7:* rmw")
 fi
 
-# Write kickstart selection to a temporary file for the container to read
-# This is a fallback for systemd mode where environment variables may not propagate
-KICKSTART_FILE=$(mktemp)
-echo "$SELECTED_KICKSTART" > "$KICKSTART_FILE"
-echo "Kickstart selection written to: $KICKSTART_FILE"
-
 # Run the container with systemd support and loop device access
 # Note: --security-opt label=disable helps with SELinux-related mount warnings
 # --replace will automatically replace any existing container with the same name
 # The /sys unmount issue is now handled gracefully by Enhanced_Remix_Build_Script.sh
-# Pass the selected kickstart as an environment variable AND via file (fallback)
+# Pass the selected kickstart as an environment variable
 # SOURCE_DIR is mounted as workspace (contains kickstarts, scripts, etc.)
 # FEDORA_REMIX_LOCATION is mounted as output directory for ISO creation
 $PODMAN_CMD run --rm -it \
@@ -282,9 +276,5 @@ $PODMAN_CMD run --rm -it \
     -v "$SSH_KEY_LOCATION:/root/github_id:ro" \
     -v "$FEDORA_REMIX_LOCATION:/livecd-creator:rw" \
     -v "$SOURCE_DIR:/root/workspace:rw" \
-    -v "$KICKSTART_FILE:/tmp/remix_kickstart.txt:ro" \
     "$IMAGE_NAME"
-
-# Clean up temp file
-rm -f "$KICKSTART_FILE"
 
