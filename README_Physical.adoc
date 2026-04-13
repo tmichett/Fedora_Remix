@@ -17,7 +17,7 @@ ifdef::env-github[]
 endif::[]
 :imagesdir: images/
 
-== Fedora Remix Creation Quickstart
+== Fedora Remix Creation Quickstart (Physical or Virtual)
 
 This quickstart will provide a quick method to download a pre-built Fedora Remix as well as creating your own Fedora Remix Building system. The https://github.com/tmichett/Fedora_Remix has been created with Python automation scripts that will setup a Fedora Remix Building system using the Fedora Remix installed from the liveCD provided (https://drive.google.com/drive/folders/1UAT07AJIrTdMk3ke_QE6S6vz-qn6qGtR). The requirements are relatively simply to build and the system has Fedora Remix customization scripts and self-launching menu to assist with the initial setup. The quickstart and documentation are also available at the following link: https://tmichett.github.io/Fedora_Remix/.
 
