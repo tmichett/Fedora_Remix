@@ -56,15 +56,9 @@ endif::[]
 
 [preface]
 :sectnums:
-include::README.adoc[]
+include::Quickstart_Container.adoc[]
+include::README_Physical.adoc[]
 
-// Commented out as only want kickstart for now. Need to create remaining documentation content
-
-//:sectnums:
-//include::Chapter1.adoc[]
-//include::Chapter2.adoc[]
-
-// Appendix Section below here
 
 [appendix]
 include::AppendixA.adoc[]

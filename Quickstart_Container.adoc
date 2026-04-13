@@ -1,0 +1,712 @@
+= Fedora Remix Builder - Container Quickstart Guide
+:toc: left
+:toclevels: 3
+:icons: font
+:source-highlighter: rouge
+:last-update-label!:
+:docdate: April 13, 2026
+
+[.lead]
+Quick guide to building a custom Fedora Remix ISO using the containerized build system.
+
+== Overview
+
+This guide will walk you through building a custom Fedora Remix ISO image using the Fedora Remix Builder container. The entire build process runs in a container, making it consistent across different systems.
+
+[cols="1,3"]
+|===
+|Build Time |Approximately 30-45 minutes
+|Output |A bootable Fedora Remix ISO file (~7-8 GB)
+|===
+
+== Prerequisites
+
+=== Required Software
+
+Before starting, ensure your system has:
+
+. *Git* - For cloning the repository
++
+[source,bash]
+----
+# Fedora/RHEL
+sudo dnf install git
+
+# Ubuntu/Debian
+sudo apt install git
+----
+
+. *Podman* - Container runtime (recommended) or Docker
++
+[source,bash]
+----
+# Fedora/RHEL
+sudo dnf install podman
+
+# Ubuntu/Debian
+sudo apt install podman
+----
+
+. *Sudo Access* - Required for loop device creation on Linux
+** The build script will automatically use `sudo` when needed
+
+=== System Requirements
+
+[cols="1,3"]
+|===
+|Disk Space |At least 20 GB free (for packages, cache, and ISO)
+|Memory |4 GB minimum, 8 GB recommended
+|CPU |Multi-core processor recommended (build is CPU-intensive)
+|Internet |Required for downloading packages and container image
+|===
+
+=== Supported Operating Systems
+
+* ✅ Fedora Linux (39, 40, 41, 42, 43)
+* ✅ RHEL/CentOS/Rocky/Alma Linux (8, 9)
+* ✅ Ubuntu/Debian (with Podman installed)
+* ✅ macOS (with Podman Desktop)
+
+== Quick Start (5 Steps)
+
+=== Step 1: Clone the Repository
+
+[source,bash]
+----
+# Clone the Fedora Remix repository
+git clone https://github.com/tmichett/Fedora_Remix.git
+
+# Navigate to the project directory
+cd Fedora_Remix
+----
+
+=== Step 2: Configure Container Properties
+
+Edit the main configuration file to set up the build environment:
+
+[source,bash]
+----
+vim config.yml
+----
+
+.Required Settings
+[source,yaml]
+----
+Container_Properties:
+  Fedora_Version: "43"                              # Fedora version for container
+  SSH_Key_Location: "~/.ssh/github_id"              # Your SSH key location
+  Fedora_Remix_Location: "/home/travis/Remix_Builder"  # Output directory
+  GitHub_Registry_Owner: "tmichett"                 # Container registry owner
+----
+
+.Key Configuration Options
+
+[cols="1,3"]
+|===
+|Option |Description
+
+|`Fedora_Version`
+|Must match the Fedora version you want to build (e.g., "43")
+
+|`SSH_Key_Location`
+|Path to your SSH key (used for git operations in container)
+
+|`Fedora_Remix_Location`
+|Where the ISO and build artifacts will be saved
+
+|`GitHub_Registry_Owner`
+|GitHub username/org that hosts the container image
+|===
+
+.Example Configuration
+[source,yaml]
+----
+Container_Properties:
+  Fedora_Version: "43"
+  SSH_Key_Location: "~/.ssh/id_rsa"
+  Fedora_Remix_Location: "/home/myuser/FedoraBuilds"
+  GitHub_Registry_Owner: "tmichett"
+----
+
+=== Step 3: Configure Remix Build Settings
+
+Edit the Setup configuration file:
+
+[source,bash]
+----
+vim Setup/config.yml
+----
+
+.Required Settings
+[source,yaml]
+----
+# Fedora version to use for downloading boot files
+fedora_version: 43    # MUST match Fedora_Version in config.yml
+
+# Web root directory where files will be served
+web_root: "/var/www/html"
+----
+
+[WARNING]
+====
+The `fedora_version` here *MUST match* the `Fedora_Version` in the main `config.yml` file!
+====
+
+.Example
+[source,yaml]
+----
+fedora_version: 43
+web_root: "/var/www/html"
+----
+
+=== Step 4: Verify Configuration (Recommended)
+
+Run the verification script to check your configuration:
+
+[source,bash]
+----
+./Verify_Build_Remix.sh
+----
+
+.What it checks
+* ✅ Fedora versions match between both config files
+* ✅ Container image availability
+* ✅ Configuration summary
+* ✅ Confirms before building
+
+.Sample Output
+----
+╔══════════════════════════════════════════════════════════════════════╗
+║ Configuration Summary                                                ║
+╠══════════════════════════════════════════════════════════════════════╣
+║  Container Configuration (config.yml)                              ║
+║    Fedora Version: 43                                            ║
+║  Remix Configuration (Setup/config.yml)                            ║
+║    Fedora Version: 43                                            ║
+╚══════════════════════════════════════════════════════════════════════╝
+
+✅ Versions match! Container and Remix both use Fedora 43
+
+Do you want to proceed with the build? [y/N]: y
+----
+
+=== Step 5: Build the ISO
+
+If you used the verification script and confirmed, the build starts automatically.
+
+Otherwise, run the build script directly:
+
+[source,bash]
+----
+./Build_Remix.sh
+----
+
+.Build Process
+. Container starts with systemd
+. Prepares build environment
+. Downloads and installs packages (~15-20 minutes)
+. Runs post-installation scripts
+. Creates the ISO image (~5-10 minutes)
+. ISO saved to your configured output directory
+
+.Expected Output Location
+----
+/home/travis/Remix_Builder/FedoraRemix/FedoraRemix.iso
+----
+
+== Optional Customization
+
+=== Customizing Packages
+
+To add or remove RPM packages from your remix:
+
+.Edit the package list
+[source,bash]
+----
+vim Setup/Kickstarts/FedoraRemixPackages.ks
+----
+
+.Add packages
+[source,bash]
+----
+# Add your packages here
+vim
+tmux
+htop
+----
+
+.Remove packages
+[source,bash]
+----
+# Comment out or delete unwanted packages
+# firefox  # Removed
+----
+
+.Package Categories
+* Base system packages
+* Desktop environment packages
+* Development tools
+* Multimedia applications
+* Custom applications
+
+=== Customizing Kickstart Files
+
+For advanced customization of the installation and system configuration:
+
+.Main Kickstart Files
+----
+Setup/Kickstarts/
+├── FedoraRemix.ks              # Main kickstart (default)
+├── FedoraRemixCosmic.ks        # COSMIC desktop variant
+├── FedoraRemixKDE.ks           # KDE Plasma variant
+├── FedoraRemixLab.ks           # Lab/Development variant
+├── FedoraRemixPackages.ks      # Package list (edit this for packages)
+└── FedoraRemixRepos.ks         # Repository configuration
+----
+
+.Kickstart Snippets
+----
+Setup/Kickstarts/KickstartSnippets/
+├── create-ansible-user.ks      # Create ansible user
+└── customize-anaconda.ks       # Anaconda installer customization
+----
+
+.What you can customize
+* System packages and package groups
+* User accounts and passwords
+* Network configuration
+* Firewall rules
+* SELinux settings
+* Post-installation scripts
+* Boot loader configuration
+* Partition layout
+* Repository sources
+
+.Example: Adding a Custom User
+
+Create a new snippet in `Setup/Kickstarts/KickstartSnippets/`:
+
+[source,bash]
+----
+vim Setup/Kickstarts/KickstartSnippets/create-myuser.ks
+----
+
+[source,bash]
+----
+# Create custom user
+user --name=myuser --groups=wheel --password=encrypted_password --iscrypted
+----
+
+Then include it in your main kickstart:
+
+[source,bash]
+----
+vim Setup/Kickstarts/FedoraRemix.ks
+----
+
+[source,bash]
+----
+%include Setup/Kickstarts/KickstartSnippets/create-myuser.ks
+----
+
+=== Customizing Look and Feel
+
+.Branding and Themes
+----
+Setup/files/
+├── boot/                       # Boot splash screens
+│   ├── splash.png             # Boot menu background
+│   └── anaconda_header.png    # Installer header
+├── FedoraRemixOrange.png      # Desktop wallpaper
+└── Cursor.desktop             # Desktop shortcuts
+----
+
+.GRUB Theme
+----
+Grub_Theme/Fedora_Remix_Theme/
+├── FedoraRemix.jpeg           # GRUB background options
+├── FedoraRemix2.jpeg
+└── ...
+----
+
+.To customize
+. Replace image files with your own (keep same dimensions)
+. Update references in kickstart files if needed
+. Rebuild the ISO
+
+== Building Different Variants
+
+The project includes several pre-configured variants:
+
+=== Default Fedora Remix (GNOME)
+[source,bash]
+----
+./Verify_Build_Remix.sh
+# Select: 1) FedoraRemix
+----
+
+=== COSMIC Desktop Variant
+[source,bash]
+----
+./Build_Remix.sh --kickstart FedoraRemixCosmic
+----
+
+=== KDE Plasma Variant
+[source,bash]
+----
+./Build_Remix.sh --kickstart FedoraRemixKDE
+----
+
+=== Lab/Development Variant
+[source,bash]
+----
+./Build_Remix.sh --kickstart FedoraRemixLab
+----
+
+.Each variant includes
+* Different desktop environment
+* Variant-specific packages
+* Customized configurations
+* Optimized for different use cases
+
+== Configuration File Reference
+
+=== Main Configuration (`config.yml`)
+
+.Location
+----
+/home/travis/Github/Fedora_Remix/config.yml
+----
+
+.Purpose
+Controls the container build environment
+
+.Full Example
+[source,yaml]
+----
+Container_Properties:
+  # Fedora version for the container (must match Setup/config.yml)
+  Fedora_Version: "43"
+  
+  # SSH key for git operations (optional but recommended)
+  SSH_Key_Location: "~/.ssh/github_id"
+  
+  # Output directory for ISO and build artifacts
+  Fedora_Remix_Location: "/home/travis/Remix_Builder"
+  
+  # GitHub Container Registry owner (for pulling container image)
+  GitHub_Registry_Owner: "tmichett"
+  
+  # Note: Image_Name is auto-generated as:
+  # ghcr.io/{GitHub_Registry_Owner}/fedora-remix-builder:{Fedora_Version}
+----
+
+=== Setup Configuration (`Setup/config.yml`)
+
+.Location
+----
+/home/travis/Github/Fedora_Remix/Setup/config.yml
+----
+
+.Purpose
+Controls the remix build process
+
+.Full Example
+[source,yaml]
+----
+# Configuration file for Prepare_Web_Files.py
+
+# Fedora boot files to download for PXE boot
+fedora_boot_files:
+  - "vmlinuz"
+  - "initrd.img"
+
+# Fedora version to use for downloading boot files
+# MUST match Fedora_Version in main config.yml
+fedora_version: 43
+
+# Web root directory where files will be served
+web_root: "/var/www/html"
+----
+
+== Troubleshooting
+
+=== Version Mismatch Error
+
+.Problem
+----
+⚠️ Version mismatch detected!
+  Container is configured for Fedora 43
+  Remix is configured for Fedora 42
+----
+
+.Solution
+Update both config files to use the same version:
+
+[source,bash]
+----
+# Edit main config
+vim config.yml
+# Set: Fedora_Version: "43"
+
+# Edit setup config
+vim Setup/config.yml
+# Set: fedora_version: 43
+----
+
+=== Container Image Not Found
+
+.Problem
+----
+⚠️ Container image not found locally
+----
+
+.Solution 1: Let it pull automatically (slower)
+* The image will be pulled from GitHub Container Registry
+* Takes 5-15 minutes depending on connection
+
+.Solution 2: Build container locally (faster for repeated builds)
+[source,bash]
+----
+cd /home/travis/Github/RemixBuilder
+./build.sh
+----
+
+=== SELinux Relabeling Errors
+
+.Problem
+----
+setfiles: Could not set context for /usr/share/accountsservice: Invalid argument
+Error creating Live CD : SELinux relabel failed.
+----
+
+.Solution
+This is fixed in the latest version. Ensure you have the patched `kickstart.py`:
+
+[source,bash]
+----
+ls -lh Setup/files/Fixes/kickstart.py
+----
+
+If missing, pull the latest changes:
+
+[source,bash]
+----
+git pull origin main
+----
+
+See link:SELINUX_RELABEL_FIX.md[SELINUX_RELABEL_FIX.md] for details.
+
+=== Build Fails After 15 Minutes
+
+.Problem
+----
+Error creating Live CD : Unable to unmount filesystem at /var/tmp/imgcreate-*/install_root/sys
+----
+
+.Solution
+This is fixed in the latest version. Ensure you have the patched `fs.py`:
+
+[source,bash]
+----
+ls -lh Setup/files/Fixes/fs.py
+----
+
+See link:LINUX_BUILD_FIX.md[LINUX_BUILD_FIX.md] for details.
+
+=== Insufficient Disk Space
+
+.Problem
+----
+Error: Not enough free space
+----
+
+.Solution
+* Ensure at least 20 GB free space
+* Clean up old builds:
++
+[source,bash]
+----
+rm -rf /home/travis/Remix_Builder/FedoraRemix/*.iso
+rm -rf /livecd-creator/package-cache/*
+----
+
+== Build Output
+
+=== Successful Build
+
+.Expected output
+----
+✅ 🚀 Live CD created successfully!
+  🕐 Total Build Time:          30m 46s (1846 seconds)
+  📦 Package Installation:     15m 42s (942 seconds)
+  🚀 ISO File Creation:        15m 4s (904 seconds)
+✅ 📦 Generated: FedoraRemix.iso (7.9G)
+
+╔══════════════════════════════════════════════════════════════════════════════╗
+║ BUILD COMPLETED SUCCESSFULLY!                                               ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+----
+
+=== Output Files
+
+.ISO Image
+----
+/home/travis/Remix_Builder/FedoraRemix/FedoraRemix.iso
+----
+
+.Build Log
+----
+/home/travis/Remix_Builder/FedoraRemix/FedoraRemix-Build-MMDDYY-HHMM.log
+----
+
+.Package Cache
+----
+/livecd-creator/package-cache/
+----
+
+== Next Steps
+
+=== Testing Your ISO
+
+. *Verify the ISO:*
++
+[source,bash]
+----
+ls -lh /home/travis/Remix_Builder/FedoraRemix/*.iso
+----
+
+. *Test in a VM:*
+** Use GNOME Boxes, VirtualBox, or virt-manager
+** Boot from the ISO
+** Test Live environment
+** Test installation
+
+. *Create Bootable USB:*
++
+[source,bash]
+----
+sudo dd if=/home/travis/Remix_Builder/FedoraRemix/FedoraRemix.iso \
+        of=/dev/sdX bs=4M status=progress
+----
++
+[WARNING]
+====
+Replace `/dev/sdX` with your USB device.
+====
+
+=== Distributing Your ISO
+
+.Options
+* Upload to file sharing service
+* Host on web server
+* Distribute via USB drives
+* Create torrent for large-scale distribution
+
+== Advanced Topics
+
+=== Building for Different Fedora Versions
+
+To build for a different Fedora version:
+
+. Update both config files:
++
+[source,bash]
+----
+# config.yml
+Fedora_Version: "44"
+
+# Setup/config.yml
+fedora_version: 44
+----
+
+. Verify the container image exists:
++
+[source,bash]
+----
+podman pull ghcr.io/tmichett/fedora-remix-builder:44
+----
+
+. Build as normal
+
+=== Automating Builds
+
+Create a build script:
+
+[source,bash]
+----
+#!/bin/bash
+# automated-build.sh
+
+cd /home/travis/Github/Fedora_Remix
+
+# Update to latest code
+git pull
+
+# Run build with auto-confirmation
+echo "y" | ./Verify_Build_Remix.sh
+
+# Copy ISO to distribution directory
+cp /home/travis/Remix_Builder/FedoraRemix/*.iso /var/www/html/isos/
+----
+
+=== Building Multiple Variants
+
+[source,bash]
+----
+#!/bin/bash
+# build-all-variants.sh
+
+for variant in FedoraRemix FedoraRemixCosmic FedoraRemixKDE; do
+    echo "Building $variant..."
+    ./Build_Remix.sh --kickstart $variant
+done
+----
+
+== Additional Resources
+
+=== Documentation
+
+* *Main README:* link:README.md[README.md] - Project overview
+* *Build Fixes:* link:LINUX_BUILD_FIX.md[LINUX_BUILD_FIX.md] - Known issues and solutions
+* *SELinux Fix:* link:SELINUX_RELABEL_FIX.md[SELINUX_RELABEL_FIX.md] - SELinux relabeling fix details
+* *Verification Script:* link:VERIFY_BUILD_REMIX_USAGE.md[VERIFY_BUILD_REMIX_USAGE.md] - Verification tool guide
+* *Container Build:* `/home/travis/Github/RemixBuilder/README.md` - Container documentation
+
+=== Repository Links
+
+* *Fedora Remix:* https://github.com/tmichett/Fedora_Remix
+* *Remix Builder Container:* https://github.com/tmichett/RemixBuilder
+* *Container Registry:* https://ghcr.io/tmichett/fedora-remix-builder
+
+=== Getting Help
+
+. Check the documentation files
+. Review build logs for errors
+. Check GitHub Issues
+. Consult Fedora documentation for kickstart syntax
+
+== Summary
+
+.Minimum Steps to Build
+
+. Clone repository: `git clone https://github.com/tmichett/Fedora_Remix.git`
+. Edit `config.yml` - Set container properties
+. Edit `Setup/config.yml` - Set remix version (must match!)
+. Run `./Verify_Build_Remix.sh` - Verify and build
+. Wait 30-45 minutes
+. Find ISO at `/home/travis/Remix_Builder/FedoraRemix/FedoraRemix.iso`
+
+.Optional Customization
+
+* Edit `Setup/Kickstarts/FedoraRemixPackages.ks` - Add/remove packages
+* Edit kickstart files in `Setup/Kickstarts/` - Advanced customization
+* Replace branding files in `Setup/files/` - Custom look and feel
+
+[.text-center]
+*That's it!* You now have a custom Fedora Remix ISO ready to use.
+
+'''
+
+[.text-center]
+_Last Updated: April 13, 2026 | Version: 1.0_
