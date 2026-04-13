@@ -7,21 +7,40 @@ A customized Fedora Linux live ISO with pre-configured packages, themes, and uti
 
 ## Quick Start
 
+> **📚 New to building Fedora Remix?** See **[Quickstart_Container.md](Quickstart_Container.md)** for a complete step-by-step guide from repository clone to ISO creation.
+
 ### Prerequisites
 - Podman installed on your system
 - Fedora Remix Builder container (see [RemixBuilder](https://github.com/tmichett/RemixBuilder))
-- At least 10GB free disk space
+- At least 20GB free disk space
 - SSH key for GitHub access (optional)
 
-### Building the ISO
+### Building the ISO (Containerized Method - Recommended)
 
-1. **Configure the build**:
+1. **Verify and configure** (Recommended):
+   ```bash
+   # Run verification script - checks configuration and starts build
+   ./Verify_Build_Remix.sh
+   ```
+   
+   The verification script will:
+   - ✅ Check Fedora versions match between config files
+   - ✅ Verify container image availability
+   - ✅ Display configuration summary
+   - ✅ Confirm before building
+   - ✅ Automatically launch the build if approved
+
+2. **Or configure and build manually**:
    ```bash
    # Edit config.yml with your settings
    vim config.yml
+   vim Setup/config.yml  # Ensure fedora_version matches!
+   
+   # Run the build
+   ./Build_Remix.sh
    ```
 
-2. **Run the build**:
+3. **Build specific variants**:
    ```bash
    # Interactive mode - choose from available kickstarts
    ./Build_Remix.sh
@@ -34,13 +53,13 @@ A customized Fedora Linux live ISO with pre-configured packages, themes, and uti
    ./Build_Remix.sh -l
    ```
 
-3. **Find your ISO**:
+4. **Find your ISO**:
    - Location: `{Fedora_Remix_Location}/FedoraRemix/{KickstartName}.iso`
    - Examples:
      - `FedoraRemix.iso` (GNOME desktop)
      - `FedoraRemixCosmic.iso` (COSMIC desktop)
    - Size: ~7-8 GB
-   - Build time: ~30 minutes
+   - Build time: ~30-45 minutes
 
 ### Linux Build Fix (November 2025)
 
@@ -54,9 +73,21 @@ If you're building on Linux and encounter `/sys` unmount errors, the issue has b
 
 ## Documentation
 
-- **[LINUX_BUILD_FIX.md](LINUX_BUILD_FIX.md)** - Detailed fix for Linux build issues
+### Getting Started
+- **[Quickstart_Container.md](Quickstart_Container.md)** - 🚀 Complete quickstart guide for containerized builds
+- **[VERIFY_BUILD_REMIX_USAGE.md](VERIFY_BUILD_REMIX_USAGE.md)** - Verification script usage guide
+
+### Build Methods
+- **Containerized (Recommended)** - Use `./Verify_Build_Remix.sh` or `./Build_Remix.sh`
+- **Physical/Virtual** - See **[README_Physical.adoc](README_Physical.adoc)** for building on physical or virtual machines without containers
+
+### Troubleshooting & Fixes
+- **[LINUX_BUILD_FIX.md](LINUX_BUILD_FIX.md)** - Detailed fixes for Linux build issues (3 major fixes)
+- **[SELINUX_RELABEL_FIX.md](SELINUX_RELABEL_FIX.md)** - SELinux relabeling error fix (April 2026)
+
+### Reference
 - **[README_Scripts_Usage.md](README_Scripts_Usage.md)** - Complete script documentation
-- **[README.adoc](README.adoc)** - Extended documentation
+- **[README.adoc](README.adoc)** - Extended documentation and detailed information
 
 ## Project Structure
 
