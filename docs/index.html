@@ -449,6 +449,86 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <div id="toc" class="toc">
 <div id="toctitle">Table of Contents</div>
 <ul class="sectlevel1">
+<li><a href="#_fedora_remix_builder_container_quickstart_guide">Fedora Remix Builder - Container Quickstart Guide</a></li>
+<li><a href="#_overview">1. Overview</a></li>
+<li><a href="#_prerequisites">2. Prerequisites</a>
+<ul class="sectlevel2">
+<li><a href="#_required_software">2.1. Required Software</a></li>
+<li><a href="#_system_requirements">2.2. System Requirements</a></li>
+<li><a href="#_supported_operating_systems">2.3. Supported Operating Systems</a></li>
+</ul>
+</li>
+<li><a href="#_quick_start_5_steps">3. Quick Start (5 Steps)</a>
+<ul class="sectlevel2">
+<li><a href="#_step_1_clone_the_repository">3.1. Step 1: Clone the Repository</a></li>
+<li><a href="#_step_2_configure_container_properties">3.2. Step 2: Configure Container Properties</a></li>
+<li><a href="#_step_3_configure_remix_build_settings">3.3. Step 3: Configure Remix Build Settings</a></li>
+<li><a href="#_step_4_verify_configuration_recommended">3.4. Step 4: Verify Configuration (Recommended)</a></li>
+<li><a href="#_step_5_build_the_iso">3.5. Step 5: Build the ISO</a></li>
+</ul>
+</li>
+<li><a href="#_optional_customization">4. Optional Customization</a>
+<ul class="sectlevel2">
+<li><a href="#_customizing_packages">4.1. Customizing Packages</a></li>
+<li><a href="#_customizing_kickstart_files">4.2. Customizing Kickstart Files</a></li>
+<li><a href="#_customizing_look_and_feel">4.3. Customizing Look and Feel</a></li>
+</ul>
+</li>
+<li><a href="#_building_different_variants">5. Building Different Variants</a>
+<ul class="sectlevel2">
+<li><a href="#_default_fedora_remix_gnome">5.1. Default Fedora Remix (GNOME)</a></li>
+<li><a href="#_cosmic_desktop_variant">5.2. COSMIC Desktop Variant</a></li>
+<li><a href="#_kde_plasma_variant">5.3. KDE Plasma Variant</a></li>
+<li><a href="#_labdevelopment_variant">5.4. Lab/Development Variant</a></li>
+</ul>
+</li>
+<li><a href="#_configuration_file_reference">6. Configuration File Reference</a>
+<ul class="sectlevel2">
+<li><a href="#_main_configuration_config_yml">6.1. Main Configuration (<code>config.yml</code>)</a></li>
+<li><a href="#_setup_configuration_setupconfig_yml">6.2. Setup Configuration (<code>Setup/config.yml</code>)</a></li>
+</ul>
+</li>
+<li><a href="#_troubleshooting">7. Troubleshooting</a>
+<ul class="sectlevel2">
+<li><a href="#_version_mismatch_error">7.1. Version Mismatch Error</a></li>
+<li><a href="#_container_image_not_found">7.2. Container Image Not Found</a></li>
+<li><a href="#_selinux_relabeling_errors">7.3. SELinux Relabeling Errors</a></li>
+<li><a href="#_build_fails_after_15_minutes">7.4. Build Fails After 15 Minutes</a></li>
+<li><a href="#_insufficient_disk_space">7.5. Insufficient Disk Space</a></li>
+</ul>
+</li>
+<li><a href="#_build_output">8. Build Output</a>
+<ul class="sectlevel2">
+<li><a href="#_successful_build">8.1. Successful Build</a></li>
+<li><a href="#_output_files">8.2. Output Files</a></li>
+</ul>
+</li>
+<li><a href="#_next_steps">9. Next Steps</a>
+<ul class="sectlevel2">
+<li><a href="#_testing_your_iso">9.1. Testing Your ISO</a></li>
+<li><a href="#_distributing_your_iso">9.2. Distributing Your ISO</a></li>
+</ul>
+</li>
+<li><a href="#_advanced_topics">10. Advanced Topics</a>
+<ul class="sectlevel2">
+<li><a href="#_building_for_different_fedora_versions">10.1. Building for Different Fedora Versions</a></li>
+<li><a href="#_automating_builds">10.2. Automating Builds</a></li>
+<li><a href="#_building_multiple_variants">10.3. Building Multiple Variants</a></li>
+</ul>
+</li>
+<li><a href="#_additional_resources">11. Additional Resources</a>
+<ul class="sectlevel2">
+<li><a href="#_documentation">11.1. Documentation</a></li>
+<li><a href="#_repository_links">11.2. Repository Links</a></li>
+<li><a href="#_getting_help">11.3. Getting Help</a></li>
+</ul>
+</li>
+<li><a href="#_summary">12. Summary</a></li>
+<li><a href="#_fedora_remix_creation_quickstart">13. Fedora Remix Creation Quickstart</a>
+<ul class="sectlevel2">
+<li><a href="#_quickstart">13.1. <span class="blue"><strong>Quickstart</strong></span></a></li>
+</ul>
+</li>
 <li><a href="#_fedora_remix">Appendix A: Fedora Remix</a>
 <ul class="sectlevel2">
 <li><a href="#_fedora_remix_application_repositories">A.1. Fedora Remix Application Repositories</a></li>
@@ -459,10 +539,1460 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 </div>
 </div>
 <div id="content">
-<div id="preamble">
+<div class="sect1">
+<h2 id="_fedora_remix_builder_container_quickstart_guide">Fedora Remix Builder - Container Quickstart Guide</h2>
+<div class="sectionbody">
+<div class="paragraph lead">
+<p>Quick guide to building a custom Fedora Remix ISO using the containerized build system.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_overview">1. Overview</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>Unresolved directive in Main.adoc - include::README.adoc[]</p>
+<p>This guide will walk you through building a custom Fedora Remix ISO image using the Fedora Remix Builder container. The entire build process runs in a container, making it consistent across different systems.</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 25%;">
+<col style="width: 75%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Build Time</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Approximately 30-45 minutes</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Output</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A bootable Fedora Remix ISO file (~7-8 GB)</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_prerequisites">2. Prerequisites</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_required_software">2.1. Required Software</h3>
+<div class="paragraph">
+<p>Before starting, ensure your system has:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p><strong>Git</strong> - For cloning the repository</p>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-bash" data-lang="bash"># Fedora/RHEL
+sudo dnf install git
+
+# Ubuntu/Debian
+sudo apt install git</code></pre>
+</div>
+</div>
+</li>
+<li>
+<p><strong>Podman</strong> - Container runtime (recommended) or Docker</p>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-bash" data-lang="bash"># Fedora/RHEL
+sudo dnf install podman
+
+# Ubuntu/Debian
+sudo apt install podman</code></pre>
+</div>
+</div>
+</li>
+<li>
+<p><strong>Sudo Access</strong> - Required for loop device creation on Linux</p>
+<div class="ulist">
+<ul>
+<li>
+<p>The build script will automatically use <code>sudo</code> when needed</p>
+</li>
+</ul>
+</div>
+</li>
+</ol>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_system_requirements">2.2. System Requirements</h3>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 25%;">
+<col style="width: 75%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Disk Space</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">At least 20 GB free (for packages, cache, and ISO)</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Memory</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">4 GB minimum, 8 GB recommended</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">CPU</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Multi-core processor recommended (build is CPU-intensive)</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Internet</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Required for downloading packages and container image</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect2">
+<h3 id="_supported_operating_systems">2.3. Supported Operating Systems</h3>
+<div class="ulist">
+<ul>
+<li>
+<p>✅ Fedora Linux (39, 40, 41, 42, 43)</p>
+</li>
+<li>
+<p>✅ RHEL/CentOS/Rocky/Alma Linux (8, 9)</p>
+</li>
+<li>
+<p>✅ Ubuntu/Debian (with Podman installed)</p>
+</li>
+<li>
+<p>✅ macOS (with Podman Desktop)</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_quick_start_5_steps">3. Quick Start (5 Steps)</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_step_1_clone_the_repository">3.1. Step 1: Clone the Repository</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-bash" data-lang="bash"># Clone the Fedora Remix repository
+git clone https://github.com/tmichett/Fedora_Remix.git
+
+# Navigate to the project directory
+cd Fedora_Remix</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_step_2_configure_container_properties">3.2. Step 2: Configure Container Properties</h3>
+<div class="paragraph">
+<p>Edit the main configuration file to set up the build environment:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-bash" data-lang="bash">vim config.yml</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Listing 1. Required Settings</div>
+<div class="content">
+<pre class="highlight"><code class="language-yaml" data-lang="yaml">Container_Properties:
+  Fedora_Version: "43"                              # Fedora version for container
+  SSH_Key_Location: "~/.ssh/github_id"              # Your SSH key location
+  Fedora_Remix_Location: "/home/travis/Remix_Builder"  # Output directory
+  GitHub_Registry_Owner: "tmichett"                 # Container registry owner</code></pre>
+</div>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<caption class="title">Table 1. Key Configuration Options</caption>
+<colgroup>
+<col style="width: 25%;">
+<col style="width: 75%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Option</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Fedora_Version</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Must match the Fedora version you want to build (e.g., "43")</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>SSH_Key_Location</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Path to your SSH key (used for git operations in container)</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Fedora_Remix_Location</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Where the ISO and build artifacts will be saved</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>GitHub_Registry_Owner</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">GitHub username/org that hosts the container image</p></td>
+</tr>
+</tbody>
+</table>
+<div class="listingblock">
+<div class="title">Listing 2. Example Configuration</div>
+<div class="content">
+<pre class="highlight"><code class="language-yaml" data-lang="yaml">Container_Properties:
+  Fedora_Version: "43"
+  SSH_Key_Location: "~/.ssh/id_rsa"
+  Fedora_Remix_Location: "/home/myuser/FedoraBuilds"
+  GitHub_Registry_Owner: "tmichett"</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_step_3_configure_remix_build_settings">3.3. Step 3: Configure Remix Build Settings</h3>
+<div class="paragraph">
+<p>Edit the Setup configuration file:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-bash" data-lang="bash">vim Setup/config.yml</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Listing 3. Required Settings</div>
+<div class="content">
+<pre class="highlight"><code class="language-yaml" data-lang="yaml"># Fedora version to use for downloading boot files
+fedora_version: 43    # MUST match Fedora_Version in config.yml
+
+# Web root directory where files will be served
+web_root: "/var/www/html"</code></pre>
+</div>
+</div>
+<div class="admonitionblock warning">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-warning" title="Warning"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>The <code>fedora_version</code> here <strong>MUST match</strong> the <code>Fedora_Version</code> in the main <code>config.yml</code> file!</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="listingblock">
+<div class="title">Listing 4. Example</div>
+<div class="content">
+<pre class="highlight"><code class="language-yaml" data-lang="yaml">fedora_version: 43
+web_root: "/var/www/html"</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_step_4_verify_configuration_recommended">3.4. Step 4: Verify Configuration (Recommended)</h3>
+<div class="paragraph">
+<p>Run the verification script to check your configuration:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-bash" data-lang="bash">./Verify_Build_Remix.sh</code></pre>
+</div>
+</div>
+<div class="ulist">
+<div class="title">What it checks</div>
+<ul>
+<li>
+<p>✅ Fedora versions match between both config files</p>
+</li>
+<li>
+<p>✅ Container image availability</p>
+</li>
+<li>
+<p>✅ Configuration summary</p>
+</li>
+<li>
+<p>✅ Confirms before building</p>
+</li>
+</ul>
+</div>
+<div class="listingblock">
+<div class="title">Listing 5. Sample Output</div>
+<div class="content">
+<pre>╔══════════════════════════════════════════════════════════════════════╗
+║ Configuration Summary                                                ║
+╠══════════════════════════════════════════════════════════════════════╣
+║  Container Configuration (config.yml)                              ║
+║    Fedora Version: 43                                            ║
+║  Remix Configuration (Setup/config.yml)                            ║
+║    Fedora Version: 43                                            ║
+╚══════════════════════════════════════════════════════════════════════╝
+
+✅ Versions match! Container and Remix both use Fedora 43
+
+Do you want to proceed with the build? [y/N]: y</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_step_5_build_the_iso">3.5. Step 5: Build the ISO</h3>
+<div class="paragraph">
+<p>If you used the verification script and confirmed, the build starts automatically.</p>
+</div>
+<div class="paragraph">
+<p>Otherwise, run the build script directly:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-bash" data-lang="bash">./Build_Remix.sh</code></pre>
+</div>
+</div>
+<div class="olist arabic">
+<div class="title">Build Process</div>
+<ol class="arabic">
+<li>
+<p>Container starts with systemd</p>
+</li>
+<li>
+<p>Prepares build environment</p>
+</li>
+<li>
+<p>Downloads and installs packages (~15-20 minutes)</p>
+</li>
+<li>
+<p>Runs post-installation scripts</p>
+</li>
+<li>
+<p>Creates the ISO image (~5-10 minutes)</p>
+</li>
+<li>
+<p>ISO saved to your configured output directory</p>
+</li>
+</ol>
+</div>
+<div class="listingblock">
+<div class="title">Listing 6. Expected Output Location</div>
+<div class="content">
+<pre>/home/travis/Remix_Builder/FedoraRemix/FedoraRemix.iso</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_optional_customization">4. Optional Customization</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_customizing_packages">4.1. Customizing Packages</h3>
+<div class="paragraph">
+<p>To add or remove RPM packages from your remix:</p>
+</div>
+<div class="listingblock">
+<div class="title">Listing 7. Edit the package list</div>
+<div class="content">
+<pre class="highlight"><code class="language-bash" data-lang="bash">vim Setup/Kickstarts/FedoraRemixPackages.ks</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Listing 8. Add packages</div>
+<div class="content">
+<pre class="highlight"><code class="language-bash" data-lang="bash"># Add your packages here
+vim
+tmux
+htop</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Listing 9. Remove packages</div>
+<div class="content">
+<pre class="highlight"><code class="language-bash" data-lang="bash"># Comment out or delete unwanted packages
+# firefox  # Removed</code></pre>
+</div>
+</div>
+<div class="ulist">
+<div class="title">Package Categories</div>
+<ul>
+<li>
+<p>Base system packages</p>
+</li>
+<li>
+<p>Desktop environment packages</p>
+</li>
+<li>
+<p>Development tools</p>
+</li>
+<li>
+<p>Multimedia applications</p>
+</li>
+<li>
+<p>Custom applications</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_customizing_kickstart_files">4.2. Customizing Kickstart Files</h3>
+<div class="paragraph">
+<p>For advanced customization of the installation and system configuration:</p>
+</div>
+<div class="listingblock">
+<div class="title">Listing 10. Main Kickstart Files</div>
+<div class="content">
+<pre>Setup/Kickstarts/
+├── FedoraRemix.ks              # Main kickstart (default)
+├── FedoraRemixCosmic.ks        # COSMIC desktop variant
+├── FedoraRemixKDE.ks           # KDE Plasma variant
+├── FedoraRemixLab.ks           # Lab/Development variant
+├── FedoraRemixPackages.ks      # Package list (edit this for packages)
+└── FedoraRemixRepos.ks         # Repository configuration</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Listing 11. Kickstart Snippets</div>
+<div class="content">
+<pre>Setup/Kickstarts/KickstartSnippets/
+├── create-ansible-user.ks      # Create ansible user
+└── customize-anaconda.ks       # Anaconda installer customization</pre>
+</div>
+</div>
+<div class="ulist">
+<div class="title">What you can customize</div>
+<ul>
+<li>
+<p>System packages and package groups</p>
+</li>
+<li>
+<p>User accounts and passwords</p>
+</li>
+<li>
+<p>Network configuration</p>
+</li>
+<li>
+<p>Firewall rules</p>
+</li>
+<li>
+<p>SELinux settings</p>
+</li>
+<li>
+<p>Post-installation scripts</p>
+</li>
+<li>
+<p>Boot loader configuration</p>
+</li>
+<li>
+<p>Partition layout</p>
+</li>
+<li>
+<p>Repository sources</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<div class="title">Example: Adding a Custom User</div>
+<p>Create a new snippet in <code>Setup/Kickstarts/KickstartSnippets/</code>:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-bash" data-lang="bash">vim Setup/Kickstarts/KickstartSnippets/create-myuser.ks</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-bash" data-lang="bash"># Create custom user
+user --name=myuser --groups=wheel --password=encrypted_password --iscrypted</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Then include it in your main kickstart:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-bash" data-lang="bash">vim Setup/Kickstarts/FedoraRemix.ks</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-bash" data-lang="bash">%include Setup/Kickstarts/KickstartSnippets/create-myuser.ks</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_customizing_look_and_feel">4.3. Customizing Look and Feel</h3>
+<div class="listingblock">
+<div class="title">Listing 12. Branding and Themes</div>
+<div class="content">
+<pre>Setup/files/
+├── boot/                       # Boot splash screens
+│   ├── splash.png             # Boot menu background
+│   └── anaconda_header.png    # Installer header
+├── FedoraRemixOrange.png      # Desktop wallpaper
+└── Cursor.desktop             # Desktop shortcuts</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Listing 13. GRUB Theme</div>
+<div class="content">
+<pre>Grub_Theme/Fedora_Remix_Theme/
+├── FedoraRemix.jpeg           # GRUB background options
+├── FedoraRemix2.jpeg
+└── ...</pre>
+</div>
+</div>
+<div class="olist arabic">
+<div class="title">To customize</div>
+<ol class="arabic">
+<li>
+<p>Replace image files with your own (keep same dimensions)</p>
+</li>
+<li>
+<p>Update references in kickstart files if needed</p>
+</li>
+<li>
+<p>Rebuild the ISO</p>
+</li>
+</ol>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_building_different_variants">5. Building Different Variants</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The project includes several pre-configured variants:</p>
+</div>
+<div class="sect2">
+<h3 id="_default_fedora_remix_gnome">5.1. Default Fedora Remix (GNOME)</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-bash" data-lang="bash">./Verify_Build_Remix.sh
+# Select: 1) FedoraRemix</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_cosmic_desktop_variant">5.2. COSMIC Desktop Variant</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-bash" data-lang="bash">./Build_Remix.sh --kickstart FedoraRemixCosmic</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_kde_plasma_variant">5.3. KDE Plasma Variant</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-bash" data-lang="bash">./Build_Remix.sh --kickstart FedoraRemixKDE</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_labdevelopment_variant">5.4. Lab/Development Variant</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-bash" data-lang="bash">./Build_Remix.sh --kickstart FedoraRemixLab</code></pre>
+</div>
+</div>
+<div class="ulist">
+<div class="title">Each variant includes</div>
+<ul>
+<li>
+<p>Different desktop environment</p>
+</li>
+<li>
+<p>Variant-specific packages</p>
+</li>
+<li>
+<p>Customized configurations</p>
+</li>
+<li>
+<p>Optimized for different use cases</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_configuration_file_reference">6. Configuration File Reference</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_main_configuration_config_yml">6.1. Main Configuration (<code>config.yml</code>)</h3>
+<div class="listingblock">
+<div class="title">Listing 14. Location</div>
+<div class="content">
+<pre>/home/travis/Github/Fedora_Remix/config.yml</pre>
+</div>
+</div>
+<div class="paragraph">
+<div class="title">Purpose</div>
+<p>Controls the container build environment</p>
+</div>
+<div class="listingblock">
+<div class="title">Listing 15. Full Example</div>
+<div class="content">
+<pre class="highlight"><code class="language-yaml" data-lang="yaml">Container_Properties:
+  # Fedora version for the container (must match Setup/config.yml)
+  Fedora_Version: "43"
+
+  # SSH key for git operations (optional but recommended)
+  SSH_Key_Location: "~/.ssh/github_id"
+
+  # Output directory for ISO and build artifacts
+  Fedora_Remix_Location: "/home/travis/Remix_Builder"
+
+  # GitHub Container Registry owner (for pulling container image)
+  GitHub_Registry_Owner: "tmichett"
+
+  # Note: Image_Name is auto-generated as:
+  # ghcr.io/{GitHub_Registry_Owner}/fedora-remix-builder:{Fedora_Version}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_setup_configuration_setupconfig_yml">6.2. Setup Configuration (<code>Setup/config.yml</code>)</h3>
+<div class="listingblock">
+<div class="title">Listing 16. Location</div>
+<div class="content">
+<pre>/home/travis/Github/Fedora_Remix/Setup/config.yml</pre>
+</div>
+</div>
+<div class="paragraph">
+<div class="title">Purpose</div>
+<p>Controls the remix build process</p>
+</div>
+<div class="listingblock">
+<div class="title">Listing 17. Full Example</div>
+<div class="content">
+<pre class="highlight"><code class="language-yaml" data-lang="yaml"># Configuration file for Prepare_Web_Files.py
+
+# Fedora boot files to download for PXE boot
+fedora_boot_files:
+  - "vmlinuz"
+  - "initrd.img"
+
+# Fedora version to use for downloading boot files
+# MUST match Fedora_Version in main config.yml
+fedora_version: 43
+
+# Web root directory where files will be served
+web_root: "/var/www/html"</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_troubleshooting">7. Troubleshooting</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_version_mismatch_error">7.1. Version Mismatch Error</h3>
+<div class="listingblock">
+<div class="title">Listing 18. Problem</div>
+<div class="content">
+<pre>⚠️ Version mismatch detected!
+  Container is configured for Fedora 43
+  Remix is configured for Fedora 42</pre>
+</div>
+</div>
+<div class="paragraph">
+<div class="title">Solution</div>
+<p>Update both config files to use the same version:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-bash" data-lang="bash"># Edit main config
+vim config.yml
+# Set: Fedora_Version: "43"
+
+# Edit setup config
+vim Setup/config.yml
+# Set: fedora_version: 43</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_container_image_not_found">7.2. Container Image Not Found</h3>
+<div class="listingblock">
+<div class="title">Listing 19. Problem</div>
+<div class="content">
+<pre>⚠️ Container image not found locally</pre>
+</div>
+</div>
+<div class="ulist">
+<div class="title">Solution 1: Let it pull automatically (slower)</div>
+<ul>
+<li>
+<p>The image will be pulled from GitHub Container Registry</p>
+</li>
+<li>
+<p>Takes 5-15 minutes depending on connection</p>
+</li>
+</ul>
+</div>
+<div class="listingblock">
+<div class="title">Listing 20. Solution 2: Build container locally (faster for repeated builds)</div>
+<div class="content">
+<pre class="highlight"><code class="language-bash" data-lang="bash">cd /home/travis/Github/RemixBuilder
+./build.sh</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_selinux_relabeling_errors">7.3. SELinux Relabeling Errors</h3>
+<div class="listingblock">
+<div class="title">Listing 21. Problem</div>
+<div class="content">
+<pre>setfiles: Could not set context for /usr/share/accountsservice: Invalid argument
+Error creating Live CD : SELinux relabel failed.</pre>
+</div>
+</div>
+<div class="paragraph">
+<div class="title">Solution</div>
+<p>This is fixed in the latest version. Ensure you have the patched <code>kickstart.py</code>:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-bash" data-lang="bash">ls -lh Setup/files/Fixes/kickstart.py</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>If missing, pull the latest changes:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-bash" data-lang="bash">git pull origin main</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>See <a href="SELINUX_RELABEL_FIX.md">SELINUX_RELABEL_FIX.md</a> for details.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_build_fails_after_15_minutes">7.4. Build Fails After 15 Minutes</h3>
+<div class="listingblock">
+<div class="title">Listing 22. Problem</div>
+<div class="content">
+<pre>Error creating Live CD : Unable to unmount filesystem at /var/tmp/imgcreate-*/install_root/sys</pre>
+</div>
+</div>
+<div class="paragraph">
+<div class="title">Solution</div>
+<p>This is fixed in the latest version. Ensure you have the patched <code>fs.py</code>:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-bash" data-lang="bash">ls -lh Setup/files/Fixes/fs.py</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>See <a href="LINUX_BUILD_FIX.md">LINUX_BUILD_FIX.md</a> for details.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_insufficient_disk_space">7.5. Insufficient Disk Space</h3>
+<div class="listingblock">
+<div class="title">Listing 23. Problem</div>
+<div class="content">
+<pre>Error: Not enough free space</pre>
+</div>
+</div>
+<div class="ulist">
+<div class="title">Solution</div>
+<ul>
+<li>
+<p>Ensure at least 20 GB free space</p>
+</li>
+<li>
+<p>Clean up old builds:</p>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-bash" data-lang="bash">rm -rf /home/travis/Remix_Builder/FedoraRemix/*.iso
+rm -rf /livecd-creator/package-cache/*</code></pre>
+</div>
+</div>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_build_output">8. Build Output</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_successful_build">8.1. Successful Build</h3>
+<div class="listingblock">
+<div class="title">Listing 24. Expected output</div>
+<div class="content">
+<pre>✅ 🚀 Live CD created successfully!
+  🕐 Total Build Time:          30m 46s (1846 seconds)
+  📦 Package Installation:     15m 42s (942 seconds)
+  🚀 ISO File Creation:        15m 4s (904 seconds)
+✅ 📦 Generated: FedoraRemix.iso (7.9G)
+
+╔══════════════════════════════════════════════════════════════════════════════╗
+║ BUILD COMPLETED SUCCESSFULLY!                                               ║
+╚══════════════════════════════════════════════════════════════════════════════╝</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_output_files">8.2. Output Files</h3>
+<div class="listingblock">
+<div class="title">Listing 25. ISO Image</div>
+<div class="content">
+<pre>/home/travis/Remix_Builder/FedoraRemix/FedoraRemix.iso</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Listing 26. Build Log</div>
+<div class="content">
+<pre>/home/travis/Remix_Builder/FedoraRemix/FedoraRemix-Build-MMDDYY-HHMM.log</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Listing 27. Package Cache</div>
+<div class="content">
+<pre>/livecd-creator/package-cache/</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_next_steps">9. Next Steps</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_testing_your_iso">9.1. Testing Your ISO</h3>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p><strong>Verify the ISO:</strong></p>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-bash" data-lang="bash">ls -lh /home/travis/Remix_Builder/FedoraRemix/*.iso</code></pre>
+</div>
+</div>
+</li>
+<li>
+<p><strong>Test in a VM:</strong></p>
+<div class="ulist">
+<ul>
+<li>
+<p>Use GNOME Boxes, VirtualBox, or virt-manager</p>
+</li>
+<li>
+<p>Boot from the ISO</p>
+</li>
+<li>
+<p>Test Live environment</p>
+</li>
+<li>
+<p>Test installation</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p><strong>Create Bootable USB:</strong></p>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-bash" data-lang="bash">sudo dd if=/home/travis/Remix_Builder/FedoraRemix/FedoraRemix.iso \
+        of=/dev/sdX bs=4M status=progress</code></pre>
+</div>
+</div>
+<div class="admonitionblock warning">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-warning" title="Warning"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>Replace <code>/dev/sdX</code> with your USB device.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</li>
+</ol>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_distributing_your_iso">9.2. Distributing Your ISO</h3>
+<div class="ulist">
+<div class="title">Options</div>
+<ul>
+<li>
+<p>Upload to file sharing service</p>
+</li>
+<li>
+<p>Host on web server</p>
+</li>
+<li>
+<p>Distribute via USB drives</p>
+</li>
+<li>
+<p>Create torrent for large-scale distribution</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_advanced_topics">10. Advanced Topics</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_building_for_different_fedora_versions">10.1. Building for Different Fedora Versions</h3>
+<div class="paragraph">
+<p>To build for a different Fedora version:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Update both config files:</p>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-bash" data-lang="bash"># config.yml
+Fedora_Version: "44"
+
+# Setup/config.yml
+fedora_version: 44</code></pre>
+</div>
+</div>
+</li>
+<li>
+<p>Verify the container image exists:</p>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-bash" data-lang="bash">podman pull ghcr.io/tmichett/fedora-remix-builder:44</code></pre>
+</div>
+</div>
+</li>
+<li>
+<p>Build as normal</p>
+</li>
+</ol>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_automating_builds">10.2. Automating Builds</h3>
+<div class="paragraph">
+<p>Create a build script:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-bash" data-lang="bash">#!/bin/bash
+# automated-build.sh
+
+cd /home/travis/Github/Fedora_Remix
+
+# Update to latest code
+git pull
+
+# Run build with auto-confirmation
+echo "y" | ./Verify_Build_Remix.sh
+
+# Copy ISO to distribution directory
+cp /home/travis/Remix_Builder/FedoraRemix/*.iso /var/www/html/isos/</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_building_multiple_variants">10.3. Building Multiple Variants</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-bash" data-lang="bash">#!/bin/bash
+# build-all-variants.sh
+
+for variant in FedoraRemix FedoraRemixCosmic FedoraRemixKDE; do
+    echo "Building $variant..."
+    ./Build_Remix.sh --kickstart $variant
+done</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_additional_resources">11. Additional Resources</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_documentation">11.1. Documentation</h3>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Main README:</strong> <a href="README.md">README.md</a> - Project overview</p>
+</li>
+<li>
+<p><strong>Build Fixes:</strong> <a href="LINUX_BUILD_FIX.md">LINUX_BUILD_FIX.md</a> - Known issues and solutions</p>
+</li>
+<li>
+<p><strong>SELinux Fix:</strong> <a href="SELINUX_RELABEL_FIX.md">SELINUX_RELABEL_FIX.md</a> - SELinux relabeling fix details</p>
+</li>
+<li>
+<p><strong>Verification Script:</strong> <a href="VERIFY_BUILD_REMIX_USAGE.md">VERIFY_BUILD_REMIX_USAGE.md</a> - Verification tool guide</p>
+</li>
+<li>
+<p><strong>Container Build:</strong> <code>/home/travis/Github/RemixBuilder/README.md</code> - Container documentation</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_repository_links">11.2. Repository Links</h3>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Fedora Remix:</strong> <a href="https://github.com/tmichett/Fedora_Remix" class="bare">https://github.com/tmichett/Fedora_Remix</a></p>
+</li>
+<li>
+<p><strong>Remix Builder Container:</strong> <a href="https://github.com/tmichett/RemixBuilder" class="bare">https://github.com/tmichett/RemixBuilder</a></p>
+</li>
+<li>
+<p><strong>Container Registry:</strong> <a href="https://ghcr.io/tmichett/fedora-remix-builder" class="bare">https://ghcr.io/tmichett/fedora-remix-builder</a></p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_getting_help">11.3. Getting Help</h3>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Check the documentation files</p>
+</li>
+<li>
+<p>Review build logs for errors</p>
+</li>
+<li>
+<p>Check GitHub Issues</p>
+</li>
+<li>
+<p>Consult Fedora documentation for kickstart syntax</p>
+</li>
+</ol>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_summary">12. Summary</h2>
+<div class="sectionbody">
+<div class="olist arabic">
+<div class="title">Minimum Steps to Build</div>
+<ol class="arabic">
+<li>
+<p>Clone repository: <code>git clone <a href="https://github.com/tmichett/Fedora_Remix.git" class="bare">https://github.com/tmichett/Fedora_Remix.git</a></code></p>
+</li>
+<li>
+<p>Edit <code>config.yml</code> - Set container properties</p>
+</li>
+<li>
+<p>Edit <code>Setup/config.yml</code> - Set remix version (must match!)</p>
+</li>
+<li>
+<p>Run <code>./Verify_Build_Remix.sh</code> - Verify and build</p>
+</li>
+<li>
+<p>Wait 30-45 minutes</p>
+</li>
+<li>
+<p>Find ISO at <code>/home/travis/Remix_Builder/FedoraRemix/FedoraRemix.iso</code></p>
+</li>
+</ol>
+</div>
+<div class="ulist">
+<div class="title">Optional Customization</div>
+<ul>
+<li>
+<p>Edit <code>Setup/Kickstarts/FedoraRemixPackages.ks</code> - Add/remove packages</p>
+</li>
+<li>
+<p>Edit kickstart files in <code>Setup/Kickstarts/</code> - Advanced customization</p>
+</li>
+<li>
+<p>Replace branding files in <code>Setup/files/</code> - Custom look and feel</p>
+</li>
+</ul>
+</div>
+<div class="paragraph text-center">
+<p><strong>That&#8217;s it!</strong> You now have a custom Fedora Remix ISO ready to use.</p>
+</div>
+<hr>
+<div class="paragraph text-center">
+<p><em>Last Updated: April 13, 2026 | Version: 1.0</em></p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_fedora_remix_creation_quickstart">13. Fedora Remix Creation Quickstart</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>This quickstart will provide a quick method to download a pre-built Fedora Remix as well as creating your own Fedora Remix Building system. The <a href="https://github.com/tmichett/Fedora_Remix" class="bare">https://github.com/tmichett/Fedora_Remix</a> has been created with Python automation scripts that will setup a Fedora Remix Building system using the Fedora Remix installed from the liveCD provided (<a href="https://drive.google.com/drive/folders/1UAT07AJIrTdMk3ke_QE6S6vz-qn6qGtR" class="bare">https://drive.google.com/drive/folders/1UAT07AJIrTdMk3ke_QE6S6vz-qn6qGtR</a>). The requirements are relatively simply to build and the system has Fedora Remix customization scripts and self-launching menu to assist with the initial setup. The quickstart and documentation are also available at the following link: <a href="https://tmichett.github.io/Fedora_Remix/" class="bare">https://tmichett.github.io/Fedora_Remix/</a>.</p>
+</div>
+<div class="olist arabic">
+<div class="title"><strong>Building your own Fedora Remix - Overview</strong></div>
+<ol class="arabic">
+<li>
+<p>Download the Fedora Remix ISO and install locally to hard drive</p>
+<div class="olist loweralpha">
+<ol class="loweralpha" type="a">
+<li>
+<p>Setup a local user and ensure it is in the SUDOERS file</p>
+</li>
+<li>
+<p>Run some the Fedora Remix customize scripts to create SSH keys and SUDO with no password</p>
+</li>
+</ol>
+</div>
+</li>
+<li>
+<p>Clone <a href="https://github.com/tmichett/Fedora_Remix" class="bare">https://github.com/tmichett/Fedora_Remix</a></p>
+</li>
+<li>
+<p>Run the Python automation scripts with the "sudo" command</p>
+<div class="olist loweralpha">
+<ol class="loweralpha" type="a">
+<li>
+<p>Prepare_Web_Files.py</p>
+</li>
+<li>
+<p>Prepare_Fedora_Remix_Build.py</p>
+</li>
+</ol>
+</div>
+</li>
+<li>
+<p>Modify the Kickstart files in <strong>/livecd-creator/FedoraRemix</strong></p>
+<div class="olist loweralpha">
+<ol class="loweralpha" type="a">
+<li>
+<p>FedoraRemix.ks - To control various setup components and run commands</p>
+</li>
+<li>
+<p>FedoraRemixPackages.ks - To control RPM packages that are installed as part of your Remix</p>
+</li>
+</ol>
+</div>
+</li>
+<li>
+<p>Run the <strong>Remix_Build_Script.sh</strong></p>
+<div class="admonitionblock warning">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-warning" title="Warning"></i>
+</td>
+<td class="content">
+<div class="title">Error Regarding <strong>kickstart.py</strong></div>
+<div class="paragraph">
+<p>With newer Fedora releases, there is an error with the <strong>kickstart.py</strong> package and URLGrabber. Located on the "FedoraRemixTools" application, I&#8217;ve included a button to "FIX" the issue with the <strong>kickstart.py</strong> package. After completing the fix, you will no longer get the issue.</p>
+</div>
+<div class="listingblock">
+<div class="title">Listing 28. Python <strong>kickstart.py</strong> Errors</div>
+<div class="content">
+<pre class="highlight"><code class="language-bash" data-lang="bash">Traceback (most recent call last):
+  File "/usr/sbin/livecd-creator", line 265, in &lt;module&gt;
+    sys.exit(main())
+
+... OUTPUT OMITTED ...</code></pre>
+</div>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</li>
+</ol>
+</div>
+<div class="sect2">
+<h3 id="_quickstart">13.1. <span class="blue"><strong>Quickstart</strong></span></h3>
+<div class="paragraph">
+<p>This quickstart provides detailed information on how to download, install, and create your custom Fedora Remix. It depends first on having the Fedora Remix installed locally and access to the Github repository and playbooks contained withing the repository.</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Download the "Latest" FedoraRemix LiveISO and create a bootable USB disk.</p>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="https://drive.google.com/drive/folders/1UAT07AJIrTdMk3ke_QE6S6vz-qn6qGtR" class="bare">https://drive.google.com/drive/folders/1UAT07AJIrTdMk3ke_QE6S6vz-qn6qGtR</a></p>
+<div class="ulist">
+<ul>
+<li>
+<p>Use Balena Etcher or Fedora Media Writer to create the bootable USB device for installation on a physical machine.</p>
+</li>
+<li>
+<p>Attach the ISO image to your virtual machine and select it as the boot device so it can be installed</p>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>Insert the disk into a computer or connect to the virtual machine and select</p>
+<div class="imageblock text-center">
+<div class="content">
+<img src="images/README-25-04-09-15-59-19.png" alt="README 25 04 09 15 59 19">
+</div>
+<div class="title">Figure 1. GRUB Boot Menu</div>
+</div>
+</li>
+<li>
+<p>Select "Start Fedoraremix" and hit Enter</p>
+</li>
+<li>
+<p>Once booted to the main screen, click on the icon in the top left beside of "Apps" to bring up the application dock. Select the icon from the dock</p>
+<div class="imageblock text-center">
+<div class="content">
+<img src="images/README-25-05-09-15-18-25.png" alt="README 25 05 09 15 18 25">
+</div>
+<div class="title">Figure 2. Fedora Remix LiveCD Desktop</div>
+</div>
+</li>
+<li>
+<p>The Anaconda graphical installer will appear. Select your desired language and optionally select the keyboard layout.</p>
+<div class="imageblock text-center">
+<div class="content">
+<img src="images/README-25-05-09-15-22-57.png" alt="README 25 05 09 15 22 57">
+</div>
+<div class="title">Figure 3. Anaconda Installer - Language and Keyboard</div>
+</div>
+</li>
+<li>
+<p>Complete the required and optional installation components.</p>
+<div class="imageblock text-center">
+<div class="content">
+<img src="images/2025-05-09T19-27-47-719Z.png" alt="2025 05 09T19 27 47 719Z">
+</div>
+<div class="title">Figure 4. Anaconda Installer - Installation Summary</div>
+</div>
+<div class="olist loweralpha">
+<ol class="loweralpha" type="a">
+<li>
+<p>Select "Installation Destination" and choose an appropriate installation device.</p>
+<div class="imageblock text-center">
+<div class="content">
+<img src="images/README-25-05-09-15-33-05.png" alt="README 25 05 09 15 33 05">
+</div>
+<div class="title">Figure 5. Setting Installation Location</div>
+</div>
+</li>
+<li>
+<p>Create a user account by clicking "User Creation". Complete the required information and then click done.</p>
+<div class="imageblock text-center">
+<div class="content">
+<img src="images/2025-05-09T19-35-59-879Z.png" alt="2025 05 09T19 35 59 879Z">
+</div>
+<div class="title">Figure 6. User Creation</div>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="Important"></i>
+</td>
+<td class="content">
+<div class="title">Root Account</div>
+<div class="paragraph">
+<p>After you have specified the installation location and an initial user, you may proceed with the installation. Creating and enabling the <strong>root</strong> user is optional and not required. If you create the root user, likewise, you are not required to create a regular user account.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+<div class="title">Setup Complete</div>
+<div class="paragraph">
+<p>After the installation is completed, you will need to reboot your system and perform package updates and any other needed tasks.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</li>
+</ol>
+</div>
+</li>
+<li>
+<p>Clone the Fedora Remix Repository</p>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-bash" data-lang="bash">travis@localhost-fedoraremix-live [~] | (05/09/25 @ 15:55)
+$ git clone https://github.com/tmichett/Fedora_Remix.git
+Cloning into 'Fedora_Remix'...
+remote: Enumerating objects: 1949, done
+
+... OUTPUT OMITTED ...
+
+Resolving deltas: 100% (1042/1042), done.</code></pre>
+</div>
+</div>
+</li>
+<li>
+<p>Prepare the Fedora Remix build environment by running the Python scripts from the <strong>Setup</strong> directory as the root user.</p>
+<div class="listingblock">
+<div class="title">Listing 29. Create <strong>/livecd-creator/FedoraRemix</strong> Assets</div>
+<div class="content">
+<pre class="highlight"><code class="language-bash" data-lang="bash">travis@localhost-fedoraremix-live [~/Fedora_Remix/Setup] | (05/09/25 @ 15:57)  | main ✓ |
+$ sudo python Prepare_Fedora_Remix_Build.py
+
+... OUTPUT OMITTED ...
+
+Copying ../Remix_Buid_Script.sh to /livecd-creator/FedoraRemix/Remix_Buid_Script.sh
+Setup complete!</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Listing 30. Create httpd server and repository assets</div>
+<div class="content">
+<pre class="highlight"><code class="language-bash" data-lang="bash">travis@localhost-fedoraremix-live [~/Fedora_Remix/Setup] | (05/09/25 @ 15:59)  | main ✓ |
+$ sudo python Prepare_Web_Files.py
+Installing packages: httpd
+Running command: dnf install -y httpd
+
+... OUTPUT OMITTED ...
+
+Setup complete!</code></pre>
+</div>
+</div>
+</li>
+<li>
+<p>Perform System and Package customizations by modifying the <strong>FedoraRemix.ks</strong> kickstart file and the <strong>FedoraRemixPackages.ks</strong> file.</p>
+<div class="olist loweralpha">
+<ol class="loweralpha" type="a">
+<li>
+<p>The setup scripts or playbooks created <strong>/livecd-creator/FedoraRemix</strong> directory. This is where the kickstart files live that you will modify as well as the directory where the FedoraRemix.iso will reside once built.</p>
+<div class="listingblock">
+<div class="title">Listing 31. FedoraRemix.ks</div>
+<div class="content">
+<pre class="highlight"><code class="language-bash" data-lang="bash">... OUTPUT OMITTED ...
+
+## Add Fedora Dynamic MotD Script
+cd /usr/bin
+wget http://localhost/files/fedora-dynamic-motd.sh
+chmod +x /usr/bin/fedora-dynamic-motd.sh
+echo /usr/bin/fedora-dynamic-motd.sh &gt;&gt; /etc/profile
+
+
+## Customize BASH Prompts and Shell
+mkdir /opt/bash
+cd /opt/bash
+wget http://localhost/files/bashrc.append
+## Install Gitprompt
+git clone https://github.com/tmichett/bash-git-prompt.git /opt/bash-git-prompt --depth=1
+
+... OUTPUT OMITTED ...</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Listing 32. FedoraPackages.ks</div>
+<div class="content">
+<pre class="highlight"><code class="language-bash" data-lang="bash">... OUTPUT OMITTED ...
+
+## Image Editing and Manipulation
+inkscape
+gimp
+krita
+netpbm-progs
+scribus
+
+## Video Editing and Manipulation
+kdenlive
+
+## Container Tools
+buildah
+skopeo
+podman-machine
+
+... OUTPUT OMITTED ...</code></pre>
+</div>
+</div>
+</li>
+</ol>
+</div>
+</li>
+<li>
+<p>Execute the <strong>Remix_Build_Script.sh</strong> file to kick off the build. Depending on system and Internet connection speed and customizations to the kickstart file, this process could take up to an hour.</p>
+<div class="listingblock">
+<div class="title">Listing 33. Launching the Script</div>
+<div class="content">
+<pre class="highlight"><code class="language-bash" data-lang="bash">travis@localhost-fedoraremix-live [/livecd-creator/FedoraRemix] | (05/09/25 @ 16:09)
+$ time ./Remix_Buid_Script.sh
+/usr/lib/python3.13/site-packages/pykickstart/commands/partition.py:461: KickstartParseWarning: A partition with the mountpoint / has already been defined.
+  warnings.warn(_("A partition with the mountpoint %s has already been defined.") % pd.mountpoint, KickstartParseWarning)
+fedora                                           19 MB/s |  35 MB     00:01
+updates                                         3.8 MB/s | 5.8 MB     00:01
+google-chrome                                   7.5 kB/s | 1.9 kB     00:00
+
+... OUTPUT OMITTED ...
+
+Pass 4: Checking reference counts
+Pass 5: Checking group summary information
+_FedoraRemix: 371986/1324512 files (0.2% non-contiguous), 4248977/5294080 blocks
+
+ e2fsck 1.47.1 (20-May-2024)
+
+ 0
+
+real	34m41.254s
+user	143m42.195s
+sys	    5m11.054s</code></pre>
+</div>
+</div>
+</li>
+</ol>
+</div>
+<div class="admonitionblock warning">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-warning" title="Warning"></i>
+</td>
+<td class="content">
+<div class="title">Error Regarding <strong>kickstart.py</strong></div>
+<div class="paragraph">
+<p>With newer Fedora releases, there is an error with the <strong>kickstart.py</strong> package and URLGrabber. Located on the "FedoraRemixTools" application, I&#8217;ve included a button to "FIX" the issue with the <strong>kickstart.py</strong> package. After completing the fix, you will no longer get the issue.</p>
+</div>
+<div class="listingblock">
+<div class="title">Listing 34. Python <strong>kickstart.py</strong> Errors</div>
+<div class="content">
+<pre class="highlight"><code class="language-bash" data-lang="bash">Traceback (most recent call last):
+  File "/usr/sbin/livecd-creator", line 265, in &lt;module&gt;
+    sys.exit(main())
+             ~~~~^^
+  File "/usr/sbin/livecd-creator", line 195, in main
+    ks = imgcreate.read_kickstart(options.kscfg)
+  File "/usr/lib/python3.13/site-packages/imgcreate/kickstart.py", line 54, in read_kickstart
+    ksfile = urlgrabber.urlgrab(path, filename=tmpks)
+  File "/usr/lib/python3.13/site-packages/urlgrabber/grabber.py", line 808, in urlgrab
+    return default_grabber.urlgrab(url, filename, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.13/site-packages/urlgrabber/grabber.py", line 1205, in urlgrab
+    (url,parts) = opts.urlparser.parse(url, opts)
+                  ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^
+  File "/usr/lib/python3.13/site-packages/urlgrabber/grabber.py", line 873, in parse
+    pathname = pathname2url(url)
+  File "/usr/lib64/python3.13/urllib/request.py", line 1679, in pathname2url
+    return quote(pathname, encoding=encoding, errors=errors)
+  File "/usr/lib64/python3.13/urllib/parse.py", line 924, in quote
+    raise TypeError("quote() doesn't support 'encoding' for bytes")
+TypeError: quote() doesn't support 'encoding' for bytes</code></pre>
+</div>
+</div>
+</td>
+</tr>
+</table>
+</div>
 </div>
 </div>
 </div>
@@ -540,7 +2070,6 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <div id="footer">
 <div id="footer-text">
 Version 1.0<br>
-Last updated 2026-04-13 17:39:07 UTC
 </div>
 </div>
 </body>
