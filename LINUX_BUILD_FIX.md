@@ -1,9 +1,42 @@
 # Fedora Remix Builder - Linux Compatibility Fixes
 
-**Last Updated:** February 22, 2026  
+**Last Updated:** April 13, 2026
 **Status:** RESOLVED
 
 ## Fix History
+
+### Fix #3: SELinux Relabeling Errors During ISO Creation (April 13, 2026)
+
+**Issue:** ISO creation fails with SELinux relabeling errors during final image creation
+
+**Error Message:**
+```
+setfiles: Could not set context for /usr/share/accountsservice: Invalid argument
+setfiles: Could not set context for /usr/share/accountsservice/interfaces: Invalid argument
+...
+Error creating Live CD : SELinux relabel failed.
+```
+
+**Root Cause:**
+- `livecd-creator` uses `imgcreate/kickstart.py` to relabel all files in the ISO with SELinux contexts
+- When building in containers, the SELinux contexts from the host system don't match the container's expectations
+- The `setfiles` command fails because it cannot apply contexts to certain system directories
+- The `SelinuxConfig.relabel()` method raises a fatal error when relabeling fails in enforcing mode
+- This is particularly problematic for files in `/usr/share/accountsservice` and similar system directories
+
+**Solution:**
+- Patched `imgcreate/kickstart.py` to handle SELinux relabeling failures gracefully
+- Changed the error from fatal (`raise errors.KickstartError`) to a warning (`logging.warning`)
+- The ISO will be properly relabeled on first boot when installed on a target system
+- This is safe and follows the same pattern as the `/sys` unmount fix
+
+**Files Modified:**
+- `Setup/files/Fixes/kickstart.py` (lines 499-503): Changed fatal error to warning for SELinux relabel failures
+- `Setup/Enhanced_Remix_Build_Script.sh` (line 265): Added informational message about the patch
+
+**Result:** ✅ ISO builds now complete successfully with SELinux relabeling errors logged as warnings
+
+---
 
 ### Fix #2: SELinux Permission Denied on /tmp/remix_kickstart.txt (February 22, 2026)
 

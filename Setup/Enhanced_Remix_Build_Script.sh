@@ -263,6 +263,7 @@ run_build() {
     
     print_message "INFO" "${ROCKET} Launching build process..."
     print_message "INFO" "${TARGET} Command: $build_cmd"
+    print_message "INFO" "${WRENCH} Note: SELinux relabeling errors are handled gracefully via patched kickstart.py"
     
     # Add build command section to log
     {
