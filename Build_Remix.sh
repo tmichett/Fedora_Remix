@@ -14,6 +14,10 @@ show_usage() {
     echo "                           Examples: FedoraRemix, FedoraRemixCosmic"
     echo "  -l, --list               List available kickstart files"
     echo "  -h, --help               Show this help message"
+    echo "  -a, --attach             Interactive: attach to the container (podman run -it)."
+    echo "                           Default is detached: build runs in background, this"
+    echo "                           script streams /tmp/entrypoint.log in this terminal"
+    echo "                           until the build finishes (no second window needed)."
     echo ""
     echo "If no kickstart is specified, you will be prompted to choose."
 }
@@ -102,11 +106,17 @@ SOURCE_DIR="$CURRENT_DIR"
 
 # Parse command line arguments
 SELECTED_KICKSTART=""
+# 0 = default: run detached, stream build log in this shell
+ATTACH_MODE=0
 while [[ $# -gt 0 ]]; do
     case $1 in
         -k|--kickstart)
             SELECTED_KICKSTART="$2"
             shift 2
+            ;;
+        -a|--attach)
+            ATTACH_MODE=1
+            shift
             ;;
         -l|--list)
             # List kickstarts from current directory (source)
@@ -124,6 +134,11 @@ while [[ $# -gt 0 ]]; do
             ;;
     esac
 done
+
+# Environment override (e.g. REMIX_BUILD_ATTACH=1 ./Build_Remix.sh)
+if [ "${REMIX_BUILD_ATTACH:-0}" = "1" ]; then
+    ATTACH_MODE=1
+fi
 
 # Check if config.yml exists
 if [ ! -f "config.yml" ]; then
@@ -258,6 +273,76 @@ else
     EXTRA_ARGS=("--device-cgroup-rule=b 7:* rmw")
 fi
 
+# After `podman run -d`, stream /tmp/entrypoint.log in the foreground (same terminal).
+# Stops when /tmp/entrypoint-status exists (or legacy /tmp/entrypoint-completed) or
+# remix-builder.service fails, or a max wait is exceeded.
+stream_remix_entrypoint_log() {
+    local name=$1
+    local cap=${2:-21600}
+    local waited=0
+    # Wait for container and log to appear
+    while [ "$waited" -lt 300 ]; do
+        if $PODMAN_CMD ps -q -f "name=^${name}$" 2>/dev/null | grep -q .; then
+            if $PODMAN_CMD exec "$name" test -f /tmp/entrypoint.log 2>/dev/null; then
+                break
+            fi
+        else
+            if ! $PODMAN_CMD ps -a -q -f "name=^${name}$" 2>/dev/null | grep -q .; then
+                echo "Error: container ${name} is not running (exited before entrypoint log was created)."
+                return 1
+            fi
+        fi
+        sleep 1
+        waited=$((waited + 1))
+    done
+    if [ "$waited" -ge 300 ]; then
+        echo "Error: timed out waiting for /tmp/entrypoint.log in ${name}."
+        return 1
+    fi
+    echo "Streaming build log from ${name}:/tmp/entrypoint.log (Ctrl-C stops follow only; container keeps running)..."
+    set +e
+    $PODMAN_CMD exec -i "$name" bash -s "$cap" <<'REMIX_STREAM'
+set +e
+max_s=$1
+tail -n 200 -F /tmp/entrypoint.log 2>/dev/null &
+TAILPID=$!
+i=0
+while [ "$i" -lt "$max_s" ]; do
+    if [ -f /tmp/entrypoint-status ]; then break; fi
+    if [ -f /tmp/entrypoint-completed ]; then break; fi
+    if systemctl is-failed --quiet remix-builder.service 2>/dev/null; then break; fi
+    if ! kill -0 $TAILPID 2>/dev/null; then break; fi
+    i=$((i + 1))
+    sleep 1
+done
+# Drain last lines
+sleep 2
+kill $TAILPID 2>/dev/null
+wait $TAILPID 2>/dev/null
+exit 0
+REMIX_STREAM
+    set -e
+    local s
+    s=$($PODMAN_CMD exec "$name" cat /tmp/entrypoint-status 2>/dev/null | tr -d '\r' || true)
+    if [ "$s" = "ok" ]; then
+        echo ""
+        echo "Build entrypoint completed successfully (status: ok)."
+        return 0
+    fi
+    if echo "$s" | grep -q '^failed:'; then
+        echo ""
+        echo "Build entrypoint failed (${s})."
+        return 1
+    fi
+    if $PODMAN_CMD exec "$name" test -f /tmp/entrypoint-completed; then
+        echo ""
+        echo "Build entrypoint completed (entrypoint-completed; older image without entrypoint-status)."
+        return 0
+    fi
+    echo "Could not determine final build status. Check: $PODMAN_CMD exec -it $name cat /tmp/entrypoint.log"
+    return 1
+}
+
 # Run the container with systemd support and loop device access
 # Note: --security-opt label=disable helps with SELinux-related mount warnings
 # --replace will automatically replace any existing container with the same name
@@ -265,16 +350,25 @@ fi
 # Pass the selected kickstart as an environment variable
 # SOURCE_DIR is mounted as workspace (contains kickstarts, scripts, etc.)
 # FEDORA_REMIX_LOCATION is mounted as output directory for ISO creation
-$PODMAN_CMD run --rm -it \
-    --replace \
-    --name "$CONTAINER_NAME" \
-    --systemd=always \
-    --privileged \
-    "${EXTRA_ARGS[@]}" \
-    --security-opt label=disable \
-    -e "REMIX_KICKSTART=$SELECTED_KICKSTART" \
-    -v "$SSH_KEY_LOCATION:/root/github_id:ro" \
-    -v "$FEDORA_REMIX_LOCATION:/livecd-creator:rw" \
-    -v "$SOURCE_DIR:/root/workspace:rw" \
-    "$IMAGE_NAME"
+
+RUN_ARGS=("--replace" "--name" "$CONTAINER_NAME" "--systemd=always" "--privileged" "${EXTRA_ARGS[@]}"
+  "--security-opt" "label=disable" "-e" "REMIX_KICKSTART=$SELECTED_KICKSTART"
+  "-v" "$SSH_KEY_LOCATION:/root/github_id:ro" "-v" "$FEDORA_REMIX_LOCATION:/livecd-creator:rw" "-v" "$SOURCE_DIR:/root/workspace:rw" "$IMAGE_NAME")
+
+if [ "$ATTACH_MODE" = "1" ]; then
+    echo "Interactive attach: build output is not auto-streamed; use tail/journal in another shell if needed."
+    $PODMAN_CMD run --rm -it "${RUN_ARGS[@]}"
+else
+    echo "Container runs detached; this terminal will follow /tmp/entrypoint.log until the build step finishes."
+    if ! $PODMAN_CMD run -d --rm "${RUN_ARGS[@]}"; then
+        echo "Error: failed to start builder container"
+        exit 1
+    fi
+    if ! stream_remix_entrypoint_log "$CONTAINER_NAME" 21600; then
+        echo "The container may still be running: $PODMAN_CMD ps -a -f name=$CONTAINER_NAME"
+        exit 1
+    fi
+    echo "Container is still running for shell inspection. Example:  $PODMAN_CMD exec -it $CONTAINER_NAME bash"
+    echo "When finished, stop it with:  $PODMAN_CMD stop $CONTAINER_NAME"
+fi
 

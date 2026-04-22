@@ -1,6 +1,6 @@
 # Fedora Remix Builder - Container Quickstart Guide
 
-**Last Updated:** April 13, 2026  
+**Last Updated:** April 22, 2026  
 **Purpose:** Quick guide to building a custom Fedora Remix ISO using the containerized build system
 
 ---
@@ -38,8 +38,26 @@ Before starting, ensure your system has:
    sudo apt install podman
    ```
 
-3. **Sudo Access** - Required for loop device creation on Linux
+3. **Vim** (or another editor) - The steps below use `vim` to edit configuration files
+   ```bash
+   # Fedora/RHEL
+   sudo dnf install vim
+   ```
+   You can use `nano` or a graphical editor instead; replace `vim` in the commands in this guide with whatever you prefer.
+
+4. **Sudo Access** - Required for loop device creation on Linux
    - The build script will automatically use `sudo` when needed
+
+#### Optional: tools for testing the built ISO in a local VM (Fedora host)
+
+If you plan to boot and test the ISO on the **same** machine (for example with **virt-manager**), install the virtualization stack:
+
+```bash
+sudo dnf install virt-manager libvirt qemu
+sudo systemctl enable libvirtd --now
+```
+
+Without these packages you can still **build** the ISO; you would test it on another system, on bare metal, or by installing a VM stack later.
 
 ### System Requirements
 
@@ -170,7 +188,27 @@ Otherwise, run the build script directly:
 ./Build_Remix.sh
 ```
 
-**Build Process:**
+**Build Process (default):** The script starts the container **detached** and **streams the build** by following `/tmp/entrypoint.log` **in the same terminal** (you do not need a second window or `podman exec` just to watch progress). A typical run looks like:
+
+1. Container starts with systemd.
+2. Message that the container runs detached and this terminal will follow the log.
+3. Prepares build environment (patches, cache, and so on).
+4. Downloads and installs packages (often the longest phase).
+5. Runs post-installation scripts and creates the ISO.
+6. When the **build step inside the entrypoint** finishes, the log follow stops. The script prints a short **success or failure** line, then something like: the **container is still running** for inspection, with examples for a shell: `podman exec -it remix-builder bash` (or `sudo podman` on Linux if your script uses it).
+
+**Stopping the container when you are done**  
+The build container is only needed while you want to **inspect** the build environment. When you are finished (or to free resources before using the machine for something else), stop it (use `sudo` the same way you do for `podman` in your setup):
+
+```bash
+podman stop remix-builder
+```
+
+On Linux, if the script used `sudo podman` to start the container, use `sudo podman stop remix-builder`.
+
+**Interactive attach (optional):** If you want the old behavior and attach the terminal directly to the container (no host-side log follow), use `./Build_Remix.sh --attach` or set `REMIX_BUILD_ATTACH=1` before running the script.
+
+**Build Process (summary):**
 1. Container starts with systemd
 2. Prepares build environment
 3. Downloads and installs packages (~15-20 minutes)
@@ -480,9 +518,13 @@ Error: Not enough free space
 
 ## Build Output
 
+### After the log follow ends
+
+When you run `./Build_Remix.sh` in the default mode, your terminal shows the **same** build output that is written to `/tmp/entrypoint.log` in the container. After the **remix-builder** entrypoint completes, the script prints whether the build **succeeded** or **failed** and reminds you that the **container is still running**. Use **`podman stop remix-builder`** (with `sudo` if your build used `sudo podman`) to stop it when you no longer need a shell inside the container.
+
 ### Successful Build
 
-**Expected output:**
+**Expected output (excerpt from the end of the build log):**
 ```
 ✅ 🚀 Live CD created successfully!
   🕐 Total Build Time:          30m 46s (1846 seconds)
@@ -524,7 +566,8 @@ Error: Not enough free space
    ```
 
 2. **Test in a VM:**
-   - Use GNOME Boxes, VirtualBox, or virt-manager
+   - If you installed **virt-manager**, **libvirt**, and **qemu** (and enabled **libvirtd**) as described in **Prerequisites** (optional VM testing tools), use **virt-manager** on the same machine
+   - Otherwise use GNOME Boxes, VirtualBox, or another hypervisor
    - Boot from the ISO
    - Test Live environment
    - Test installation
@@ -635,7 +678,7 @@ done
 2. Edit `config.yml` - Set container properties
 3. Edit `Setup/config.yml` - Set remix version (must match!)
 4. Run `./Verify_Build_Remix.sh` - Verify and build
-5. Wait 30-45 minutes
+5. Wait 30-45 minutes (build log streams in the same terminal; when the follow step ends, run `podman stop remix-builder` if you are done with the container)
 6. Find ISO at `/home/travis/Remix_Builder/FedoraRemix/FedoraRemix.iso`
 
 **Optional Customization:**
@@ -648,5 +691,5 @@ done
 
 ---
 
-**Last Updated:** April 13, 2026  
-**Version:** 1.0
+**Last Updated:** April 22, 2026  
+**Version:** 1.1
