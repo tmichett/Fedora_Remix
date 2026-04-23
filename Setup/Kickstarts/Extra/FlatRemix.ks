@@ -19,8 +19,8 @@ repo --name="rpmfusionnon-nonfree" --mirrorlist=https://mirrors.rpmfusion.org/me
 repo --name="GithubCLITools" --baseurl=https://cli.github.com/packages/rpm
 # Root password
 rootpw --iscrypted --lock locked
-# SELinux (permissive — match fedora-live-base / container build reality)
-selinux --permissive
+# SELinux configuration
+selinux --enforcing
 # System services
 services --disabled="sshd" --enabled="NetworkManager,ModemManager"
 # System timezone

@@ -2,7 +2,9 @@
 
 **Date:** April 13, 2026  
 **Issue:** ISO creation fails with SELinux relabeling errors  
-**Status:** ✅ FIXED
+**Status:** ✅ FIXED (historical document)
+
+> **April 2026 update:** The default approach is now **SELinux-aware Podman** (`:z` on volume mounts, **no** `label=disable`) plus **strict** `kickstart.py` relabel and **`selinux --enforcing`** in the live kickstart. See **`LINUX_BUILD_FIX.md`** (Fix #3 and **Fix #3b**). The sections below describe the earlier **warning-only** patch for context.
 
 ## Problem Summary
 
