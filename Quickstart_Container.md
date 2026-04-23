@@ -472,17 +472,15 @@ Error creating Live CD : SELinux relabel failed.
 ```
 
 **Solution:**
-This is fixed in the latest version. Ensure you have the patched `kickstart.py`:
-```bash
-ls -lh Setup/files/Fixes/kickstart.py
-```
+`Build_Remix.sh` is configured for **host SELinux**: bind mounts use **`:z`** and **`--security-opt label=disable` is not used**, so `setfiles` inside the container can complete. Ensure you are on a current `Fedora_Remix` tree and that **`Setup/files/Fixes/kickstart.py`** is present (the build installs it into `imgcreate`).
 
-If missing, pull the latest changes:
-```bash
-git pull origin main
-```
+If relabel still fails:
 
-See `SELINUX_RELABEL_FIX.md` for details.
+1. On the **host** (Fedora), check for denials: `sudo ausearch -m avc -ts recent`
+2. Confirm output and workspace paths support extended attributes (avoid odd network-only mounts for the ISO output tree if possible)
+3. See **`LINUX_BUILD_FIX.md`** (Fix #3 / Fix #3b) for the full write-up
+
+Historical note: `SELINUX_RELABEL_FIX.md` describes an older “warn and continue” approach; the default is again **strict relabel** with **enforcing** in the live kickstart when the container setup is correct.
 
 ### Build Fails After 15 Minutes
 

@@ -273,6 +273,12 @@ else
     EXTRA_ARGS=("--device-cgroup-rule=b 7:* rmw")
 fi
 
+# :z relabels bind mounts for SELinux (shared); omit on non-Linux hosts (e.g. macOS Podman VM)
+VOL_Z=""
+if [ "$(uname -s)" = "Linux" ]; then
+    VOL_Z=",z"
+fi
+
 # After `podman run -d`, stream /tmp/entrypoint.log in the foreground (same terminal).
 # Stops when /tmp/entrypoint-status exists (or legacy /tmp/entrypoint-completed) or
 # remix-builder.service fails, or a max wait is exceeded.
@@ -344,7 +350,9 @@ REMIX_STREAM
 }
 
 # Run the container with systemd support and loop device access
-# Note: --security-opt label=disable helps with SELinux-related mount warnings
+# Do NOT use --security-opt label=disable: with host SELinux enforcing, Podman needs
+# proper labels on bind mounts so setfiles inside livecd-creator can relabel the chroot.
+# Volume suffix :z relabels content for shared container access (see LINUX_BUILD_FIX.md).
 # --replace will automatically replace any existing container with the same name
 # The /sys unmount issue is now handled gracefully by Enhanced_Remix_Build_Script.sh
 # Pass the selected kickstart as an environment variable
@@ -352,8 +360,8 @@ REMIX_STREAM
 # FEDORA_REMIX_LOCATION is mounted as output directory for ISO creation
 
 RUN_ARGS=("--replace" "--name" "$CONTAINER_NAME" "--systemd=always" "--privileged" "${EXTRA_ARGS[@]}"
-  "--security-opt" "label=disable" "-e" "REMIX_KICKSTART=$SELECTED_KICKSTART"
-  "-v" "$SSH_KEY_LOCATION:/root/github_id:ro" "-v" "$FEDORA_REMIX_LOCATION:/livecd-creator:rw" "-v" "$SOURCE_DIR:/root/workspace:rw" "$IMAGE_NAME")
+  "-e" "REMIX_KICKSTART=$SELECTED_KICKSTART"
+  "-v" "$SSH_KEY_LOCATION:/root/github_id:ro${VOL_Z}" "-v" "$FEDORA_REMIX_LOCATION:/livecd-creator:rw${VOL_Z}" "-v" "$SOURCE_DIR:/root/workspace:rw${VOL_Z}" "$IMAGE_NAME")
 
 if [ "$ATTACH_MODE" = "1" ]; then
     echo "Interactive attach: build output is not auto-streamed; use tail/journal in another shell if needed."

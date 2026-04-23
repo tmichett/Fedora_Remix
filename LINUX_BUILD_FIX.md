@@ -1,6 +1,6 @@
 # Fedora Remix Builder - Linux Compatibility Fixes
 
-**Last Updated:** April 13, 2026
+**Last Updated:** April 22, 2026
 **Status:** RESOLVED
 
 ## Fix History
@@ -17,24 +17,28 @@ setfiles: Could not set context for /usr/share/accountsservice/interfaces: Inval
 Error creating Live CD : SELinux relabel failed.
 ```
 
-**Root Cause:**
-- `livecd-creator` uses `imgcreate/kickstart.py` to relabel all files in the ISO with SELinux contexts
-- When building in containers, the SELinux contexts from the host system don't match the container's expectations
-- The `setfiles` command fails because it cannot apply contexts to certain system directories
-- The `SelinuxConfig.relabel()` method raises a fatal error when relabeling fails in enforcing mode
-- This is particularly problematic for files in `/usr/share/accountsservice` and similar system directories
+**Root Cause (container builds):**
+- `livecd-creator` uses `imgcreate/kickstart.py` to relabel the chroot with `setfiles`.
+- With **`podman run --security-opt label=disable`** and bind mounts **without** SELinux volume options, the build environment often could not complete relabeling the same way as on a bare Fedora host.
 
-**Solution:**
-- Patched `imgcreate/kickstart.py` to handle SELinux relabeling failures gracefully
-- Changed the error from fatal (`raise errors.KickstartError`) to a warning (`logging.warning`)
-- The ISO will be properly relabeled on first boot when installed on a target system
-- This is safe and follows the same pattern as the `/sys` unmount fix
+**Interim workaround (April 13 – April 22, 2026):** Patched `kickstart.py` to log relabel failure as a warning instead of aborting, and used **`selinux --permissive`** in the live kickstart so incomplete labels were less harmful on the Live image. That path is **no longer the default** after Fix #3b.
 
-**Files Modified:**
-- `Setup/files/Fixes/kickstart.py` (lines 499-503): Changed fatal error to warning for SELinux relabel failures
-- `Setup/Enhanced_Remix_Build_Script.sh` (line 265): Added informational message about the patch
+### Fix #3b: SELinux-aware Podman for container builds (April 2026)
 
-**Result:** ✅ ISO builds now complete successfully with SELinux relabeling errors logged as warnings
+**Goal:** Run **`setfiles` successfully** inside the RemixBuilder container so the Live image can use **`selinux --enforcing`** and `kickstart.py` can **fail the build** again if relabel fails.
+
+**Changes:**
+- **`Build_Remix.sh`:** Remove **`--security-opt label=disable`**. On **Linux** hosts, add the **`:z` suffix** on bind mounts (`:ro,z` / `:rw,z`) so Podman relabels host paths for shared container access under SELinux. On **non-Linux** hosts (for example macOS with Podman Machine), the suffix is omitted because `:z` is not applicable there.
+- **`Setup/files/Fixes/kickstart.py`:** Restore **strict** behavior: on enforcing kickstart, **`setfiles` non-zero exit raises `KickstartError`** again.
+- **`Setup/Kickstarts/fedora-live-base.ks`** (and **`Extra/FlatRemix.ks`**): Restore **`selinux --enforcing`** for the product in the ISO.
+
+**Still in place:** `Enhanced_Remix_Build_Script.sh` runs **`setenforce 0`** inside the container during the build so the **container runtime** stays permissive while tools run; that is independent of **`selinux --enforcing`** in the **kickstart** (the tree that becomes the ISO).
+
+**If the build still fails with AVCs on the host:** from the host (not inside the container), inspect denials (`ausearch -m avc -ts recent`) and adjust host policy or paths; ensure the output and workspace directories are on a filesystem that supports xattrs.
+
+### Reference: non-container builds (VM / physical host)
+
+On a normal Fedora **build VM** without Podman’s `label=disable`, **`setfiles` completes** during `livecd-creator` and the Live image can run **SELinux enforcing** — same kickstart behavior as Fix #3b when the container path is healthy.
 
 ---
 
@@ -506,13 +510,7 @@ $PODMAN_CMD run --rm -it \
 
 **Why**: Automatically replaces stuck containers instead of failing
 
-**Change 6**: Added `--security-opt label=disable`
-
-```bash
---security-opt label=disable \
-```
-
-**Why**: Prevents SELinux-related mount warnings
+**Change 6** (superseded April 2026): Previously added `--security-opt label=disable` to silence mount warnings; that prevented reliable **`setfiles`** relabel in the chroot. **Fix #3b** removes it and uses **`:z` on `-v` mounts** in `Build_Remix.sh` instead so host SELinux and container relabel work together.
 
 ---
 

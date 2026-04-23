@@ -10,9 +10,7 @@
 lang en_US.UTF-8
 keyboard us
 timezone US/Eastern
-# Permissive: container livecd-creator setfiles is often incomplete; permissive avoids
-# GDM/session breakages on live boot without a long first-boot relabel.
-selinux --permissive
+selinux --enforcing
 firewall --enabled --service=mdns
 xconfig --startxonboot
 zerombr
