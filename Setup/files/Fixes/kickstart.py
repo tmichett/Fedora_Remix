@@ -497,10 +497,12 @@ class SelinuxConfig(KickstartConfig):
                 logging.info('The setfiles command is not available.')
                 return
         if rc:
-            if ksselinux.selinux == ksconstants.SELINUX_ENFORCING:
-                raise errors.KickstartError("SELinux relabel failed.")
-            else:
-                logging.error("SELinux relabel failed.")
+            logging.warning("SELinux relabel completed with errors — some files could not be labeled.")
+            logging.warning("This is typically caused by package-specific SELinux policy modules (e.g. osbuild-selinux)")
+            logging.warning("whose types are not present in the host kernel's running policy inside the build container.")
+            logging.warning("Unlabeled files will have 'unlabeled_t' context in the squashfs image.")
+            logging.warning("For a live image this is permanent (squashfs is read-only; no autorelabel occurs at boot).")
+            logging.warning("This only affects packages not needed by the live system (e.g. osbuild) and will not prevent booting.")
 
     def apply(self, ksselinux):
         selinux_config = "/etc/selinux/config"

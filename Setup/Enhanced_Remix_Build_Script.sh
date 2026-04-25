@@ -221,6 +221,14 @@ prepare_environment() {
         print_message "ERROR" "  Expected location: $PYTHON_IMGCREATE_PATH/fs.py"
         exit 1
     fi
+
+    if grep -q "SELinux relabel completed with errors" "$PYTHON_IMGCREATE_PATH/kickstart.py" 2>/dev/null; then
+        print_message "SUCCESS" "  ✓ Verified: kickstart.py SELinux relabel patch active"
+    else
+        print_message "ERROR" "  ✗ WARNING: kickstart.py SELinux relabel patch NOT found!"
+        print_message "ERROR" "  Expected location: $PYTHON_IMGCREATE_PATH/kickstart.py"
+        exit 1
+    fi
     
     print_message "INFO" "${PACKAGE} Creating cache directory..."
     mkdir -p "$CACHE_DIR"
