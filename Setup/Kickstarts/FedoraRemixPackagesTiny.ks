@@ -10,7 +10,11 @@
 vim
 vim-enhanced
 curl
+wget
 
+
+## GNOME Desktop Environment
+@Gnome-desktop
 
 ## Remove Tour
 -gnome-tour
