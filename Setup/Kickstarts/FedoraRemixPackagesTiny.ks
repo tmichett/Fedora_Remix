@@ -10,6 +10,7 @@
 vim
 vim-enhanced
 curl
+wget
 
 
 ## GNOME Desktop Environment
