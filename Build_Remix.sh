@@ -380,3 +380,14 @@ else
     echo "When finished, stop it with:  $PODMAN_CMD stop $CONTAINER_NAME"
 fi
 
+# Fix ownership of output files back to the invoking user.
+# When sudo podman is used on Linux, the container runs as root and all files
+# written to the mounted output volume are owned by root.  Restore ownership
+# to the original user so they can work with the ISO without sudo.
+if [ "$(uname -s)" = "Linux" ] && [ "$PODMAN_CMD" = "sudo podman" ] && [ -n "$USER" ] && [ "$USER" != "root" ]; then
+    echo ""
+    echo "Restoring ownership of output files to ${USER}..."
+    sudo chown -R "${USER}:$(id -gn "${USER}")" "$FEDORA_REMIX_LOCATION/" 2>/dev/null || true
+    echo "Done — ISO and logs now owned by ${USER}."
+fi
+
