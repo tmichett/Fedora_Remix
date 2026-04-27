@@ -45,7 +45,12 @@ Before starting, ensure your system has:
    ```
    You can use `nano` or a graphical editor instead; replace `vim` in the commands in this guide with whatever you prefer.
 
-4. **Sudo Access** - Required for loop device creation on Linux
+4. **osbuild-selinux** - Required for SELinux-aware image builds on Fedora/RHEL hosts
+   ```bash
+   sudo dnf install osbuild-selinux
+   ```
+
+5. **Sudo Access** - Required for loop device creation on Linux
    - The build script will automatically use `sudo` when needed
 
 #### Optional: tools for testing the built ISO in a local VM (Fedora host)
@@ -58,6 +63,16 @@ sudo systemctl enable libvirtd --now
 ```
 
 Without these packages you can still **build** the ISO; you would test it on another system, on bare metal, or by installing a VM stack later.
+
+#### Optional: Enable SSH for remote access to the build system
+
+If you are connecting to the build system **remotely** (e.g., SSHing in from another machine to run builds), enable the SSH daemon:
+
+```bash
+systemctl enable sshd --now
+```
+
+This is not needed if you are working directly on the build machine.
 
 ### System Requirements
 
