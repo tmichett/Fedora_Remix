@@ -24,7 +24,9 @@ Before starting, ensure your system has:
    ```bash
    # Fedora/RHEL
    sudo dnf install git
+   ```
    
+   ```bash
    # Ubuntu/Debian
    sudo apt install git
    ```
@@ -33,7 +35,9 @@ Before starting, ensure your system has:
    ```bash
    # Fedora/RHEL
    sudo dnf install podman
+   ```
    
+   ```bash
    # Ubuntu/Debian
    sudo apt install podman
    ```
