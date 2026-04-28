@@ -116,7 +116,7 @@ git clone https://github.com/tmichett/Fedora_Remix.git
 cd Fedora_Remix
 ```
 
-### Step 2: Container-specific settings (`config.yml`) — optional
+### Step 2 (OPTIONAL - covered in Step 3): Container-specific settings (`config.yml`) 
 
 The repository root **`config.yml`** holds **`Container_Properties`** used by **`Build_Remix.sh`** / **`Verify_Build_Remix.sh`**. You **do not** have to edit this file by hand: **`./Update_Remix_Config.sh`** (Step 3) prompts for **`SSH_Key_Location`**, **`Fedora_Remix_Location`**, **`GitHub_Registry_Owner`**, **`Fedora_Version`**, and **`include_pxeboot_files`** (PXE), writing safe values back to YAML.
 
@@ -158,7 +158,7 @@ Container_Properties:
 Instead of manually editing **`Container_Properties`** in **`config.yml`** and **`fedora_version`** / **`include_pxeboot_files`** in **`Setup/config.yml`**, run from the repository root:
 
 ```bash
-chmod +x Update_Remix_Config.sh   # once
+chmod +x Update_Remix_Config.sh   # once (if needed)
 ./Update_Remix_Config.sh
 ```
 
