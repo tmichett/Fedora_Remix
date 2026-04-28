@@ -454,8 +454,9 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <li><a href="#_prerequisites">2. Prerequisites</a>
 <ul class="sectlevel2">
 <li><a href="#_required_software">2.1. Required Software</a></li>
-<li><a href="#_system_requirements">2.2. System Requirements</a></li>
-<li><a href="#_supported_operating_systems">2.3. Supported Operating Systems</a></li>
+<li><a href="#_optional_enable_ssh_for_remote_access">2.2. Optional: Enable SSH for Remote Access</a></li>
+<li><a href="#_system_requirements">2.3. System Requirements</a></li>
+<li><a href="#_supported_operating_systems">2.4. Supported Operating Systems</a></li>
 </ul>
 </li>
 <li><a href="#_quick_start_5_steps">3. Quick Start (5 Steps)</a>
@@ -606,6 +607,14 @@ sudo apt install podman</code></pre>
 </div>
 </li>
 <li>
+<p><strong>osbuild-selinux</strong> - Required for SELinux-aware image builds on Fedora/RHEL hosts</p>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-bash" data-lang="bash">sudo dnf install osbuild-selinux</code></pre>
+</div>
+</div>
+</li>
+<li>
 <p><strong>Sudo Access</strong> - Required for loop device creation on Linux</p>
 <div class="ulist">
 <ul>
@@ -619,7 +628,21 @@ sudo apt install podman</code></pre>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_system_requirements">2.2. System Requirements</h3>
+<h3 id="_optional_enable_ssh_for_remote_access">2.2. Optional: Enable SSH for Remote Access</h3>
+<div class="paragraph">
+<p>If you are connecting to the build system <strong>remotely</strong> (e.g., SSHing in from another machine to run builds), enable the SSH daemon:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-bash" data-lang="bash">systemctl enable sshd --now</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This is not needed if you are working directly on the build machine.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_system_requirements">2.3. System Requirements</h3>
 <table class="tableblock frame-all grid-all stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -646,7 +669,7 @@ sudo apt install podman</code></pre>
 </table>
 </div>
 <div class="sect2">
-<h3 id="_supported_operating_systems">2.3. Supported Operating Systems</h3>
+<h3 id="_supported_operating_systems">2.4. Supported Operating Systems</h3>
 <div class="ulist">
 <ul>
 <li>

@@ -47,8 +47,26 @@ sudo dnf install podman
 sudo apt install podman
 ----
 
+. *osbuild-selinux* - Required for SELinux-aware image builds on Fedora/RHEL hosts
++
+[source,bash]
+----
+sudo dnf install osbuild-selinux
+----
+
 . *Sudo Access* - Required for loop device creation on Linux
 ** The build script will automatically use `sudo` when needed
+
+=== Optional: Enable SSH for Remote Access
+
+If you are connecting to the build system *remotely* (e.g., SSHing in from another machine to run builds), enable the SSH daemon:
+
+[source,bash]
+----
+systemctl enable sshd --now
+----
+
+This is not needed if you are working directly on the build machine.
 
 === System Requirements
 
