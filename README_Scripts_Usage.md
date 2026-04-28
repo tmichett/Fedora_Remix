@@ -119,7 +119,7 @@ include_pxeboot_files: false
 - `fedora_boot_files`: List of boot files to download for PXE support
 - `fedora_version`: Fedora release version for boot file downloads
 - `web_root`: Apache document root directory
-- `include_pxeboot_files`: Toggle PXE kernel/initrd fetch (align with [Update_Remix_Config.sh](Update_Remix_Config.sh) or [Quickstart_Physical.md](Quickstart_Physical.md) / [Quickstart_Container.md](Quickstart_Container.md))
+- `include_pxeboot_files`: Toggle PXE kernel/initrd fetch (align with [Update_Remix_Config.sh](Update_Remix_Config.sh), which also sets root `Container_Properties` paths and registry owner, or via [Quickstart_Physical.md](Quickstart_Physical.md) / [Quickstart_Container.md](Quickstart_Container.md))
 
 ### Kickstart Configuration
 

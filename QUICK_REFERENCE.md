@@ -4,7 +4,7 @@
 
 ```bash
 cd /home/travis/Github/Fedora_Remix
-./Update_Remix_Config.sh    # Fedora version + PXE toggle; syncs root config.yml + Setup/config.yml
+./Update_Remix_Config.sh    # SSH path, remix dir, registry owner, Fedora + PXE; syncs root config.yml + Setup/config.yml (keep owner tmichett for ghcr.io/tmichett/…)
 ```
 
 ## Building an ISO

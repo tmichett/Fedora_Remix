@@ -24,9 +24,7 @@ chmod +x Update_Remix_Config.sh   # once
 ./Update_Remix_Config.sh
 ```
 
-This sets **`Fedora_Version`** (root `config.yml`), **`fedora_version`**, and **`include_pxeboot_files`** (`Setup/config.yml`). PXE boot artifacts are optional; set to **no** if you only need an ISO ([Quickstart_Container.md](Quickstart_Container.md) explains when PXE can fail on old or very new Fedora versions).
-
-Paths such as **`SSH_Key_Location`** and **`Fedora_Remix_Location`** are still edited in **`config.yml`** as needed.
+This interactively sets **`SSH_Key_Location`**, **`Fedora_Remix_Location`**, **`GitHub_Registry_Owner`**, **`Fedora_Version`** (root `config.yml`), plus **`fedora_version`** and **`include_pxeboot_files`** (`Setup/config.yml`). PXE boot artifacts are optional; answer **no** if you only need an ISO ([Quickstart_Container.md](Quickstart_Container.md) explains when PXE can fail on old or very new Fedora versions). If you pull the **published** image from **`ghcr.io/tmichett/fedora-remix-builder`**, keep **`GitHub_Registry_Owner`** as **`tmichett`**. You can still edit **`config.yml`** by hand first so the script’s defaults match your host (Enter at each prompt keeps the shown value).
 
 ### Building the ISO (Containerized Method - Recommended)
 
@@ -46,9 +44,8 @@ Paths such as **`SSH_Key_Location`** and **`Fedora_Remix_Location`** are still e
 
 2. **Or configure and build manually**:
    ```bash
-   ./Update_Remix_Config.sh           # preferred: keeps both YAML files in sync
-   # edit config.yml manually only for paths not covered above, e.g.:
-   # vim config.yml
+   ./Update_Remix_Config.sh           # preferred: paths, registry owner, Fedora + PXE in sync
+   # optional: vim config.yml first so script defaults match your machine
    
    # Run the build
    ./Build_Remix.sh
@@ -110,7 +107,7 @@ If you're building on Linux and encounter `/sys` unmount errors, the issue has b
 ```
 Fedora_Remix/
 ├── Build_Remix.sh              # Main build script (runs container, kickstart selection)
-├── Update_Remix_Config.sh      # Interactive: Fedora version + PXE toggle (updates config.yml + Setup/config.yml)
+├── Update_Remix_Config.sh      # Interactive: SSH path, remix dir, registry owner, Fedora + PXE (config.yml + Setup/config.yml)
 ├── config.yml                  # Build configuration
 ├── Setup/                      # Build preparation scripts
 │   ├── Enhanced_Remix_Build_Script.sh

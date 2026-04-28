@@ -190,12 +190,12 @@ git clone https://github.com/tmichett/Fedora_Remix_Tools.git
 
 ### Step 2: Configure the Build
 
-1. **In your `Fedora_Remix` clone**, align versions and PXE options (recommended):
+1. **In your `Fedora_Remix` clone**, align paths, registry owner, versions, and PXE (recommended):
    ```bash
    cd Fedora_Remix
    ./Update_Remix_Config.sh
    ```
-   Then edit root **`config.yml`** for paths: **`SSH_Key_Location`**, **`Fedora_Remix_Location`**, **`GitHub_Registry_Owner`** (image name is derived from owner + **`Fedora_Version`**).
+   The script prompts for **`SSH_Key_Location`**, **`Fedora_Remix_Location`**, **`GitHub_Registry_Owner`**, **`Fedora_Version`**, and PXE (**`include_pxeboot_files`**). Optionally pre-edit root **`config.yml`** so **[bracket]** defaults match your host. If you use **`ghcr.io/tmichett/fedora-remix-builder`**, keep **`GitHub_Registry_Owner`** **`tmichett`** (image name is `ghcr.io/{owner}/fedora-remix-builder:{Fedora_Version}`).
 
 2. **RemixBuilder `config.yml`** (if you build/push the container image from [RemixBuilder](https://github.com/tmichett/RemixBuilder)): set **`Fedora_Version`** to the same numeric release as **`Fedora_Remix/Setup/config.yml`**. Optionally copy this file into the Fedora_Remix repo root for **`Build_Remix.sh`**.
 
@@ -231,7 +231,7 @@ After successful build, the ISO is located at:
 
 When building for a new Fedora version (e.g., upgrading from 43 to 44), keep settings aligned.
 
-**Fastest:** from **`Fedora_Remix`**, run **`./Update_Remix_Config.sh`** — it updates **`Fedora_Version`** (root `config.yml`) and **`fedora_version`** (`Setup/config.yml`) together.
+**Fastest:** from **`Fedora_Remix`**, run **`./Update_Remix_Config.sh`** — it updates **`Container_Properties`** on the remix side (`SSH_Key_Location`, **`Fedora_Remix_Location`**, **`GitHub_Registry_Owner`**, **`Fedora_Version`**) and **`fedora_version`** / **`include_pxeboot_files`** in **`Setup/config.yml`** together.
 
 #### 1. RemixBuilder Configuration (container image)
 

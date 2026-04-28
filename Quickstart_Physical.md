@@ -14,7 +14,7 @@ This guide will walk you through building a custom Fedora Remix ISO image direct
 
 > **💡 Looking for the containerized method?** See **[Quickstart_Container.md](Quickstart_Container.md)** for building with containers (Podman), or use **[Build_Remix.sh](Build_Remix.sh)** to drive the builder image.
 
-**Configure first (recommended):** **[`Update_Remix_Config.sh`](Update_Remix_Config.sh)** interactively sets Fedora release and whether to stage **PXE Linux** boot artifacts (`vmlinuz`, `initrd.img` in the web tree). It updates the root **`config.yml`** (`Fedora_Version`), **`Setup/config.yml`** (`fedora_version`, `include_pxeboot_files`), replacing most manual YAML edits. See [Step 4](#step-4-fedora-release-and-pxe-update_remix_configsh) for PXE caveats on old or very new Fedora versions.
+**Configure first (recommended):** **[`Update_Remix_Config.sh`](Update_Remix_Config.sh)** interactively sets **`SSH_Key_Location`**, **`Fedora_Remix_Location`**, **`GitHub_Registry_Owner`**, Fedora release, and whether to stage **PXE Linux** boot artifacts (`vmlinuz`, `initrd.img` in the web tree). It updates the root **`config.yml`** under **`Container_Properties`**, and **`Setup/config.yml`** (`fedora_version`, `include_pxeboot_files`), replacing most manual YAML edits. If you use **`ghcr.io/tmichett/fedora-remix-builder`** from the registry later, keep **`GitHub_Registry_Owner`** **`tmichett`**. See [Step 4](#step-4-fedora-release-and-pxe-update_remix_configsh) for PXE caveats on old or very new Fedora versions.
 
 **Recommended (native build):** From the repository root, run **[`Build_Remix_Physical.sh`](Build_Remix_Physical.sh)**. It updates `Setup/config.yml` (`fedora_version`), runs `Setup/Prepare_Fedora_Remix_Build.py` and `Setup/Prepare_Web_Files.py` in the correct order, then runs **[`Setup/Enhanced_Remix_Build_Script.sh`](Setup/Enhanced_Remix_Build_Script.sh)** in `/livecd-creator/FedoraRemix` with the kickstart you choose. Use `./Build_Remix_Physical.sh -h` for options (`-v` release, `-k` kickstart, `-l` list). You can run **`Update_Remix_Config.sh`** first so version and PXE settings are already correct before this script prompts.
 
@@ -168,7 +168,7 @@ chmod +x Update_Remix_Config.sh   # once
 
 **What it configures**
 
-- Root **`config.yml`**: `Container_Properties.Fedora_Version` (keeps the tree aligned if you use container tools later or share the clone).
+- Root **`config.yml`**: `Container_Properties` — `SSH_Key_Location`, `Fedora_Remix_Location`, `GitHub_Registry_Owner`, `Fedora_Version` (keeps the tree aligned if you use container tools later or share the clone).
 - **`Setup/config.yml`**: `fedora_version` (must match `Fedora_Version`), and `include_pxeboot_files`.
 
 When **`include_pxeboot_files`** is **true**, **`Prepare_Web_Files.py`** downloads **PXE/Linux** installer images (`vmlinuz`, `initrd.img`) into the web tree so you can optionally use this host with **httpd** as part of a **network (PXE)** install setup for your Remix. If you answer **no**, the preparer skips those downloads (`include_pxeboot_files: false`).
@@ -726,7 +726,7 @@ See [Quickstart_Container.md](Quickstart_Container.md) for the container method.
 
 1. Install Fedora Remix (or use Fedora) and ensure sudo works
 2. `git clone https://github.com/tmichett/Fedora_Remix.git` and `cd Fedora_Remix`
-3. **`./Update_Remix_Config.sh`** to set Fedora release and PXE option (recommended; use **no** for PXE if you only need a local ISO)
+3. **`./Update_Remix_Config.sh`** to set SSH path, remix directory, **`GitHub_Registry_Owner`** (keep **`tmichett`** for **`ghcr.io/tmichett/...`**), Fedora release, and PXE (recommended; use **no** for PXE if you only need a local ISO)
 4. `./Build_Remix_Physical.sh` (set version if not already done, pick kickstart, confirm; script runs prepare + `Enhanced_Remix_Build_Script.sh`)
 5. Find the ISO under `/livecd-creator/FedoraRemix/` (e.g. `FedoraRemix.iso`)
 

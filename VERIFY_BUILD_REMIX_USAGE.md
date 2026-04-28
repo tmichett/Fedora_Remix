@@ -276,7 +276,7 @@ When updating to a new Fedora version, keep **`Fedora_Version`** and **`fedora_v
 ```bash
 ./Update_Remix_Config.sh
 ```
-This updates root `config.yml` and `Setup/config.yml` together. See [Quickstart_Container.md](Quickstart_Container.md) or [Quickstart_Physical.md](Quickstart_Physical.md).
+This updates **`Container_Properties`** in root `config.yml` (`SSH_Key_Location`, `Fedora_Remix_Location`, `GitHub_Registry_Owner`, `Fedora_Version`) and `Setup/config.yml` (`fedora_version`, `include_pxeboot_files`) together. If you pull **`ghcr.io/tmichett/fedora-remix-builder`**, leave **`GitHub_Registry_Owner`** as **`tmichett`**. See [Quickstart_Container.md](Quickstart_Container.md) or [Quickstart_Physical.md](Quickstart_Physical.md).
 
 **Manual alternative:**
 1. Update `config.yml` (`Fedora_Version`)
