@@ -246,7 +246,8 @@ prompt_fedora_version() {
     local current="$1"
     local input=""
 
-    echo ""
+    # Blank line must go to stderr: stdout is captured by $(...) for the return value
+    echo "" >&2
     read -r -p "$(echo -e "${BOLD}${WHITE}Fedora remix release to build [${current}]: ${NC}")" input
     if [ -z "$input" ]; then
         echo "$current"
