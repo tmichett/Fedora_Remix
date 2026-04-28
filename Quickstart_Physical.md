@@ -1,7 +1,7 @@
 # Fedora Remix Builder - Physical/Virtual Machine Quickstart Guide
 
-**Last Updated:** April 13, 2026  
-**Purpose:** Quick guide to building a custom Fedora Remix ISO on a physical or virtual machine (non-containerized method)
+**Last Updated:** April 27, 2026  
+**Purpose:** Quick guide to building a custom Fedora Remix ISO on a physical or virtual machine (non-containerized method), led by **`Build_Remix_Physical.sh`**
 
 ---
 
@@ -12,7 +12,9 @@ This guide will walk you through building a custom Fedora Remix ISO image direct
 **Build Time:** Approximately 30-45 minutes  
 **Output:** A bootable Fedora Remix ISO file (~7-8 GB)
 
-> **💡 Looking for the containerized method?** See **[Quickstart_Container.md](Quickstart_Container.md)** for building with containers (recommended for most users).
+> **💡 Looking for the containerized method?** See **[Quickstart_Container.md](Quickstart_Container.md)** for building with containers (Podman), or use **[Build_Remix.sh](Build_Remix.sh)** to drive the builder image.
+
+**Recommended (native build):** From the repository root, run **[`Build_Remix_Physical.sh`](Build_Remix_Physical.sh)**. It updates `Setup/config.yml` (`fedora_version`), runs `Setup/Prepare_Fedora_Remix_Build.py` and `Setup/Prepare_Web_Files.py` in the correct order, then runs **[`Setup/Enhanced_Remix_Build_Script.sh`](Setup/Enhanced_Remix_Build_Script.sh)** in `/livecd-creator/FedoraRemix` with the kickstart you choose. Use `./Build_Remix_Physical.sh -h` for options (`-v` release, `-k` kickstart, `-l` list).
 
 ---
 
@@ -51,7 +53,43 @@ If you already have Fedora installed, you can use it as your build system. The s
 
 ---
 
-## Quick Start (7 Steps)
+## Quick start
+
+You can use the **automated script** (fewer steps) or the **manual** path (same operations by hand). Both end with an ISO under `/livecd-creator/FedoraRemix/`.
+
+### Option A: One script (recommended)
+
+After [Step 1](#step-1-install-fedora-remix-if-not-already-installed) through [Step 3](#step-3-clone-the-fedora-remix-repository) (install, sudo, clone repo), run from the **repository root** (the directory that contains `Build_Remix_Physical.sh`):
+
+```bash
+cd /path/to/Fedora_Remix
+chmod +x Build_Remix_Physical.sh   # if needed
+./Build_Remix_Physical.sh
+```
+
+The script will:
+
+1. Ask for the Fedora release (e.g. `43`) and write it to `Setup/config.yml` as `fedora_version`
+2. Offer a **kickstart menu** (e.g. `FedoraRemix`, `FedoraRemixCosmic`); you can also pass `-k` / `-l` (list) on the command line
+3. Run, in order: `sudo python3 Setup/Prepare_Fedora_Remix_Build.py` then `sudo python3 Setup/Prepare_Web_Files.py` (from `Setup/`, as required for paths)
+4. `cd` to `/livecd-creator/FedoraRemix` and run `sudo env REMIX_KICKSTART=… ./Enhanced_Remix_Build_Script.sh` (the enhanced `livecd-creator` flow with the same UX style as the repo’s other helper scripts)
+
+Useful options:
+
+| Option | Purpose |
+|--------|--------|
+| `-v 43` | Set Fedora version without a prompt |
+| `-k FedoraRemix` | Choose kickstart without the menu |
+| `-l` | List available `FedoraRemix*.ks` base names and exit |
+| `-h` | Help |
+
+**Customize first:** If you need to edit kickstarts before the first run, do [Step 6 (manual)](#step-6-customize-your-remix-optional) *after* `Prepare_Fedora_Remix_Build.py` has populated `/livecd-creator/FedoraRemix/`, or run the script’s prepare steps manually once, edit files, then run the build part only (`cd /livecd-creator/FedoraRemix && sudo env REMIX_KICKSTART=FedoraRemix ./Enhanced_Remix_Build_Script.sh`).
+
+Then skip to [Build output](#build-output) and [Troubleshooting](#troubleshooting).
+
+### Option B: Manual steps (7 steps)
+
+The steps below match what `Build_Remix_Physical.sh` automates, if you prefer to run each command yourself. Prepare order is: **build directory** first, then **web files and patches** (so `/var/www/html` has `kickstart.py` / `fs.py` fixes before `Enhanced_Remix_Build_Script.sh` runs).
 
 ### Step 1: Install Fedora Remix (If Not Already Installed)
 
@@ -119,22 +157,38 @@ cd Fedora_Remix
 
 ### Step 4: Prepare the Build Environment
 
-Run the Python automation scripts to set up the build environment:
+From the `Setup` directory, run the Python scripts in this order (this matches **`Build_Remix_Physical.sh`**):
 
-#### 4a. Prepare Web Files and HTTP Server
+#### 4a. Prepare Fedora Remix build directory
 
 ```bash
 cd Setup
+sudo python3 Prepare_Fedora_Remix_Build.py
+```
+
+**What this does:**
+- Creates `/livecd-creator/FedoraRemix`
+- Copies kickstart files, `Enhanced_Remix_Build_Script.sh`, and related files
+- Copies `Setup/config.yml` to `/livecd-creator/FedoraRemix/config.yml` (used for ISO title / version)
+
+**Expected output (example):**
+```
+Copying ../Remix_Build_Script.sh to /livecd-creator/FedoraRemix/Remix_Build_Script.sh
+Setup complete!
+```
+
+#### 4b. Prepare web files and HTTP server
+
+```bash
 sudo python3 Prepare_Web_Files.py
 ```
 
 **What this does:**
 - Installs Apache HTTP server (`httpd`)
-- Copies necessary files to `/var/www/html/`
-- Sets up local repository assets
-- Configures the web server for the build process
+- Copies files to `/var/www/html/` (including `kickstart.py` and `fs.py` fixes used during the live build)
+- Sets up PXE/boot assets and related web content
 
-**Expected output:**
+**Expected output (example):**
 ```
 Installing packages: httpd
 Running command: dnf install -y httpd
@@ -142,23 +196,7 @@ Running command: dnf install -y httpd
 Setup complete!
 ```
 
-#### 4b. Prepare Fedora Remix Build Directory
-
-```bash
-sudo python3 Prepare_Fedora_Remix_Build.py
-```
-
-**What this does:**
-- Creates `/livecd-creator/FedoraRemix` directory
-- Copies kickstart files to the build directory
-- Copies build scripts
-- Sets up the build environment
-
-**Expected output:**
-```
-Copying ../Remix_Build_Script.sh to /livecd-creator/FedoraRemix/Remix_Build_Script.sh
-Setup complete!
-```
+Always run **4a then 4b** before the enhanced build; the build script looks for patches under `/var/www/html/`.
 
 ### Step 5: Configure Fedora Version
 
@@ -238,19 +276,27 @@ git clone https://github.com/tmichett/bash-git-prompt.git /opt/bash-git-prompt -
 
 ### Step 7: Build the ISO
 
-Navigate to the build directory and run the build script:
+From the build directory, use the **enhanced** script (recommended; same as `Build_Remix_Physical.sh`):
 
 ```bash
 cd /livecd-creator/FedoraRemix
-time sudo ./Remix_Build_Script.sh
+time sudo ./Enhanced_Remix_Build_Script.sh
 ```
+
+For a **variant** other than the default, set `REMIX_KICKSTART` to the kickstart base name (no `.ks`), matching the file in this directory, for example:
+
+```bash
+sudo env REMIX_KICKSTART=FedoraRemixCosmic ./Enhanced_Remix_Build_Script.sh
+```
+
+**Legacy:** `Remix_Build_Script.sh` is the older, simpler script; prefer `Enhanced_Remix_Build_Script.sh` for consistent logging and behavior with the rest of the repo.
 
 **Build Process:**
 1. Reads kickstart configuration
 2. Downloads and installs packages (~15-20 minutes)
 3. Runs post-installation scripts
 4. Creates the ISO image (~5-10 minutes)
-5. ISO saved to `/livecd-creator/FedoraRemix/`
+5. ISO saved in `/livecd-creator/FedoraRemix/` (e.g. `FedoraRemix.iso` or `FedoraRemixCosmic.iso` depending on kickstart)
 
 **Expected output:**
 ```
@@ -266,10 +312,13 @@ user    143m42.195s
 sys     5m11.054s
 ```
 
-**Output Location:**
-```
+**Output Location (default kickstart):**
+
+```text
 /livecd-creator/FedoraRemix/FedoraRemix.iso
 ```
+
+(Variant kickstarts produce a matching name, e.g. `FedoraRemixCosmic.iso`.)
 
 ---
 
@@ -279,11 +328,13 @@ After running the setup scripts, your build environment will look like this:
 
 ```
 /livecd-creator/FedoraRemix/
-├── FedoraRemix.ks              # Main kickstart file
-├── FedoraRemixPackages.ks      # Package list
-├── FedoraRemixRepos.ks         # Repository configuration
-├── Remix_Build_Script.sh       # Build script
-└── FedoraRemix.iso            # Output ISO (after build)
+├── FedoraRemix.ks                 # Main kickstart file
+├── FedoraRemixPackages.ks         # Package list
+├── FedoraRemixRepos.ks            # Repository configuration
+├── config.yml                     # fedora_version (and related) for the enhanced script
+├── Enhanced_Remix_Build_Script.sh   # Recommended build driver
+├── Remix_Build_Script.sh         # Legacy build script
+└── FedoraRemix.iso                # Output ISO (after build; name follows kickstart)
 ```
 
 ---
@@ -569,28 +620,23 @@ To build different desktop environments or configurations:
 3. **Build with new kickstart:**
    ```bash
    cd /livecd-creator/FedoraRemix
-   sudo livecd-creator -c FedoraRemixKDE.ks -f FedoraRemixKDE
+   sudo env REMIX_KICKSTART=FedoraRemixKDE ./Enhanced_Remix_Build_Script.sh
    ```
+   (Or use the same flags / menu with `Build_Remix_Physical.sh -k FedoraRemixKDE`.)
 
 ### Automating Builds
 
-Create a build automation script:
+From the repository root, prefer **`Build_Remix_Physical.sh`** (see [Option A](#option-a-one-script-recommended)) so `fedora_version`, prepare scripts, and `Enhanced_Remix_Build_Script.sh` stay aligned. After `git pull`, run it with `-v` and `-k` to skip version and kickstart prompts; you still confirm once before the script updates config and runs prepare plus build.
 
 ```bash
-#!/bin/bash
-# automated-build.sh
-
 cd ~/Fedora_Remix
 git pull
+./Build_Remix_Physical.sh -v 43 -k FedoraRemix
+```
 
-cd Setup
-sudo python3 Prepare_Web_Files.py
-sudo python3 Prepare_Fedora_Remix_Build.py
+Copy the finished ISO to a web tree if needed:
 
-cd /livecd-creator/FedoraRemix
-time sudo ./Remix_Build_Script.sh
-
-# Copy ISO to distribution directory
+```bash
 cp /livecd-creator/FedoraRemix/*.iso /var/www/html/isos/
 ```
 
@@ -598,20 +644,16 @@ cp /livecd-creator/FedoraRemix/*.iso /var/www/html/isos/
 
 To build for a different Fedora version:
 
-1. **Update configuration:**
-   ```bash
-   sudo vim Setup/config.yml
-   # Change: fedora_version: 44
-   ```
+1. **Set `fedora_version` in `Setup/config.yml`** (or pass `-v 44` to **`Build_Remix_Physical.sh`** when you run it).
 
-2. **Re-run setup scripts:**
+2. **Re-run setup scripts** (or run **`Build_Remix_Physical.sh`** again for a full refresh):
    ```bash
    cd Setup
-   sudo python3 Prepare_Web_Files.py
    sudo python3 Prepare_Fedora_Remix_Build.py
+   sudo python3 Prepare_Web_Files.py
    ```
 
-3. **Build as normal**
+3. **Build as usual** (`Build_Remix_Physical.sh` or `Enhanced_Remix_Build_Script.sh` in `/livecd-creator/FedoraRemix`).
 
 ---
 
@@ -645,6 +687,7 @@ See [Quickstart_Container.md](Quickstart_Container.md) for the container method.
 
 ### Documentation
 
+- **Asciidoc (PDF / GitHub):** [README_Physical.adoc](README_Physical.adoc) - Physical/virtual install and build narrative (includes *Build_Remix_Physical.sh*)
 - **Container Method:** [Quickstart_Container.md](Quickstart_Container.md) - Containerized build guide
 - **Main README:** [README.md](README.md) - Project overview
 - **Build Fixes:** [LINUX_BUILD_FIX.md](LINUX_BUILD_FIX.md) - Known issues and solutions
@@ -668,24 +711,18 @@ See [Quickstart_Container.md](Quickstart_Container.md) for the container method.
 
 ## Summary
 
-**Minimum Steps to Build:**
+**Shortest path (recommended):**
 
-1. Install Fedora Remix or use existing Fedora installation
-2. Clone repository: `git clone https://github.com/tmichett/Fedora_Remix.git`
-3. Run setup scripts:
-   - `sudo python3 Setup/Prepare_Web_Files.py`
-   - `sudo python3 Setup/Prepare_Fedora_Remix_Build.py`
-4. Edit `Setup/config.yml` - Set Fedora version
-5. Customize kickstart files (optional):
-   - `/livecd-creator/FedoraRemix/FedoraRemixPackages.ks` - Packages
-   - `/livecd-creator/FedoraRemix/FedoraRemix.ks` - System config
-6. Build: `cd /livecd-creator/FedoraRemix && sudo ./Remix_Build_Script.sh`
-7. Wait 30-45 minutes
-8. Find ISO at `/livecd-creator/FedoraRemix/FedoraRemix.iso`
+1. Install Fedora Remix (or use Fedora) and ensure sudo works
+2. `git clone https://github.com/tmichett/Fedora_Remix.git` and `cd Fedora_Remix`
+3. `./Build_Remix_Physical.sh` (set version, pick kickstart, confirm; script runs prepare + `Enhanced_Remix_Build_Script.sh`)
+4. Find the ISO under `/livecd-creator/FedoraRemix/` (e.g. `FedoraRemix.iso`)
+
+**Manual equivalent:** Edit `Setup/config.yml` (`fedora_version`), run `cd Setup && sudo python3 Prepare_Fedora_Remix_Build.py` then `sudo python3 Prepare_Web_Files.py`, customize kickstarts under `/livecd-creator/FedoraRemix/` if needed, then `cd /livecd-creator/FedoraRemix && sudo ./Enhanced_Remix_Build_Script.sh` (or `sudo env REMIX_KICKSTART=… ./Enhanced_Remix_Build_Script.sh` for a variant).
 
 **That's it!** You now have a custom Fedora Remix ISO built on your physical or virtual machine.
 
 ---
 
-**Last Updated:** April 13, 2026  
-**Version:** 1.0
+**Last Updated:** April 27, 2026  
+**Version:** 1.1

@@ -21,19 +21,21 @@ endif::[]
 
 This quickstart will provide a quick method to download a pre-built Fedora Remix as well as creating your own Fedora Remix Building system. The https://github.com/tmichett/Fedora_Remix has been created with Python automation scripts that will setup a Fedora Remix Building system using the Fedora Remix installed from the liveCD provided (https://drive.google.com/drive/folders/1UAT07AJIrTdMk3ke_QE6S6vz-qn6qGtR). The requirements are relatively simply to build and the system has Fedora Remix customization scripts and self-launching menu to assist with the initial setup. The quickstart and documentation are also available at the following link: https://tmichett.github.io/Fedora_Remix/.
 
+For a Markdown walkthrough that tracks the same flow as *Build_Remix_Physical.sh*, see link:Quickstart_Physical.md[Quickstart_Physical.md] in the repository.
+
 .*Building your own Fedora Remix - Overview*
 
 . Download the Fedora Remix ISO and install locally to hard drive
 .. Setup a local user and ensure it is in the SUDOERS file
 .. Run some the Fedora Remix customize scripts to create SSH keys and SUDO with no password
 . Clone https://github.com/tmichett/Fedora_Remix
-. Run the Python automation scripts with the "sudo" command
-.. Prepare_Web_Files.py
-.. Prepare_Fedora_Remix_Build.py
-. Modify the Kickstart files in */livecd-creator/FedoraRemix*
-.. FedoraRemix.ks - To control various setup components and run commands
-.. FedoraRemixPackages.ks - To control RPM packages that are installed as part of your Remix
-. Run the *Remix_Build_Script.sh*
+. Either run *Build_Remix_Physical.sh* from the repository root (recommended), or run the Python automation scripts manually with `sudo` from the *Setup* directory in this order:
+.. *Prepare_Fedora_Remix_Build.py* (creates `/livecd-creator/FedoraRemix` and copies assets)
+.. *Prepare_Web_Files.py* (HTTPd, web assets, and imgcreate `kickstart.py` / `fs.py` fixes under `/var/www/html/`)
+. Optionally modify the kickstart files in */livecd-creator/FedoraRemix* after the prepare step (or edit under *Setup/Kickstarts/* before building)
+.. *FedoraRemix.ks* - Control various setup components and run commands
+.. *FedoraRemixPackages.ks* - Control RPM packages installed in your Remix
+. Run the enhanced build: *Enhanced_Remix_Build_Script.sh* in `/livecd-creator/FedoraRemix` (invoked for you by *Build_Remix_Physical.sh*). *Remix_Build_Script.sh* remains available as a legacy wrapper
 +
 [WARNING]
 .Error Regarding *kickstart.py*
@@ -97,7 +99,7 @@ After the installation is completed, you will need to reboot your system and per
 ====
 
 
-. Clone the Fedora Remix Repository
+. Clone the Fedora Remix repository
 +
 [source,bash]
 ----
@@ -111,17 +113,29 @@ remote: Enumerating objects: 1949, done
 Resolving deltas: 100% (1042/1042), done.
 ----
 
-. Prepare the Fedora Remix build environment by running the Python scripts from the *Setup* directory as the root user.
+. *Recommended:* from the repository root, run *Build_Remix_Physical.sh*. It prompts for the Fedora release (written to *Setup/config.yml* as `fedora_version`), offers a kickstart choice, then runs *Prepare_Fedora_Remix_Build.py*, *Prepare_Web_Files.py*, and *Enhanced_Remix_Build_Script.sh* in `/livecd-creator/FedoraRemix`. Use `./Build_Remix_Physical.sh -h` for options (`-v`, `-k`, `-l`).
 +
 [source,bash]
-.Create */livecd-creator/FedoraRemix* Assets
+.Run *Build_Remix_Physical.sh* (native / physical build driver)
+----
+travis@localhost-fedoraremix-live [~/Fedora_Remix] | main ✓ |
+$ chmod +x Build_Remix_Physical.sh
+$ ./Build_Remix_Physical.sh
+
+... prompts for version, kickstart, confirmation; then prepare + enhanced build ...
+----
+
+. *Alternative — manual prepare:* run the Python scripts from the *Setup* directory as *root*, in this order (same as *Build_Remix_Physical.sh*):
++
+[source,bash]
+.Create */livecd-creator/FedoraRemix* assets
 ----
 travis@localhost-fedoraremix-live [~/Fedora_Remix/Setup] | (05/09/25 @ 15:57)  | main ✓ |
-$ sudo python Prepare_Fedora_Remix_Build.py
+$ sudo python3 Prepare_Fedora_Remix_Build.py
 
 ... OUTPUT OMITTED ...
 
-Copying ../Remix_Buid_Script.sh to /livecd-creator/FedoraRemix/Remix_Buid_Script.sh
+Copying ../Remix_Build_Script.sh to /livecd-creator/FedoraRemix/Remix_Build_Script.sh
 Setup complete!
 ----
 +
@@ -129,7 +143,7 @@ Setup complete!
 .Create httpd server and repository assets
 ----
 travis@localhost-fedoraremix-live [~/Fedora_Remix/Setup] | (05/09/25 @ 15:59)  | main ✓ |
-$ sudo python Prepare_Web_Files.py
+$ sudo python3 Prepare_Web_Files.py
 Installing packages: httpd
 Running command: dnf install -y httpd
 
@@ -139,8 +153,8 @@ Setup complete!
 ----
 
 
-. Perform System and Package customizations by modifying the *FedoraRemix.ks* kickstart file and the *FedoraRemixPackages.ks* file.
-.. The setup scripts or playbooks created */livecd-creator/FedoraRemix* directory. This is where the kickstart files live that you will modify as well as the directory where the FedoraRemix.iso will reside once built.
+. Perform system and package customizations by modifying the *FedoraRemix.ks* kickstart file and the *FedoraRemixPackages.ks* file (under */livecd-creator/FedoraRemix* after the prepare step). The default *Setup/config.yml* `fedora_version` is updated for you if you use *Build_Remix_Physical.sh*; otherwise set it before or between prepare steps.
+.. The setup scripts create the */livecd-creator/FedoraRemix* directory. That is where you edit kickstarts and where the ISO (e.g. *FedoraRemix.iso*) is written after a successful build.
 +
 [source,bash]
 .FedoraRemix.ks
@@ -187,13 +201,13 @@ podman-machine
 ... OUTPUT OMITTED ...
 ----
 
-. Execute the *Remix_Build_Script.sh* file to kick off the build. Depending on system and Internet connection speed and customizations to the kickstart file, this process could take up to an hour.
+. Execute *Enhanced_Remix_Build_Script.sh* in */livecd-creator/FedoraRemix* to start the build (or rely on the last step of *Build_Remix_Physical.sh*). For a non-default kickstart, set *REMIX_KICKSTART* (e.g. `sudo env REMIX_KICKSTART=FedoraRemixCosmic ./Enhanced_Remix_Build_Script.sh`). Depending on system and network speed and kickstart changes, the process can take on the order of an hour.
 +
 [source,bash]
-.Launching the Script
+.Launch the enhanced build script
 ----
 travis@localhost-fedoraremix-live [/livecd-creator/FedoraRemix] | (05/09/25 @ 16:09)
-$ time ./Remix_Buid_Script.sh
+$ time sudo ./Enhanced_Remix_Build_Script.sh
 /usr/lib/python3.13/site-packages/pykickstart/commands/partition.py:461: KickstartParseWarning: A partition with the mountpoint / has already been defined.
   warnings.warn(_("A partition with the mountpoint %s has already been defined.") % pd.mountpoint, KickstartParseWarning)
 fedora                                           19 MB/s |  35 MB     00:01
