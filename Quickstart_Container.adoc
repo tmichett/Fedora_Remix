@@ -4,7 +4,7 @@
 :icons: font
 :source-highlighter: rouge
 :last-update-label!:
-:docdate: April 13, 2026
+:docdate: April 28, 2026
 
 [.lead]
 Quick guide to building a custom Fedora Remix ISO using the containerized build system.
@@ -98,9 +98,9 @@ git clone https://github.com/tmichett/Fedora_Remix.git
 cd Fedora_Remix
 ----
 
-=== Step 2: Configure Container Properties
+=== Step 2: Container-specific settings in `config.yml`
 
-Edit the main configuration file to set up the build environment:
+Edit the main configuration file for paths and registry that the container build uses (SSH key, ISO output directory, GitHub Container Registry owner). You can set `Fedora_Version` here or rely on *Update_Remix_Config.sh* (next step) to align `Fedora_Version` and *Setup/config.yml* for you.
 
 [source,bash]
 ----
@@ -111,7 +111,7 @@ vim config.yml
 [source,yaml]
 ----
 Container_Properties:
-  Fedora_Version: "43"                              # Fedora version for container
+  Fedora_Version: "43"                              # Prefer *Update_Remix_Config.sh* (Step 3) to keep both configs in sync
   SSH_Key_Location: "~/.ssh/github_id"              # Your SSH key location
   Fedora_Remix_Location: "/home/travis/Remix_Builder"  # Output directory
   GitHub_Registry_Owner: "tmichett"                 # Container registry owner
@@ -124,7 +124,7 @@ Container_Properties:
 |Option |Description
 
 |`Fedora_Version`
-|Must match the Fedora version you want to build (e.g., "43")
+|String form of the Fedora release used in the builder image tag (`ghcr.io/.../fedora-remix-builder:{version}`). Prefer setting it with *Update_Remix_Config.sh* so it matches *Setup/config.yml*.
 
 |`SSH_Key_Location`
 |Path to your SSH key (used for git operations in container)
@@ -146,35 +146,41 @@ Container_Properties:
   GitHub_Registry_Owner: "tmichett"
 ----
 
-=== Step 3: Configure Remix Build Settings
+=== Step 3: Fedora release and PXE (*Update_Remix_Config.sh* — recommended)
 
-Edit the Setup configuration file:
+Instead of manually editing `Fedora_Version` in `config.yml` and `fedora_version` / `include_pxeboot_files` in *Setup/config.yml*, run from the repository root:
+
+[source,bash]
+----
+chmod +x Update_Remix_Config.sh
+./Update_Remix_Config.sh
+----
+
+The script prompts for the Fedora release and whether to download **PXE Linux** boot artifacts into the web prepare step (*include_pxeboot_files*). When *true*, container prepare stages `vmlinuz` and `initrd.img` for optional **network (PXE/HTTP) boot** tooling on the Remix. If you answer *no*, PXE assets are skipped.
+
+[IMPORTANT]
+====
+For some **older**, EOL, or **very new** Fedora versions, those images may be **unavailable** or **not** at the paths *Prepare_Web_Files.py* expects—the prepare or build can **fail**. If you are **not** using PXE/Linux network boot from this workflow, answer *no* (`include_pxeboot_files: false`).
+====
+
+[WARNING]
+====
+The `fedora_version` in *Setup/config.yml* *MUST match* `Fedora_Version` in the root `config.yml`. *Update_Remix_Config.sh* updates both together to avoid drift.
+====
+
+.Manual YAML (only if you did *not* run *Update_Remix_Config.sh*)
+Edit *Setup/config.yml* so `fedora_version` matches `Fedora_Version`, and set `include_pxeboot_files` explicitly.
 
 [source,bash]
 ----
 vim Setup/config.yml
 ----
 
-.Required Settings
-[source,yaml]
-----
-# Fedora version to use for downloading boot files
-fedora_version: 43    # MUST match Fedora_Version in config.yml
-
-# Web root directory where files will be served
-web_root: "/var/www/html"
-----
-
-[WARNING]
-====
-The `fedora_version` here *MUST match* the `Fedora_Version` in the main `config.yml` file!
-====
-
-.Example
 [source,yaml]
 ----
 fedora_version: 43
 web_root: "/var/www/html"
+include_pxeboot_files: false
 ----
 
 === Step 4: Verify Configuration (Recommended)
@@ -445,6 +451,9 @@ fedora_version: 43
 
 # Web root directory where files will be served
 web_root: "/var/www/html"
+
+# Download vmlinuz/initrd for PXE when true (see Update_Remix_Config.sh / Quick Start)
+include_pxeboot_files: false
 ----
 
 == Troubleshooting
@@ -459,17 +468,14 @@ web_root: "/var/www/html"
 ----
 
 .Solution
-Update both config files to use the same version:
+Run `./Update_Remix_Config.sh` so `Fedora_Version` and `fedora_version` match, or edit both files to the same release:
 
 [source,bash]
 ----
-# Edit main config
+./Update_Remix_Config.sh
+# or
 vim config.yml
-# Set: Fedora_Version: "43"
-
-# Edit setup config
 vim Setup/config.yml
-# Set: fedora_version: 43
 ----
 
 === Container Image Not Found
@@ -627,15 +633,18 @@ Replace `/dev/sdX` with your USB device.
 
 To build for a different Fedora version:
 
-. Update both config files:
+. Run `./Update_Remix_Config.sh` and enter the new release (or update `Fedora_Version` and `fedora_version` together):
 +
 [source,bash]
 ----
-# config.yml
-Fedora_Version: "44"
-
-# Setup/config.yml
-fedora_version: 44
+./Update_Remix_Config.sh
+----
++
+[source,bash]
+----
+# or edit both files manually
+# config.yml  -> Fedora_Version: "44"
+# Setup/config.yml -> fedora_version: 44
 ----
 
 . Verify the container image exists:
@@ -685,6 +694,8 @@ done
 
 === Documentation
 
+* *Physical/quickstart (ADOC/PDF):* link:README_Physical.adoc[README_Physical.adoc]
+* *Config helper:* link:Update_Remix_Config.sh[Update_Remix_Config.sh] — align `Fedora_Version`, `fedora_version`, PXE (`include_pxeboot_files`)
 * *Main README:* link:README.md[README.md] - Project overview
 * *Build Fixes:* link:LINUX_BUILD_FIX.md[LINUX_BUILD_FIX.md] - Known issues and solutions
 * *SELinux Fix:* link:SELINUX_RELABEL_FIX.md[SELINUX_RELABEL_FIX.md] - SELinux relabeling fix details
@@ -709,9 +720,9 @@ done
 .Minimum Steps to Build
 
 . Clone repository: `git clone https://github.com/tmichett/Fedora_Remix.git`
-. Edit `config.yml` - Set container properties
-. Edit `Setup/config.yml` - Set remix version (must match!)
-. Run `./Verify_Build_Remix.sh` - Verify and build
+. Edit root `config.yml` — SSH key, ISO output directory, registry owner
+. Run `./Update_Remix_Config.sh` — Fedora release plus PXE/Linux assets (**no** recommended unless you need PXE)
+. Run `./Verify_Build_Remix.sh` — Verify and build
 . Wait 30-45 minutes
 . Find ISO at `/home/travis/Remix_Builder/FedoraRemix/FedoraRemix.iso`
 
@@ -724,7 +735,5 @@ done
 [.text-center]
 *That's it!* You now have a custom Fedora Remix ISO ready to use.
 
-'''
-
 [.text-center]
-_Last Updated: April 13, 2026 | Version: 1.0_
+_Last Updated: April 28, 2026 | Version: 1.1_

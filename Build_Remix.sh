@@ -22,6 +22,72 @@ show_usage() {
     echo "If no kickstart is specified, you will be prompted to choose."
 }
 
+normalize_yes_no() {
+    local value
+    value=$(echo "$1" | tr '[:upper:]' '[:lower:]' | xargs)
+    case "$value" in
+        y|yes|true|1|on)
+            echo "true"
+            return 0
+            ;;
+        n|no|false|0|off)
+            echo "false"
+            return 0
+            ;;
+    esac
+    return 1
+}
+
+get_include_pxeboot_setting() {
+    local setup_config="$SOURCE_DIR/Setup/config.yml"
+    if [ ! -f "$setup_config" ]; then
+        return 1
+    fi
+
+    local raw
+    raw=$(grep '^include_pxeboot_files:' "$setup_config" | awk '{print $2}' | tr -d '"' || true)
+    if [ -z "$raw" ]; then
+        return 1
+    fi
+
+    normalize_yes_no "$raw"
+}
+
+write_include_pxeboot_setting() {
+    local value="$1"
+    local setup_config="$SOURCE_DIR/Setup/config.yml"
+    if [ ! -f "$setup_config" ]; then
+        return 1
+    fi
+    if grep -q '^include_pxeboot_files:' "$setup_config"; then
+        sed -i "s/^include_pxeboot_files:.*/include_pxeboot_files: ${value}/" "$setup_config"
+    else
+        printf '\ninclude_pxeboot_files: %s\n' "$value" >> "$setup_config"
+    fi
+}
+
+prompt_include_pxeboot() {
+    local default="${1:-true}"
+    local prompt_suffix="[Y/n]"
+    [ "$default" = "false" ] && prompt_suffix="[y/N]"
+    local input=""
+    local normalized=""
+
+    while true; do
+        read -r -p "Include PXEBoot files in web assets? ${prompt_suffix}: " input
+        if [ -z "$input" ]; then
+            echo "$default"
+            return
+        fi
+        normalized=$(normalize_yes_no "$input" || true)
+        if [ -n "$normalized" ]; then
+            echo "$normalized"
+            return
+        fi
+        echo "Please answer yes or no."
+    done
+}
+
 # Function to list available kickstarts
 # Looks in the current directory (GitHub repo) for kickstart source files
 list_kickstarts() {
@@ -204,6 +270,22 @@ if [ -z "$SELECTED_KICKSTART" ]; then
     show_menu "$SOURCE_DIR"
 fi
 
+INCLUDE_PXEBOOT=""
+if [ -n "${REMIX_INCLUDE_PXEBOOT:-}" ]; then
+    INCLUDE_PXEBOOT=$(normalize_yes_no "$REMIX_INCLUDE_PXEBOOT" || true)
+    if [ -z "$INCLUDE_PXEBOOT" ]; then
+        echo "Error: Invalid REMIX_INCLUDE_PXEBOOT value: $REMIX_INCLUDE_PXEBOOT (use true/false)"
+        exit 1
+    fi
+else
+    INCLUDE_PXEBOOT=$(get_include_pxeboot_setting || true)
+    if [ -z "$INCLUDE_PXEBOOT" ]; then
+        INCLUDE_PXEBOOT=$(prompt_include_pxeboot "true")
+    fi
+fi
+
+write_include_pxeboot_setting "$INCLUDE_PXEBOOT" || true
+
 # Validate that the selected kickstart exists (in SOURCE directory)
 if [ ! -f "$SOURCE_DIR/Setup/Kickstarts/${SELECTED_KICKSTART}.ks" ]; then
     echo "Error: Kickstart file not found: ${SELECTED_KICKSTART}.ks"
@@ -222,6 +304,7 @@ echo -e "${MENU_CYAN}╠══════════════════�
 echo -e "${MENU_CYAN}║${MENU_NC}  ${MENU_GREEN}Source:${MENU_NC}       $SOURCE_DIR$(printf '%*s' $((40 - ${#SOURCE_DIR})) '')${MENU_CYAN}║${MENU_NC}"
 echo -e "${MENU_CYAN}║${MENU_NC}  ${MENU_GREEN}Output Dir:${MENU_NC}   $FEDORA_REMIX_LOCATION$(printf '%*s' $((40 - ${#FEDORA_REMIX_LOCATION})) '')${MENU_CYAN}║${MENU_NC}"
 echo -e "${MENU_CYAN}║${MENU_NC}  ${MENU_GREEN}Container:${MENU_NC}    $IMAGE_NAME$(printf '%*s' $((40 - ${#IMAGE_NAME})) '')${MENU_CYAN}║${MENU_NC}"
+echo -e "${MENU_CYAN}║${MENU_NC}  ${MENU_GREEN}PXEBoot:${MENU_NC}      $INCLUDE_PXEBOOT$(printf '%*s' $((40 - ${#INCLUDE_PXEBOOT})) '')${MENU_CYAN}║${MENU_NC}"
 echo -e "${MENU_CYAN}╚═══════════════════════════════════════════════════════════════════╝${MENU_NC}"
 echo ""
 echo -e "${MENU_WHITE}ISO will be created at:${MENU_NC} ${MENU_YELLOW}$FEDORA_REMIX_LOCATION/FedoraRemix/${SELECTED_KICKSTART}.iso${MENU_NC}"
@@ -361,6 +444,7 @@ REMIX_STREAM
 
 RUN_ARGS=("--replace" "--name" "$CONTAINER_NAME" "--systemd=always" "--privileged" "${EXTRA_ARGS[@]}"
   "-e" "REMIX_KICKSTART=$SELECTED_KICKSTART"
+  "-e" "REMIX_INCLUDE_PXEBOOT=$INCLUDE_PXEBOOT"
   "-v" "$SSH_KEY_LOCATION:/root/github_id:ro${VOL_Z}" "-v" "$FEDORA_REMIX_LOCATION:/livecd-creator:rw${VOL_Z}" "-v" "$SOURCE_DIR:/root/workspace:rw${VOL_Z}" "$IMAGE_NAME")
 
 if [ "$ATTACH_MODE" = "1" ]; then

@@ -1,5 +1,6 @@
 ## Travis's Custom Packages
-%packages
+## --ignoremissing: util-linux-script exists only on Fedora 42+ (script ships in util-linux on F41)
+%packages --ignoremissing
 ## Fix Branding and Logos
 #-fedora-logos
 #-fedora-release*
@@ -161,7 +162,7 @@ copr-cli
 
 ## Artur's CLI Utils
 zoxide
-eza ## Needs repo
+eza
 btop
 bat
 yazi  ## Needs repo

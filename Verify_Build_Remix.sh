@@ -27,6 +27,7 @@ readonly ROCKET="🚀"
 
 # Script directory
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+SETUP_CONFIG="$SCRIPT_DIR/Setup/config.yml"
 
 # Function to print colored messages
 print_message() {
@@ -84,6 +85,67 @@ get_remix_fedora_version() {
         return 1
     fi
     echo "$version"
+}
+
+normalize_yes_no() {
+    local value
+    value=$(echo "$1" | tr '[:upper:]' '[:lower:]' | xargs)
+    case "$value" in
+        y|yes|true|1|on)
+            echo "true"
+            return 0
+            ;;
+        n|no|false|0|off)
+            echo "false"
+            return 0
+            ;;
+    esac
+    return 1
+}
+
+get_include_pxeboot_setting() {
+    if [ ! -f "$SETUP_CONFIG" ]; then
+        return 1
+    fi
+
+    local raw
+    raw=$(grep '^include_pxeboot_files:' "$SETUP_CONFIG" | awk '{print $2}' | tr -d '"' || true)
+    if [ -z "$raw" ]; then
+        return 1
+    fi
+
+    normalize_yes_no "$raw"
+}
+
+write_setup_include_pxeboot() {
+    local value="$1"
+    if grep -q '^include_pxeboot_files:' "$SETUP_CONFIG"; then
+        sed -i "s/^include_pxeboot_files:.*/include_pxeboot_files: ${value}/" "$SETUP_CONFIG"
+    else
+        printf '\ninclude_pxeboot_files: %s\n' "$value" >> "$SETUP_CONFIG"
+    fi
+}
+
+prompt_include_pxeboot() {
+    local default="${1:-true}"
+    local prompt_suffix="[Y/n]"
+    [ "$default" = "false" ] && prompt_suffix="[y/N]"
+    local input=""
+    local normalized=""
+
+    while true; do
+        read -r -p "$(echo -e "${BOLD}${WHITE}Include PXEBoot files in web assets? ${prompt_suffix}: ${NC}")" input
+        if [ -z "$input" ]; then
+            echo "$default"
+            return
+        fi
+        normalized=$(normalize_yes_no "$input" || true)
+        if [ -n "$normalized" ]; then
+            echo "$normalized"
+            return
+        fi
+        print_message "WARNING" "Please answer yes or no."
+    done
 }
 
 # Function to get GitHub registry owner
@@ -152,6 +214,23 @@ main() {
         print_message "ERROR" "Failed to read GitHub registry owner from config.yml"
         exit 1
     fi
+
+    local include_pxeboot
+    if [ -n "${REMIX_INCLUDE_PXEBOOT:-}" ]; then
+        include_pxeboot=$(normalize_yes_no "${REMIX_INCLUDE_PXEBOOT}" || true)
+        if [ -z "$include_pxeboot" ]; then
+            print_message "ERROR" "Invalid REMIX_INCLUDE_PXEBOOT value: ${REMIX_INCLUDE_PXEBOOT} (use true/false)"
+            exit 1
+        fi
+    else
+        include_pxeboot=$(get_include_pxeboot_setting || true)
+        if [ -z "$include_pxeboot" ]; then
+            print_message "INFO" "Setup/config.yml has no include_pxeboot_files setting."
+            include_pxeboot=$(prompt_include_pxeboot "true")
+            write_setup_include_pxeboot "$include_pxeboot"
+            print_message "SUCCESS" "Saved include_pxeboot_files: ${include_pxeboot} in Setup/config.yml"
+        fi
+    fi
     
     # Construct image name
     IMAGE_NAME="ghcr.io/${GITHUB_OWNER}/fedora-remix-builder:${CONTAINER_VERSION}"
@@ -168,6 +247,7 @@ main() {
     echo -e "${BOLD}${CYAN}║${NC}                                                                      ${BOLD}${CYAN}║${NC}"
     echo -e "${BOLD}${CYAN}║${NC}  ${GREEN}Remix Configuration${NC} (Setup/config.yml)                            ${BOLD}${CYAN}║${NC}"
     echo -e "${BOLD}${CYAN}║${NC}    Fedora Version: ${WHITE}${REMIX_VERSION}${NC}                                            ${BOLD}${CYAN}║${NC}"
+    echo -e "${BOLD}${CYAN}║${NC}    Include PXEBoot: ${WHITE}${include_pxeboot}${NC}                                       ${BOLD}${CYAN}║${NC}"
     echo -e "${BOLD}${CYAN}║${NC}    ISO Output: ${WHITE}FedoraRemix-${REMIX_VERSION}.iso${NC}                                ${BOLD}${CYAN}║${NC}"
     echo -e "${BOLD}${CYAN}║${NC}                                                                      ${BOLD}${CYAN}║${NC}"
     echo -e "${BOLD}${CYAN}╚══════════════════════════════════════════════════════════════════════╝${NC}"
@@ -237,13 +317,13 @@ main() {
     if [[ $REPLY =~ ^[Yy]$ ]]; then
         print_message "SUCCESS" "Starting build process..."
         echo ""
-        print_message "INFO" "Executing: ./Build_Remix.sh"
+        print_message "INFO" "Executing: ./Build_Remix.sh (REMIX_INCLUDE_PXEBOOT=${include_pxeboot})"
         echo ""
         echo -e "${CYAN}════════════════════════════════════════════════════════════════════════${NC}"
         echo ""
         
         # Execute the build script
-        exec "$SCRIPT_DIR/Build_Remix.sh"
+        exec env REMIX_INCLUDE_PXEBOOT="$include_pxeboot" "$SCRIPT_DIR/Build_Remix.sh"
     else
         print_message "INFO" "Build cancelled by user"
         echo ""
