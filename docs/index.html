@@ -462,8 +462,8 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <li><a href="#_quick_start_5_steps">3. Quick Start (5 Steps)</a>
 <ul class="sectlevel2">
 <li><a href="#_step_1_clone_the_repository">3.1. Step 1: Clone the Repository</a></li>
-<li><a href="#_step_2_configure_container_properties">3.2. Step 2: Configure Container Properties</a></li>
-<li><a href="#_step_3_configure_remix_build_settings">3.3. Step 3: Configure Remix Build Settings</a></li>
+<li><a href="#_step_2_container_specific_settings_in_config_yml">3.2. Step 2: Container-specific settings in <code>config.yml</code></a></li>
+<li><a href="#_step_3_fedora_release_and_pxe_update_remix_config_sh_recommended">3.3. Step 3: Fedora release and PXE (<strong>Update_Remix_Config.sh</strong> — recommended)</a></li>
 <li><a href="#_step_4_verify_configuration_recommended">3.4. Step 4: Verify Configuration (Recommended)</a></li>
 <li><a href="#_step_5_build_the_iso">3.5. Step 5: Build the ISO</a></li>
 </ul>
@@ -525,9 +525,10 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 </ul>
 </li>
 <li><a href="#_summary">12. Summary</a></li>
-<li><a href="#_fedora_remix_creation_quickstart_physical_or_virtual">13. Fedora Remix Creation Quickstart (Physical or Virtual)</a>
+<li><a href="#_fedora_remix_creation_quickstart_physical_or_virtual">13. Fedora Remix Creation Quickstart (Physical or Virtual)</a></li>
+<li><a href="#_fedora_release_and_pxe_update_remix_config_sh">14. Fedora release and PXE (<strong>Update_Remix_Config.sh</strong>)</a>
 <ul class="sectlevel2">
-<li><a href="#_quickstart">13.1. <span class="blue"><strong>Quickstart</strong></span></a></li>
+<li><a href="#_quickstart">14.1. <span class="blue"><strong>Quickstart</strong></span></a></li>
 </ul>
 </li>
 <li><a href="#_fedora_remix">Appendix A: Fedora Remix</a>
@@ -705,9 +706,9 @@ cd Fedora_Remix</code></pre>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_step_2_configure_container_properties">3.2. Step 2: Configure Container Properties</h3>
+<h3 id="_step_2_container_specific_settings_in_config_yml">3.2. Step 2: Container-specific settings in <code>config.yml</code></h3>
 <div class="paragraph">
-<p>Edit the main configuration file to set up the build environment:</p>
+<p>Edit the main configuration file for paths and registry that the container build uses (SSH key, ISO output directory, GitHub Container Registry owner). You can set <code>Fedora_Version</code> here or rely on <strong>Update_Remix_Config.sh</strong> (next step) to align <code>Fedora_Version</code> and <strong>Setup/config.yml</strong> for you.</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -718,7 +719,7 @@ cd Fedora_Remix</code></pre>
 <div class="title">Listing 1. Required Settings</div>
 <div class="content">
 <pre class="highlight"><code class="language-yaml" data-lang="yaml">Container_Properties:
-  Fedora_Version: "43"                              # Fedora version for container
+  Fedora_Version: "43"                              # Prefer *Update_Remix_Config.sh* (Step 3) to keep both configs in sync
   SSH_Key_Location: "~/.ssh/github_id"              # Your SSH key location
   Fedora_Remix_Location: "/home/travis/Remix_Builder"  # Output directory
   GitHub_Registry_Owner: "tmichett"                 # Container registry owner</code></pre>
@@ -739,7 +740,7 @@ cd Fedora_Remix</code></pre>
 <tbody>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>Fedora_Version</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Must match the Fedora version you want to build (e.g., "43")</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">String form of the Fedora release used in the builder image tag (<code>ghcr.io/&#8230;&#8203;/fedora-remix-builder:{version}</code>). Prefer setting it with <strong>Update_Remix_Config.sh</strong> so it matches <strong>Setup/config.yml</strong>.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>SSH_Key_Location</code></p></td>
@@ -767,24 +768,32 @@ cd Fedora_Remix</code></pre>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_step_3_configure_remix_build_settings">3.3. Step 3: Configure Remix Build Settings</h3>
+<h3 id="_step_3_fedora_release_and_pxe_update_remix_config_sh_recommended">3.3. Step 3: Fedora release and PXE (<strong>Update_Remix_Config.sh</strong> — recommended)</h3>
 <div class="paragraph">
-<p>Edit the Setup configuration file:</p>
+<p>Instead of manually editing <code>Fedora_Version</code> in <code>config.yml</code> and <code>fedora_version</code> / <code>include_pxeboot_files</code> in <strong>Setup/config.yml</strong>, run from the repository root:</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code class="language-bash" data-lang="bash">vim Setup/config.yml</code></pre>
+<pre class="highlight"><code class="language-bash" data-lang="bash">chmod +x Update_Remix_Config.sh
+./Update_Remix_Config.sh</code></pre>
 </div>
 </div>
-<div class="listingblock">
-<div class="title">Listing 3. Required Settings</div>
-<div class="content">
-<pre class="highlight"><code class="language-yaml" data-lang="yaml"># Fedora version to use for downloading boot files
-fedora_version: 43    # MUST match Fedora_Version in config.yml
-
-# Web root directory where files will be served
-web_root: "/var/www/html"</code></pre>
+<div class="paragraph">
+<p>The script prompts for the Fedora release and whether to download <strong>PXE Linux</strong> boot artifacts into the web prepare step (<strong>include_pxeboot_files</strong>). When <strong>true</strong>, container prepare stages <code>vmlinuz</code> and <code>initrd.img</code> for optional <strong>network (PXE/HTTP) boot</strong> tooling on the Remix. If you answer <strong>no</strong>, PXE assets are skipped.</p>
 </div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="Important"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>For some <strong>older</strong>, EOL, or <strong>very new</strong> Fedora versions, those images may be <strong>unavailable</strong> or <strong>not</strong> at the paths <strong>Prepare_Web_Files.py</strong> expects—the prepare or build can <strong>fail</strong>. If you are <strong>not</strong> using PXE/Linux network boot from this workflow, answer <strong>no</strong> (<code>include_pxeboot_files: false</code>).</p>
+</div>
+</td>
+</tr>
+</table>
 </div>
 <div class="admonitionblock warning">
 <table>
@@ -794,17 +803,26 @@ web_root: "/var/www/html"</code></pre>
 </td>
 <td class="content">
 <div class="paragraph">
-<p>The <code>fedora_version</code> here <strong>MUST match</strong> the <code>Fedora_Version</code> in the main <code>config.yml</code> file!</p>
+<p>The <code>fedora_version</code> in <strong>Setup/config.yml</strong> <strong>MUST match</strong> <code>Fedora_Version</code> in the root <code>config.yml</code>. <strong>Update_Remix_Config.sh</strong> updates both together to avoid drift.</p>
 </div>
 </td>
 </tr>
 </table>
 </div>
+<div class="paragraph">
+<div class="title">Manual YAML (only if you did <strong>not</strong> run <strong>Update_Remix_Config.sh</strong>)</div>
+<p>Edit <strong>Setup/config.yml</strong> so <code>fedora_version</code> matches <code>Fedora_Version</code>, and set <code>include_pxeboot_files</code> explicitly.</p>
+</div>
 <div class="listingblock">
-<div class="title">Listing 4. Example</div>
+<div class="content">
+<pre class="highlight"><code class="language-bash" data-lang="bash">vim Setup/config.yml</code></pre>
+</div>
+</div>
+<div class="listingblock">
 <div class="content">
 <pre class="highlight"><code class="language-yaml" data-lang="yaml">fedora_version: 43
-web_root: "/var/www/html"</code></pre>
+web_root: "/var/www/html"
+include_pxeboot_files: false</code></pre>
 </div>
 </div>
 </div>
@@ -836,7 +854,7 @@ web_root: "/var/www/html"</code></pre>
 </ul>
 </div>
 <div class="listingblock">
-<div class="title">Listing 5. Sample Output</div>
+<div class="title">Listing 3. Sample Output</div>
 <div class="content">
 <pre>╔══════════════════════════════════════════════════════════════════════╗
 ║ Configuration Summary                                                ║
@@ -890,7 +908,7 @@ Do you want to proceed with the build? [y/N]: y</pre>
 </ol>
 </div>
 <div class="listingblock">
-<div class="title">Listing 6. Expected Output Location</div>
+<div class="title">Listing 4. Expected Output Location</div>
 <div class="content">
 <pre>/home/travis/Remix_Builder/FedoraRemix/FedoraRemix.iso</pre>
 </div>
@@ -907,13 +925,13 @@ Do you want to proceed with the build? [y/N]: y</pre>
 <p>To add or remove RPM packages from your remix:</p>
 </div>
 <div class="listingblock">
-<div class="title">Listing 7. Edit the package list</div>
+<div class="title">Listing 5. Edit the package list</div>
 <div class="content">
 <pre class="highlight"><code class="language-bash" data-lang="bash">vim Setup/Kickstarts/FedoraRemixPackages.ks</code></pre>
 </div>
 </div>
 <div class="listingblock">
-<div class="title">Listing 8. Add packages</div>
+<div class="title">Listing 6. Add packages</div>
 <div class="content">
 <pre class="highlight"><code class="language-bash" data-lang="bash"># Add your packages here
 vim
@@ -922,7 +940,7 @@ htop</code></pre>
 </div>
 </div>
 <div class="listingblock">
-<div class="title">Listing 9. Remove packages</div>
+<div class="title">Listing 7. Remove packages</div>
 <div class="content">
 <pre class="highlight"><code class="language-bash" data-lang="bash"># Comment out or delete unwanted packages
 # firefox  # Removed</code></pre>
@@ -955,7 +973,7 @@ htop</code></pre>
 <p>For advanced customization of the installation and system configuration:</p>
 </div>
 <div class="listingblock">
-<div class="title">Listing 10. Main Kickstart Files</div>
+<div class="title">Listing 8. Main Kickstart Files</div>
 <div class="content">
 <pre>Setup/Kickstarts/
 ├── FedoraRemix.ks              # Main kickstart (default)
@@ -967,7 +985,7 @@ htop</code></pre>
 </div>
 </div>
 <div class="listingblock">
-<div class="title">Listing 11. Kickstart Snippets</div>
+<div class="title">Listing 9. Kickstart Snippets</div>
 <div class="content">
 <pre>Setup/Kickstarts/KickstartSnippets/
 ├── create-ansible-user.ks      # Create ansible user
@@ -1038,7 +1056,7 @@ user --name=myuser --groups=wheel --password=encrypted_password --iscrypted</cod
 <div class="sect2">
 <h3 id="_customizing_look_and_feel">4.3. Customizing Look and Feel</h3>
 <div class="listingblock">
-<div class="title">Listing 12. Branding and Themes</div>
+<div class="title">Listing 10. Branding and Themes</div>
 <div class="content">
 <pre>Setup/files/
 ├── boot/                       # Boot splash screens
@@ -1049,7 +1067,7 @@ user --name=myuser --groups=wheel --password=encrypted_password --iscrypted</cod
 </div>
 </div>
 <div class="listingblock">
-<div class="title">Listing 13. GRUB Theme</div>
+<div class="title">Listing 11. GRUB Theme</div>
 <div class="content">
 <pre>Grub_Theme/Fedora_Remix_Theme/
 ├── FedoraRemix.jpeg           # GRUB background options
@@ -1138,7 +1156,7 @@ user --name=myuser --groups=wheel --password=encrypted_password --iscrypted</cod
 <div class="sect2">
 <h3 id="_main_configuration_config_yml">6.1. Main Configuration (<code>config.yml</code>)</h3>
 <div class="listingblock">
-<div class="title">Listing 14. Location</div>
+<div class="title">Listing 12. Location</div>
 <div class="content">
 <pre>/home/travis/Github/Fedora_Remix/config.yml</pre>
 </div>
@@ -1148,7 +1166,7 @@ user --name=myuser --groups=wheel --password=encrypted_password --iscrypted</cod
 <p>Controls the container build environment</p>
 </div>
 <div class="listingblock">
-<div class="title">Listing 15. Full Example</div>
+<div class="title">Listing 13. Full Example</div>
 <div class="content">
 <pre class="highlight"><code class="language-yaml" data-lang="yaml">Container_Properties:
   # Fedora version for the container (must match Setup/config.yml)
@@ -1171,7 +1189,7 @@ user --name=myuser --groups=wheel --password=encrypted_password --iscrypted</cod
 <div class="sect2">
 <h3 id="_setup_configuration_setupconfig_yml">6.2. Setup Configuration (<code>Setup/config.yml</code>)</h3>
 <div class="listingblock">
-<div class="title">Listing 16. Location</div>
+<div class="title">Listing 14. Location</div>
 <div class="content">
 <pre>/home/travis/Github/Fedora_Remix/Setup/config.yml</pre>
 </div>
@@ -1181,7 +1199,7 @@ user --name=myuser --groups=wheel --password=encrypted_password --iscrypted</cod
 <p>Controls the remix build process</p>
 </div>
 <div class="listingblock">
-<div class="title">Listing 17. Full Example</div>
+<div class="title">Listing 15. Full Example</div>
 <div class="content">
 <pre class="highlight"><code class="language-yaml" data-lang="yaml"># Configuration file for Prepare_Web_Files.py
 
@@ -1195,7 +1213,10 @@ fedora_boot_files:
 fedora_version: 43
 
 # Web root directory where files will be served
-web_root: "/var/www/html"</code></pre>
+web_root: "/var/www/html"
+
+# Download vmlinuz/initrd for PXE when true (see Update_Remix_Config.sh / Quick Start)
+include_pxeboot_files: false</code></pre>
 </div>
 </div>
 </div>
@@ -1207,7 +1228,7 @@ web_root: "/var/www/html"</code></pre>
 <div class="sect2">
 <h3 id="_version_mismatch_error">7.1. Version Mismatch Error</h3>
 <div class="listingblock">
-<div class="title">Listing 18. Problem</div>
+<div class="title">Listing 16. Problem</div>
 <div class="content">
 <pre>⚠️ Version mismatch detected!
   Container is configured for Fedora 43
@@ -1216,24 +1237,21 @@ web_root: "/var/www/html"</code></pre>
 </div>
 <div class="paragraph">
 <div class="title">Solution</div>
-<p>Update both config files to use the same version:</p>
+<p>Run <code>./Update_Remix_Config.sh</code> so <code>Fedora_Version</code> and <code>fedora_version</code> match, or edit both files to the same release:</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code class="language-bash" data-lang="bash"># Edit main config
+<pre class="highlight"><code class="language-bash" data-lang="bash">./Update_Remix_Config.sh
+# or
 vim config.yml
-# Set: Fedora_Version: "43"
-
-# Edit setup config
-vim Setup/config.yml
-# Set: fedora_version: 43</code></pre>
+vim Setup/config.yml</code></pre>
 </div>
 </div>
 </div>
 <div class="sect2">
 <h3 id="_container_image_not_found">7.2. Container Image Not Found</h3>
 <div class="listingblock">
-<div class="title">Listing 19. Problem</div>
+<div class="title">Listing 17. Problem</div>
 <div class="content">
 <pre>⚠️ Container image not found locally</pre>
 </div>
@@ -1250,7 +1268,7 @@ vim Setup/config.yml
 </ul>
 </div>
 <div class="listingblock">
-<div class="title">Listing 20. Solution 2: Build container locally (faster for repeated builds)</div>
+<div class="title">Listing 18. Solution 2: Build container locally (faster for repeated builds)</div>
 <div class="content">
 <pre class="highlight"><code class="language-bash" data-lang="bash">cd /home/travis/Github/RemixBuilder
 ./build.sh</code></pre>
@@ -1260,7 +1278,7 @@ vim Setup/config.yml
 <div class="sect2">
 <h3 id="_selinux_relabeling_errors">7.3. SELinux Relabeling Errors</h3>
 <div class="listingblock">
-<div class="title">Listing 21. Problem</div>
+<div class="title">Listing 19. Problem</div>
 <div class="content">
 <pre>setfiles: Could not set context for /usr/share/accountsservice: Invalid argument
 Error creating Live CD : SELinux relabel failed.</pre>
@@ -1290,7 +1308,7 @@ Error creating Live CD : SELinux relabel failed.</pre>
 <div class="sect2">
 <h3 id="_build_fails_after_15_minutes">7.4. Build Fails After 15 Minutes</h3>
 <div class="listingblock">
-<div class="title">Listing 22. Problem</div>
+<div class="title">Listing 20. Problem</div>
 <div class="content">
 <pre>Error creating Live CD : Unable to unmount filesystem at /var/tmp/imgcreate-*/install_root/sys</pre>
 </div>
@@ -1311,7 +1329,7 @@ Error creating Live CD : SELinux relabel failed.</pre>
 <div class="sect2">
 <h3 id="_insufficient_disk_space">7.5. Insufficient Disk Space</h3>
 <div class="listingblock">
-<div class="title">Listing 23. Problem</div>
+<div class="title">Listing 21. Problem</div>
 <div class="content">
 <pre>Error: Not enough free space</pre>
 </div>
@@ -1342,7 +1360,7 @@ rm -rf /livecd-creator/package-cache/*</code></pre>
 <div class="sect2">
 <h3 id="_successful_build">8.1. Successful Build</h3>
 <div class="listingblock">
-<div class="title">Listing 24. Expected output</div>
+<div class="title">Listing 22. Expected output</div>
 <div class="content">
 <pre>✅ 🚀 Live CD created successfully!
   🕐 Total Build Time:          30m 46s (1846 seconds)
@@ -1359,19 +1377,19 @@ rm -rf /livecd-creator/package-cache/*</code></pre>
 <div class="sect2">
 <h3 id="_output_files">8.2. Output Files</h3>
 <div class="listingblock">
-<div class="title">Listing 25. ISO Image</div>
+<div class="title">Listing 23. ISO Image</div>
 <div class="content">
 <pre>/home/travis/Remix_Builder/FedoraRemix/FedoraRemix.iso</pre>
 </div>
 </div>
 <div class="listingblock">
-<div class="title">Listing 26. Build Log</div>
+<div class="title">Listing 24. Build Log</div>
 <div class="content">
 <pre>/home/travis/Remix_Builder/FedoraRemix/FedoraRemix-Build-MMDDYY-HHMM.log</pre>
 </div>
 </div>
 <div class="listingblock">
-<div class="title">Listing 27. Package Cache</div>
+<div class="title">Listing 25. Package Cache</div>
 <div class="content">
 <pre>/livecd-creator/package-cache/</pre>
 </div>
@@ -1472,14 +1490,17 @@ rm -rf /livecd-creator/package-cache/*</code></pre>
 <div class="olist arabic">
 <ol class="arabic">
 <li>
-<p>Update both config files:</p>
+<p>Run <code>./Update_Remix_Config.sh</code> and enter the new release (or update <code>Fedora_Version</code> and <code>fedora_version</code> together):</p>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code class="language-bash" data-lang="bash"># config.yml
-Fedora_Version: "44"
-
-# Setup/config.yml
-fedora_version: 44</code></pre>
+<pre class="highlight"><code class="language-bash" data-lang="bash">./Update_Remix_Config.sh</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-bash" data-lang="bash"># or edit both files manually
+# config.yml  -&gt; Fedora_Version: "44"
+# Setup/config.yml -&gt; fedora_version: 44</code></pre>
 </div>
 </div>
 </li>
@@ -1543,6 +1564,12 @@ done</code></pre>
 <h3 id="_documentation">11.1. Documentation</h3>
 <div class="ulist">
 <ul>
+<li>
+<p><strong>Physical/quickstart (ADOC/PDF):</strong> <a href="README_Physical.adoc">README_Physical.adoc</a></p>
+</li>
+<li>
+<p><strong>Config helper:</strong> <a href="Update_Remix_Config.sh">Update_Remix_Config.sh</a> — align <code>Fedora_Version</code>, <code>fedora_version</code>, PXE (<code>include_pxeboot_files</code>)</p>
+</li>
 <li>
 <p><strong>Main README:</strong> <a href="README.md">README.md</a> - Project overview</p>
 </li>
@@ -1608,13 +1635,13 @@ done</code></pre>
 <p>Clone repository: <code>git clone <a href="https://github.com/tmichett/Fedora_Remix.git" class="bare">https://github.com/tmichett/Fedora_Remix.git</a></code></p>
 </li>
 <li>
-<p>Edit <code>config.yml</code> - Set container properties</p>
+<p>Edit root <code>config.yml</code> — SSH key, ISO output directory, registry owner</p>
 </li>
 <li>
-<p>Edit <code>Setup/config.yml</code> - Set remix version (must match!)</p>
+<p>Run <code>./Update_Remix_Config.sh</code> — Fedora release plus PXE/Linux assets (<strong>no</strong> recommended unless you need PXE)</p>
 </li>
 <li>
-<p>Run <code>./Verify_Build_Remix.sh</code> - Verify and build</p>
+<p>Run <code>./Verify_Build_Remix.sh</code> — Verify and build</p>
 </li>
 <li>
 <p>Wait 30-45 minutes</p>
@@ -1641,9 +1668,8 @@ done</code></pre>
 <div class="paragraph text-center">
 <p><strong>That&#8217;s it!</strong> You now have a custom Fedora Remix ISO ready to use.</p>
 </div>
-<hr>
 <div class="paragraph text-center">
-<p><em>Last Updated: April 13, 2026 | Version: 1.0</em></p>
+<p><em>Last Updated: April 28, 2026 | Version: 1.1</em></p>
 </div>
 </div>
 </div>
@@ -1655,6 +1681,37 @@ done</code></pre>
 </div>
 <div class="paragraph">
 <p>For a Markdown walkthrough that tracks the same flow as <strong>Build_Remix_Physical.sh</strong>, see <a href="Quickstart_Physical.md">Quickstart_Physical.md</a> in the repository.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_fedora_release_and_pxe_update_remix_config_sh">14. Fedora release and PXE (<strong>Update_Remix_Config.sh</strong>)</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>After you clone the repository, run <strong>Update_Remix_Config.sh</strong> from the repository root (recommended) instead of manually editing <strong>config.yml</strong> and <strong>Setup/config.yml</strong>.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-bash" data-lang="bash">chmod +x Update_Remix_Config.sh
+./Update_Remix_Config.sh</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The script asks for the Fedora release and whether to download <strong>PXE Linux</strong> boot images for the web tree. It updates <strong>config.yml</strong> (<strong>Container_Properties.Fedora_Version</strong>), <strong>Setup/config.yml</strong> <strong>fedora_version</strong>, and <strong>include_pxeboot_files</strong>. When <strong>include_pxeboot_files</strong> is <strong>true</strong>, <strong>Prepare_Web_Files.py</strong> fetches <code>vmlinuz</code> and <code>initrd.img</code> so you can optionally use the build host (HTTPd) as part of a <strong>PXE</strong> / network-install layout for your Fedora Remix.</p>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="Important"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>For some <strong>older</strong> releases, EOL composes, or <strong>very new</strong> Fedora versions, those kernel and initrd artifacts may be <strong>missing</strong> or not at the expected mirror paths; including PXE assets can make <strong>Prepare_Web_Files.py</strong> or later steps <strong>fail</strong>. If you are <strong>not</strong> planning to serve PXE/network-boot content from this system, answer <strong>no</strong> and keep <code>include_pxeboot_files: false</code>.</p>
+</div>
+</td>
+</tr>
+</table>
 </div>
 <div class="olist arabic">
 <div class="title"><strong>Building your own Fedora Remix - Overview</strong></div>
@@ -1674,6 +1731,9 @@ done</code></pre>
 </li>
 <li>
 <p>Clone <a href="https://github.com/tmichett/Fedora_Remix" class="bare">https://github.com/tmichett/Fedora_Remix</a></p>
+</li>
+<li>
+<p>Run <strong>Update_Remix_Config.sh</strong> from the repository root (recommended) to align <strong>Fedora_Version</strong>, <strong>fedora_version</strong>, and PXE-related <strong>include_pxeboot_files</strong>; or set those values by hand in <strong>config.yml</strong> and <strong>Setup/config.yml</strong></p>
 </li>
 <li>
 <p>Either run <strong>Build_Remix_Physical.sh</strong> from the repository root (recommended), or run the Python automation scripts manually with <code>sudo</code> from the <strong>Setup</strong> directory in this order:</p>
@@ -1715,7 +1775,7 @@ done</code></pre>
 <p>With newer Fedora releases, there is an error with the <strong>kickstart.py</strong> package and URLGrabber. Located on the "FedoraRemixTools" application, I&#8217;ve included a button to "FIX" the issue with the <strong>kickstart.py</strong> package. After completing the fix, you will no longer get the issue.</p>
 </div>
 <div class="listingblock">
-<div class="title">Listing 28. Python <strong>kickstart.py</strong> Errors</div>
+<div class="title">Listing 26. Python <strong>kickstart.py</strong> Errors</div>
 <div class="content">
 <pre class="highlight"><code class="language-bash" data-lang="bash">Traceback (most recent call last):
   File "/usr/sbin/livecd-creator", line 265, in &lt;module&gt;
@@ -1732,7 +1792,7 @@ done</code></pre>
 </ol>
 </div>
 <div class="sect2">
-<h3 id="_quickstart">13.1. <span class="blue"><strong>Quickstart</strong></span></h3>
+<h3 id="_quickstart">14.1. <span class="blue"><strong>Quickstart</strong></span></h3>
 <div class="paragraph">
 <p>This quickstart provides detailed information on how to download, install, and create your custom Fedora Remix. It depends first on having the Fedora Remix installed locally and access to the Github repository and playbooks contained withing the repository.</p>
 </div>
@@ -1865,9 +1925,9 @@ Resolving deltas: 100% (1042/1042), done.</code></pre>
 </div>
 </li>
 <li>
-<p><strong>Recommended:</strong> from the repository root, run <strong>Build_Remix_Physical.sh</strong>. It prompts for the Fedora release (written to <strong>Setup/config.yml</strong> as <code>fedora_version</code>), offers a kickstart choice, then runs <strong>Prepare_Fedora_Remix_Build.py</strong>, <strong>Prepare_Web_Files.py</strong>, and <strong>Enhanced_Remix_Build_Script.sh</strong> in <code>/livecd-creator/FedoraRemix</code>. Use <code>./Build_Remix_Physical.sh -h</code> for options (<code>-v</code>, <code>-k</code>, <code>-l</code>).</p>
+<p><strong>Recommended:</strong> from the repository root, run <strong>Build_Remix_Physical.sh</strong>. It prompts for the Fedora release (written to <strong>Setup/config.yml</strong> as <code>fedora_version</code>; or pre-set Fedora and PXE preferences with <strong>Update_Remix_Config.sh</strong>), offers a kickstart choice, then runs <strong>Prepare_Fedora_Remix_Build.py</strong>, <strong>Prepare_Web_Files.py</strong>, and <strong>Enhanced_Remix_Build_Script.sh</strong> in <code>/livecd-creator/FedoraRemix</code>. Use <code>./Build_Remix_Physical.sh -h</code> for options (<code>-v</code>, <code>-k</code>, <code>-l</code>).</p>
 <div class="listingblock">
-<div class="title">Listing 29. Run <strong>Build_Remix_Physical.sh</strong> (native / physical build driver)</div>
+<div class="title">Listing 27. Run <strong>Build_Remix_Physical.sh</strong> (native / physical build driver)</div>
 <div class="content">
 <pre class="highlight"><code class="language-bash" data-lang="bash">travis@localhost-fedoraremix-live [~/Fedora_Remix] | main ✓ |
 $ chmod +x Build_Remix_Physical.sh
@@ -1880,7 +1940,7 @@ $ ./Build_Remix_Physical.sh
 <li>
 <p><strong>Alternative — manual prepare:</strong> run the Python scripts from the <strong>Setup</strong> directory as <strong>root</strong>, in this order (same as <strong>Build_Remix_Physical.sh</strong>):</p>
 <div class="listingblock">
-<div class="title">Listing 30. Create <strong>/livecd-creator/FedoraRemix</strong> assets</div>
+<div class="title">Listing 28. Create <strong>/livecd-creator/FedoraRemix</strong> assets</div>
 <div class="content">
 <pre class="highlight"><code class="language-bash" data-lang="bash">travis@localhost-fedoraremix-live [~/Fedora_Remix/Setup] | (05/09/25 @ 15:57)  | main ✓ |
 $ sudo python3 Prepare_Fedora_Remix_Build.py
@@ -1892,7 +1952,7 @@ Setup complete!</code></pre>
 </div>
 </div>
 <div class="listingblock">
-<div class="title">Listing 31. Create httpd server and repository assets</div>
+<div class="title">Listing 29. Create httpd server and repository assets</div>
 <div class="content">
 <pre class="highlight"><code class="language-bash" data-lang="bash">travis@localhost-fedoraremix-live [~/Fedora_Remix/Setup] | (05/09/25 @ 15:59)  | main ✓ |
 $ sudo python3 Prepare_Web_Files.py
@@ -1906,13 +1966,13 @@ Setup complete!</code></pre>
 </div>
 </li>
 <li>
-<p>Perform system and package customizations by modifying the <strong>FedoraRemix.ks</strong> kickstart file and the <strong>FedoraRemixPackages.ks</strong> file (under <strong>/livecd-creator/FedoraRemix</strong> after the prepare step). The default <strong>Setup/config.yml</strong> <code>fedora_version</code> is updated for you if you use <strong>Build_Remix_Physical.sh</strong>; otherwise set it before or between prepare steps.</p>
+<p>Perform system and package customizations by modifying the <strong>FedoraRemix.ks</strong> kickstart file and the <strong>FedoraRemixPackages.ks</strong> file (under <strong>/livecd-creator/FedoraRemix</strong> after the prepare step). The default <strong>Setup/config.yml</strong> <code>fedora_version</code> is updated for you if you use <strong>Build_Remix_Physical.sh</strong>; otherwise use <strong>Update_Remix_Config.sh</strong> or set <code>fedora_version</code> (and PXE settings) before or between prepare steps.</p>
 <div class="olist loweralpha">
 <ol class="loweralpha" type="a">
 <li>
 <p>The setup scripts create the <strong>/livecd-creator/FedoraRemix</strong> directory. That is where you edit kickstarts and where the ISO (e.g. <strong>FedoraRemix.iso</strong>) is written after a successful build.</p>
 <div class="listingblock">
-<div class="title">Listing 32. FedoraRemix.ks</div>
+<div class="title">Listing 30. FedoraRemix.ks</div>
 <div class="content">
 <pre class="highlight"><code class="language-bash" data-lang="bash">... OUTPUT OMITTED ...
 
@@ -1934,7 +1994,7 @@ git clone https://github.com/tmichett/bash-git-prompt.git /opt/bash-git-prompt -
 </div>
 </div>
 <div class="listingblock">
-<div class="title">Listing 33. FedoraPackages.ks</div>
+<div class="title">Listing 31. FedoraPackages.ks</div>
 <div class="content">
 <pre class="highlight"><code class="language-bash" data-lang="bash">... OUTPUT OMITTED ...
 
@@ -1963,7 +2023,7 @@ podman-machine
 <li>
 <p>Execute <strong>Enhanced_Remix_Build_Script.sh</strong> in <strong>/livecd-creator/FedoraRemix</strong> to start the build (or rely on the last step of <strong>Build_Remix_Physical.sh</strong>). For a non-default kickstart, set <strong>REMIX_KICKSTART</strong> (e.g. <code>sudo env REMIX_KICKSTART=FedoraRemixCosmic ./Enhanced_Remix_Build_Script.sh</code>). Depending on system and network speed and kickstart changes, the process can take on the order of an hour.</p>
 <div class="listingblock">
-<div class="title">Listing 34. Launch the enhanced build script</div>
+<div class="title">Listing 32. Launch the enhanced build script</div>
 <div class="content">
 <pre class="highlight"><code class="language-bash" data-lang="bash">travis@localhost-fedoraremix-live [/livecd-creator/FedoraRemix] | (05/09/25 @ 16:09)
 $ time sudo ./Enhanced_Remix_Build_Script.sh
@@ -2003,7 +2063,7 @@ sys	    5m11.054s</code></pre>
 <p>With newer Fedora releases, there is an error with the <strong>kickstart.py</strong> package and URLGrabber. Located on the "FedoraRemixTools" application, I&#8217;ve included a button to "FIX" the issue with the <strong>kickstart.py</strong> package. After completing the fix, you will no longer get the issue.</p>
 </div>
 <div class="listingblock">
-<div class="title">Listing 35. Python <strong>kickstart.py</strong> Errors</div>
+<div class="title">Listing 33. Python <strong>kickstart.py</strong> Errors</div>
 <div class="content">
 <pre class="highlight"><code class="language-bash" data-lang="bash">Traceback (most recent call last):
   File "/usr/sbin/livecd-creator", line 265, in &lt;module&gt;
