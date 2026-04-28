@@ -7,6 +7,57 @@ import urllib.request
 import sys
 import yaml
 
+def parse_bool(value):
+    """Parse common boolean string values into True/False/None."""
+    if isinstance(value, bool):
+        return value
+    if value is None:
+        return None
+    if isinstance(value, (int, float)):
+        return bool(value)
+
+    value_str = str(value).strip().lower()
+    if value_str in {"y", "yes", "true", "1", "on"}:
+        return True
+    if value_str in {"n", "no", "false", "0", "off"}:
+        return False
+    return None
+
+def prompt_yes_no(prompt, default=True):
+    """Prompt for yes/no and return bool."""
+    suffix = "[Y/n]" if default else "[y/N]"
+    while True:
+        response = input(f"{prompt} {suffix}: ").strip()
+        if not response:
+            return default
+        parsed = parse_bool(response)
+        if parsed is not None:
+            return parsed
+        print("Please answer yes or no.")
+
+def resolve_include_pxeboot_files(config):
+    """
+    Determine whether PXEBoot files should be downloaded.
+    Priority:
+    1) REMIX_INCLUDE_PXEBOOT environment variable
+    2) include_pxeboot_files in config.yml
+    3) interactive prompt (if terminal available)
+    4) default True in non-interactive mode (backward compatible)
+    """
+    env_value = parse_bool(os.environ.get("REMIX_INCLUDE_PXEBOOT"))
+    if env_value is not None:
+        return env_value
+
+    config_value = parse_bool(config.get("include_pxeboot_files"))
+    if config_value is not None:
+        return config_value
+
+    if sys.stdin.isatty():
+        return prompt_yes_no("Include PXEBoot files in web assets?", default=True)
+
+    print("include_pxeboot_files is not defined; defaulting to enabled.")
+    return True
+
 def run_command(command, shell=False):
     """Run a shell command and return the output"""
     cmd_str = ' '.join(command) if isinstance(command, list) else command
@@ -130,6 +181,9 @@ def main():
     fedora_boot_files = config['fedora_boot_files']
     fedora_version = config['fedora_version']
     web_root = config['web_root']
+    include_pxeboot_files = resolve_include_pxeboot_files(config)
+
+    print(f"PXEBoot files enabled: {include_pxeboot_files}")
     
     # Install required packages
     install_packages("httpd")
@@ -164,14 +218,17 @@ def main():
     clone_git_repo("https://github.com/tmichett/FedoraRemixCustomize.git", f"{web_root}/FedoraRemixCustomize")
     clone_git_repo("https://github.com/tmichett/PXEServer.git", f"{web_root}/PXEServer")
     
-    # Create PXE Boot Files directory
-    create_directory(f"{web_root}/FedoraRemixPXE")
-    
-    # Download Boot Images for PXEBoot
-    for file in fedora_boot_files:
-        url = f"https://download.fedoraproject.org/pub/fedora/linux/releases/{fedora_version}/Server/x86_64/os/images/pxeboot/{file}"
-        dest = f"{web_root}/FedoraRemixPXE/{file}"
-        download_file(url, dest)
+    if include_pxeboot_files:
+        # Create PXE Boot Files directory
+        create_directory(f"{web_root}/FedoraRemixPXE")
+
+        # Download Boot Images for PXEBoot
+        for file in fedora_boot_files:
+            url = f"https://download.fedoraproject.org/pub/fedora/linux/releases/{fedora_version}/Server/x86_64/os/images/pxeboot/{file}"
+            dest = f"{web_root}/FedoraRemixPXE/{file}"
+            download_file(url, dest)
+    else:
+        print("Skipping PXEBoot files download (disabled by configuration).")
     
     # Create and Synchronize Scripts Directory
     scripts_dir = "../YAD/scripts"

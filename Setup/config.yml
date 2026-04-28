@@ -10,3 +10,5 @@ fedora_version: 43
 
 # Web root directory where files will be served
 web_root: "/var/www/html"
+
+include_pxeboot_files: false

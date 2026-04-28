@@ -32,6 +32,7 @@ readonly PREPARE_WEB="$SETUP_DIR/Prepare_Web_Files.py"
 readonly ENHANCED_SCRIPT="$SETUP_DIR/Enhanced_Remix_Build_Script.sh"
 
 SELECTED_KICKSTART=""
+INCLUDE_PXEBOOT=""
 
 print_message() {
     local level="$1"
@@ -149,6 +150,67 @@ get_remix_fedora_version() {
         return 1
     fi
     echo "$version"
+}
+
+normalize_yes_no() {
+    local value
+    value=$(echo "$1" | tr '[:upper:]' '[:lower:]' | xargs)
+    case "$value" in
+        y|yes|true|1|on)
+            echo "true"
+            return 0
+            ;;
+        n|no|false|0|off)
+            echo "false"
+            return 0
+            ;;
+    esac
+    return 1
+}
+
+get_include_pxeboot_setting() {
+    if [ ! -f "$SETUP_CONFIG" ]; then
+        return 1
+    fi
+
+    local raw
+    raw=$(grep '^include_pxeboot_files:' "$SETUP_CONFIG" | awk '{print $2}' | tr -d '"' || true)
+    if [ -z "$raw" ]; then
+        return 1
+    fi
+
+    normalize_yes_no "$raw"
+}
+
+write_setup_include_pxeboot() {
+    local value="$1"
+    if grep -q '^include_pxeboot_files:' "$SETUP_CONFIG"; then
+        sed -i "s/^include_pxeboot_files:.*/include_pxeboot_files: ${value}/" "$SETUP_CONFIG"
+    else
+        printf '\ninclude_pxeboot_files: %s\n' "$value" >> "$SETUP_CONFIG"
+    fi
+}
+
+prompt_include_pxeboot() {
+    local default="${1:-true}"
+    local prompt_suffix="[Y/n]"
+    [ "$default" = "false" ] && prompt_suffix="[y/N]"
+    local input=""
+    local normalized=""
+
+    while true; do
+        read -r -p "$(echo -e "${BOLD}${WHITE}Include PXEBoot files in web assets? ${prompt_suffix}: ${NC}")" input
+        if [ -z "$input" ]; then
+            echo "$default"
+            return
+        fi
+        normalized=$(normalize_yes_no "$input" || true)
+        if [ -n "$normalized" ]; then
+            echo "$normalized"
+            return
+        fi
+        print_message "WARNING" "Please answer yes or no."
+    done
 }
 
 validate_fedora_version() {
@@ -278,6 +340,23 @@ main() {
         validate_fedora_version "$target_version" || exit 1
     fi
 
+    local include_pxeboot_setting
+    if [ -n "${REMIX_INCLUDE_PXEBOOT:-}" ]; then
+        include_pxeboot_setting=$(normalize_yes_no "${REMIX_INCLUDE_PXEBOOT}" || true)
+        if [ -z "$include_pxeboot_setting" ]; then
+            print_message "ERROR" "Invalid REMIX_INCLUDE_PXEBOOT value: ${REMIX_INCLUDE_PXEBOOT} (use true/false)"
+            exit 1
+        fi
+    else
+        include_pxeboot_setting=$(get_include_pxeboot_setting || true)
+        if [ -z "$include_pxeboot_setting" ]; then
+            print_message "INFO" "Setup/config.yml has no include_pxeboot_files setting."
+            include_pxeboot_setting=$(prompt_include_pxeboot "true")
+        fi
+    fi
+
+    INCLUDE_PXEBOOT="$include_pxeboot_setting"
+
     if [ -z "$SELECTED_KICKSTART" ]; then
         show_kickstart_menu "$SCRIPT_DIR"
     fi
@@ -294,6 +373,7 @@ main() {
     echo -e "${BOLD}${CYAN}╠══════════════════════════════════════════════════════════════════════╣${NC}"
     echo -e "${BOLD}${CYAN}║${NC}  ${GREEN}Setup/config.yml${NC}  fedora_version → ${WHITE}${target_version}${NC}                          ${BOLD}${CYAN}║${NC}"
     echo -e "${BOLD}${CYAN}║${NC}  ${GREEN}Kickstart${NC}         ${WHITE}${SELECTED_KICKSTART}.ks${NC}                                  ${BOLD}${CYAN}║${NC}"
+    echo -e "${BOLD}${CYAN}║${NC}  ${GREEN}PXEBoot files${NC}     ${WHITE}${INCLUDE_PXEBOOT}${NC}                                            ${BOLD}${CYAN}║${NC}"
     echo -e "${BOLD}${CYAN}║${NC}  ${GREEN}Work directory${NC}    ${WHITE}${LIVECD_WORKDIR}${NC}                              ${BOLD}${CYAN}║${NC}"
     echo -e "${BOLD}${CYAN}╚══════════════════════════════════════════════════════════════════════╝${NC}"
     echo ""
@@ -308,12 +388,14 @@ main() {
 
     write_setup_fedora_version "$target_version"
     print_message "SUCCESS" "Updated $SETUP_CONFIG (fedora_version: $target_version)"
+    write_setup_include_pxeboot "$INCLUDE_PXEBOOT"
+    print_message "SUCCESS" "Updated $SETUP_CONFIG (include_pxeboot_files: $INCLUDE_PXEBOOT)"
 
     print_message "INFO" "Running Prepare_Fedora_Remix_Build.py (sudo python3, cwd: Setup)..."
     (cd "$SETUP_DIR" && sudo python3 ./Prepare_Fedora_Remix_Build.py)
 
     print_message "INFO" "Running Prepare_Web_Files.py (sudo python3, cwd: Setup)..."
-    (cd "$SETUP_DIR" && sudo python3 ./Prepare_Web_Files.py)
+    (cd "$SETUP_DIR" && sudo env REMIX_INCLUDE_PXEBOOT="$INCLUDE_PXEBOOT" python3 ./Prepare_Web_Files.py)
 
     if [ ! -d "$LIVECD_WORKDIR" ]; then
         print_message "ERROR" "Expected directory missing after prepare: $LIVECD_WORKDIR"
@@ -325,9 +407,9 @@ main() {
         exit 1
     fi
 
-    print_message "INFO" "Starting livecd build in $LIVECD_WORKDIR (REMIX_KICKSTART=${SELECTED_KICKSTART})..."
+    print_message "INFO" "Starting livecd build in $LIVECD_WORKDIR (REMIX_KICKSTART=${SELECTED_KICKSTART}, REMIX_INCLUDE_PXEBOOT=${INCLUDE_PXEBOOT})..."
     echo ""
-    (cd "$LIVECD_WORKDIR" && sudo env REMIX_KICKSTART="$SELECTED_KICKSTART" ./Enhanced_Remix_Build_Script.sh)
+    (cd "$LIVECD_WORKDIR" && sudo env REMIX_KICKSTART="$SELECTED_KICKSTART" REMIX_INCLUDE_PXEBOOT="$INCLUDE_PXEBOOT" ./Enhanced_Remix_Build_Script.sh)
     local build_rc=$?
 
     echo ""
