@@ -703,7 +703,7 @@ See [Quickstart_Container.md](Quickstart_Container.md) for the container method.
 - **Main README:** [README.md](README.md) - Project overview
 - **Build Fixes:** [LINUX_BUILD_FIX.md](LINUX_BUILD_FIX.md) - Known issues and solutions
 - **SELinux Fix:** [SELINUX_RELABEL_FIX.md](SELINUX_RELABEL_FIX.md) - SELinux relabeling fix details
-- **Extended Docs:** [README.adoc](README.adoc) - Detailed documentation
+- **Docs folder:** [docs/README.adoc](docs/README.adoc)
 
 ### Repository Links
 

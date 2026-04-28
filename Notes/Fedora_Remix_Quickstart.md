@@ -117,8 +117,10 @@ sudo dnf install -y \
     python3 \
     vim \
     git \
-    rsync \
-    util-linux-script
+    rsync
+
+# Fedora 42+: install util-linux-script if you need standalone script(1) split from util-linux
+# (Prepare_Fedora_Remix_Build.py adds this automatically on F42+.)
 
 # HTTP server for hosting files during build
 sudo dnf install -y httpd
@@ -142,24 +144,24 @@ sudo dnf install -y curl wget
 | `vim` | Text editor for configuration |
 | `git` | Version control and repository cloning |
 | `rsync` | File synchronization |
-| `util-linux-script` | Script command for build logging |
+| `util-linux-script` | (Fedora 42+) Optional; `script` for livecd logging — on older Fedora it is in **`util-linux`** |
 
 ### Manual Build Steps (Without Container)
 
+Prefer **`./Build_Remix_Physical.sh`** from the Fedora_Remix repo root (sets version/PXE prompts, runs prepare scripts, then the enhanced livecd build).
+
+Manual equivalent — **prepare build tree first**, then web files ([README_Scripts_Usage.md](../README_Scripts_Usage.md)):
+
 ```bash
-# 1. Navigate to the Setup directory
 cd Fedora_Remix/Setup
 
-# 2. Run the web files preparation script
-sudo python3 Prepare_Web_Files.py
-
-# 3. Run the build preparation script
+# 1. Create /livecd-creator/FedoraRemix and copy kickstarts/scripts
 sudo python3 Prepare_Fedora_Remix_Build.py
 
-# 4. Navigate to the build directory
-cd /livecd-creator/FedoraRemix
+# 2. Configure httpd / web assets (optional: PXE files per Setup/config.yml)
+sudo python3 Prepare_Web_Files.py
 
-# 5. Run the build script
+cd /livecd-creator/FedoraRemix
 sudo ./Enhanced_Remix_Build_Script.sh
 ```
 
@@ -188,23 +190,16 @@ git clone https://github.com/tmichett/Fedora_Remix_Tools.git
 
 ### Step 2: Configure the Build
 
-1. **Edit RemixBuilder `config.yml`**:
+1. **In your `Fedora_Remix` clone**, align versions and PXE options (recommended):
+   ```bash
+   cd Fedora_Remix
+   ./Update_Remix_Config.sh
+   ```
+   Then edit root **`config.yml`** for paths: **`SSH_Key_Location`**, **`Fedora_Remix_Location`**, **`GitHub_Registry_Owner`** (image name is derived from owner + **`Fedora_Version`**).
 
-```yaml
-Container_Properties:
-  Fedora_Version: "43"                              # Target Fedora version
-  SSH_Key_Location: "~/.ssh/github_id"              # Your GitHub SSH key
-  Fedora_Remix_Location: "/path/to/Fedora_Remix"   # Path to Fedora_Remix project
-  GitHub_Registry_Owner: "your-username"            # GitHub username
-  Image_Name: "ghcr.io/your-username/fedora-remix-builder:43"
-```
+2. **RemixBuilder `config.yml`** (if you build/push the container image from [RemixBuilder](https://github.com/tmichett/RemixBuilder)): set **`Fedora_Version`** to the same numeric release as **`Fedora_Remix/Setup/config.yml`**. Optionally copy this file into the Fedora_Remix repo root for **`Build_Remix.sh`**.
 
-2. **Verify version consistency** in `Fedora_Remix/Setup/config.yml`:
-
-```yaml
-fedora_version: 43  # Must match RemixBuilder config
-web_root: "/var/www/html"
-```
+3. **`Fedora_Remix/Setup/config.yml`** — after **`Update_Remix_Config.sh`**, **`fedora_version`** matches **`Fedora_Version`**; keep **`web_root`** and **`include_pxeboot_files`** as documented in [Quickstart_Container.md](../Quickstart_Container.md).
 
 ### Step 3: Build and Run
 
@@ -216,7 +211,8 @@ cd RemixBuilder
 # Option B: Use pre-built container from registry
 # (Skip build.sh if image already exists)
 
-# Run the build
+# Run the build from the Fedora_Remix repo root (where Build_Remix.sh lives)
+cd /path/to/Fedora_Remix
 ./Build_Remix.sh
 ```
 
@@ -233,33 +229,20 @@ After successful build, the ISO is located at:
 
 ### Where to Change the Fedora Version
 
-When building for a new Fedora version (e.g., upgrading from 43 to 44), you must update the version in **multiple locations**:
+When building for a new Fedora version (e.g., upgrading from 43 to 44), keep settings aligned.
 
-#### 1. RemixBuilder Configuration
+**Fastest:** from **`Fedora_Remix`**, run **`./Update_Remix_Config.sh`** — it updates **`Fedora_Version`** (root `config.yml`) and **`fedora_version`** (`Setup/config.yml`) together.
 
-**File:** `RemixBuilder/config.yml`
+#### 1. RemixBuilder Configuration (container image)
 
-```yaml
-Container_Properties:
-  Fedora_Version: "43"  # ← Change this to your target version
-  # ...
-  Image_Name: "ghcr.io/your-username/fedora-remix-builder:43"  # ← Update tag to match
-```
-
-This controls:
-- The base Fedora image used for the container
-- The container image tag
+**File:** `RemixBuilder/config.yml` — set **`Fedora_Version`** to your target (e.g. `"44"`). Image tag is **`ghcr.io/{GitHub_Registry_Owner}/fedora-remix-builder:{Fedora_Version}`** (no separate `Image_Name` field in current trees).
 
 #### 2. Setup Configuration
 
-**File:** `Fedora_Remix/Setup/config.yml`
-
-```yaml
-fedora_version: 43  # ← Change this to your target version
-```
+**File:** `Fedora_Remix/Setup/config.yml` — **`fedora_version`** must match **`Fedora_Version`**. Use **`Update_Remix_Config.sh`** or edit by hand.
 
 This controls:
-- PXE boot file downloads from the correct Fedora version
+- PXE boot file downloads from the correct Fedora version (when **`include_pxeboot_files`** is true)
 - Version displayed in build messages
 
 #### 3. Build Scripts (Automatic)
@@ -531,6 +514,7 @@ fedora_boot_files:
   - "initrd.img"
 fedora_version: 43
 web_root: "/var/www/html"
+include_pxeboot_files: false
 ```
 
 ### `Prepare_Fedora_Remix_Build.py`
@@ -541,7 +525,8 @@ This script prepares the livecd-creator build environment.
 
 1. **Installs Required Packages**
    ```python
-   remix_packages = ["vim", "livecd-tools", "sshfs", "util-linux-script"]
+   remix_packages = ["vim", "livecd-tools", "sshfs"]
+   # util-linux-script appended on Fedora 42+ (see Prepare_Fedora_Remix_Build.py)
    install_packages(remix_packages)
    ```
 
@@ -722,15 +707,14 @@ fzf
 ### FedoraRemixRepos.ks - Third-Party Repositories
 
 ```kickstart
-# Extra Repos
+# Extra Repos (RPM Fusion uses metalinks; eza ships from Fedora rust-eza — see FedoraRemixRepos.ks)
+repo --name="rpmfusion-free" --mirrorlist=https://mirrors.rpmfusion.org/metalink?repo=free-fedora-$releasever&arch=$basearch
+repo --name="rpmfusion-nonfree" --mirrorlist=https://mirrors.rpmfusion.org/metalink?repo=nonfree-fedora-$releasever&arch=$basearch
 repo --name="google-chrome" --baseurl=http://dl.google.com/linux/chrome/rpm/stable/x86_64
 repo --name="vscode" --baseurl=https://packages.microsoft.com/yumrepos/vscode
-repo --name="rpmfusion-free" --baseurl=https://download1.rpmfusion.org/free/fedora/releases/$releasever/Everything/$basearch/os/
-repo --name="rpmfusion-nonfree" --baseurl=https://download1.rpmfusion.org/nonfree/fedora/releases/$releasever/Everything/$basearch/os/
 repo --name="GithubCLITools" --baseurl=https://cli.github.com/packages/rpm
 repo --name="DUST-COPR" --baseurl=https://download.copr.fedorainfracloud.org/results/gourlaysama/dust/fedora-$releasever-$basearch/
 repo --name="YAZI-COPR" --baseurl=https://download.copr.fedorainfracloud.org/results/lihaohong/yazi/fedora-$releasever-$basearch/
-repo --name="EZA-COPR" --baseurl=https://download.copr.fedorainfracloud.org/results/alternateved/eza/fedora-$releasever-$basearch/
 repo --name="FedoraRemix-COPR" --baseurl=https://download.copr.fedorainfracloud.org/results/tmichett/FedoraRemix/fedora-$releasever-$basearch/
 ```
 
