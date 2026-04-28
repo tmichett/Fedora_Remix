@@ -56,7 +56,7 @@ sudo dnf install -y ansible-core
 **Purpose**: Sets up the build environment for creating Fedora Remix ISOs.
 
 **What it does**:
-- Installs essential packages (`vim`, `livecd-tools`, `sshfs`)
+- Installs essential packages (`vim`, `livecd-tools`, `sshfs`; adds `util-linux-script` on Fedora 42 and later — on older releases `script(1)` comes from `util-linux`)
 - Creates build directories (`/livecd-creator/FedoraRemix`, `/livecd-creator/package-cache`)
 - Copies kickstart files to the build location
 - Copies the build script with proper permissions
@@ -70,7 +70,7 @@ sudo dnf install -y ansible-core
 
 **What it does**:
 - Installs and configures Apache HTTP server
-- Downloads Fedora boot files for PXE booting
+- When **`include_pxeboot_files`** is true (or overridden by **`REMIX_INCLUDE_PXEBOOT`**), downloads Fedora boot images for PXE; otherwise skips PXE binaries
 - Sets up web directories and file structure
 - Clones related Git repositories
 - Configures Apache for file serving
@@ -110,12 +110,16 @@ fedora_version: 42
 
 # Web root directory where files will be served
 web_root: "/var/www/html"
+
+# When false, skip downloading vmlinuz/initrd for PXE (recommended if not network-booting)
+include_pxeboot_files: false
 ```
 
 **Customization Options**:
 - `fedora_boot_files`: List of boot files to download for PXE support
 - `fedora_version`: Fedora release version for boot file downloads
 - `web_root`: Apache document root directory
+- `include_pxeboot_files`: Toggle PXE kernel/initrd fetch (align with [Update_Remix_Config.sh](Update_Remix_Config.sh), which also sets root `Container_Properties` paths and registry owner, or via [Quickstart_Physical.md](Quickstart_Physical.md) / [Quickstart_Container.md](Quickstart_Container.md))
 
 ### Kickstart Configuration
 
@@ -144,7 +148,7 @@ flowchart TD
     B --> D["Web Hosting Only<br/>Prepare_Web_Files.py"]
     B --> E["Complete Setup<br/>Both Build + Web"]
     
-    C --> F["Build Environment Setup<br/>• Install packages (livecd-tools, util-linux-script)<br/>• Create /livecd-creator/FedoraRemix/<br/>• Copy kickstart files<br/>• Copy Python scripts<br/>• Copy config.yml"]
+    C --> F["Build Environment Setup<br/>• Install packages (livecd-tools, sshfs; util-linux-script on F42+)<br/>• Create /livecd-creator/FedoraRemix/<br/>• Copy kickstart files<br/>• Copy Python scripts<br/>• Copy config.yml"]
     
     D --> G["Web Hosting Setup<br/>• Install Apache httpd<br/>• Download Fedora boot files<br/>• Setup /var/www/html/ structure<br/>• Clone Git repositories<br/>• Copy extensions & tools"]
     
@@ -195,7 +199,10 @@ sudo python3 Prepare_Fedora_Remix_Build.py
 # Ensure you're in the Setup directory
 cd /path/to/Fedora_Remix/Setup
 
-# Edit configuration if needed
+# Optional: edit include_pxeboot_files / fedora_version (repo root helper):
+# cd .. && ./Update_Remix_Config.sh
+
+# Edit Setup/config.yml if needed
 vim config.yml
 
 # Run the Python web setup script as root
@@ -204,7 +211,7 @@ sudo python3 Prepare_Web_Files.py
 
 **What happens**:
 - Installs and configures Apache
-- Downloads Fedora boot files for PXE
+- If enabled in config, downloads Fedora boot files for PXE
 - Sets up web directory structure
 - Clones additional repositories
 - Enables HTTP service

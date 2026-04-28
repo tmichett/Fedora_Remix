@@ -270,24 +270,22 @@ Instead of directly running:
 
 ### 3. Update Both Files Together
 
-When updating to a new Fedora version:
+When updating to a new Fedora version, keep **`Fedora_Version`** and **`fedora_version`** (and **PXE**, if you care) aligned.
 
-1. Update `config.yml`:
-   ```bash
-   vim config.yml
-   # Change Fedora_Version: "43" to "44"
-   ```
+**Recommended (from the Fedora_Remix repo root):**
+```bash
+./Update_Remix_Config.sh
+```
+This updates **`Container_Properties`** in root `config.yml` (`SSH_Key_Location`, `Fedora_Remix_Location`, `GitHub_Registry_Owner`, `Fedora_Version`) and `Setup/config.yml` (`fedora_version`, `include_pxeboot_files`) together. If you pull **`ghcr.io/tmichett/fedora-remix-builder`**, leave **`GitHub_Registry_Owner`** as **`tmichett`**. See [Quickstart_Container.md](Quickstart_Container.md) or [Quickstart_Physical.md](Quickstart_Physical.md).
 
-2. Update `Setup/config.yml`:
-   ```bash
-   vim Setup/config.yml
-   # Change fedora_version: 43 to 44
-   ```
+**Manual alternative:**
+1. Update `config.yml` (`Fedora_Version`)
+2. Update `Setup/config.yml` (`fedora_version`, `include_pxeboot_files` as needed)
 
-3. Verify the changes:
-   ```bash
-   ./Verify_Build_Remix.sh
-   ```
+**Then verify:**
+```bash
+./Verify_Build_Remix.sh
+```
 
 ---
 

@@ -1,5 +1,12 @@
 # Fedora Remix Builder - Quick Reference Card
 
+## Configuration snapshot
+
+```bash
+cd /home/travis/Github/Fedora_Remix
+./Update_Remix_Config.sh    # SSH path, remix dir, registry owner, Fedora + PXE; syncs root config.yml + Setup/config.yml (keep owner tmichett for ghcr.io/tmichett/…)
+```
+
 ## Building an ISO
 
 ```bash
@@ -83,14 +90,13 @@ cd /home/travis/Github/Fedora_Remix
 **Solution**: Update to latest scripts (includes Python version detection)  
 **Details**: See [LINUX_BUILD_FIX.md](LINUX_BUILD_FIX.md)
 
-### ❌ "Could not extract Image_Name from config.yml"
-```bash
-# Check config.yml format
-cat config.yml
+### ❌ "Could not extract … from config.yml"
 
-# Should have:
-Container_Properties:
-  Image_Name: "ghcr.io/tmichett/fedora-remix-builder:43"
+```bash
+cat config.yml
+# Contemporary trees use Container_Properties.Fedora_Version + GitHub_Registry_Owner
+# Image name defaults to: ghcr.io/{GitHub_Registry_Owner}/fedora-remix-builder:{Fedora_Version}
+./Update_Remix_Config.sh   # if versions are out of sync
 ```
 
 ### ❌ Container stuck in "Stopping" state

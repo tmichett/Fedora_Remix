@@ -7,11 +7,24 @@
 :docdate: April 28, 2026
 
 [.lead]
-Quick guide to building a custom Fedora Remix ISO using the containerized build system.
+Quick guide to building a custom Fedora Remix ISO using the Fedora Remix Builder container (`Build_Remix.sh` / `Verify_Build_Remix.sh`).
 
 == Overview
 
-This guide will walk you through building a custom Fedora Remix ISO image using the Fedora Remix Builder container. The entire build process runs in a container, making it consistent across different systems.
+This guide walks you through a **Podman-based** remix build: the workload runs inside the **fedora-remix-builder** image; your host stays outside the compose except for bind-mounted workspace and ISO output paths.
+
+.Standard configuration order (recommended)
+[start=1]
+. *Clone:* `git clone https://github.com/tmichett/Fedora_Remix.git` and `cd Fedora_Remix`.
+. *Configure:* run `./Update_Remix_Config.sh` — prompts for `SSH_Key_Location`, `Fedora_Remix_Location`, `GitHub_Registry_Owner`, `Fedora_Version`, and PXE (`include_pxeboot_files`). Press *Enter* at any prompt to keep the value shown in brackets (defaults come from `config.yml`). Optionally pre-seed `config.yml` so those defaults match your host (see *Step 2*).
+. *Verify / build:* `./Verify_Build_Remix.sh` (recommended) or `./Build_Remix.sh`.
+
+[NOTE]
+====
+If you use the *published* builder image at `ghcr.io/tmichett/fedora-remix-builder`, keep `GitHub_Registry_Owner` set to `tmichett` so pulls and verification resolve the same image (the script reminds you before that prompt).
+====
+
+PXE/web assets (`Prepare_Web_Files.py` inside the build): enable `include_pxeboot_files` only when you intentionally stage **`vmlinuz`** / **`initrd`** for network boot tooling. Use *false* (answer *no*) for a normal ISO-only build—see IMPORTANT under *Step 3* below; fragile mirrors on older or unreleased Fedora can fail the prepare step if PXE downloads are forced on.
 
 [cols="1,3"]
 |===
@@ -57,6 +70,8 @@ sudo dnf install osbuild-selinux
 . *Sudo Access* - Required for loop device creation on Linux
 ** The build script will automatically use `sudo` when needed
 
+. *Editor* - Examples use `vim`; `nano`, VS Code, or any editor works for YAML and kickstarts
+
 === Optional: Enable SSH for Remote Access
 
 If you are connecting to the build system *remotely* (e.g., SSHing in from another machine to run builds), enable the SSH daemon:
@@ -80,7 +95,7 @@ This is not needed if you are working directly on the build machine.
 
 === Supported Operating Systems
 
-* ✅ Fedora Linux (39, 40, 41, 42, 43)
+* ✅ Fedora Linux (39–44; newer releases track current Fedora Remix builder tags)
 * ✅ RHEL/CentOS/Rocky/Alma Linux (8, 9)
 * ✅ Ubuntu/Debian (with Podman installed)
 * ✅ macOS (with Podman Desktop)
@@ -98,9 +113,11 @@ git clone https://github.com/tmichett/Fedora_Remix.git
 cd Fedora_Remix
 ----
 
-=== Step 2: Container-specific settings in `config.yml`
+=== Step 2 (OPTIONAL - covered in Step 3): Container-specific settings in `config.yml`
 
-Edit the main configuration file for paths and registry that the container build uses (SSH key, ISO output directory, GitHub Container Registry owner). You can set `Fedora_Version` here or rely on *Update_Remix_Config.sh* (next step) to align `Fedora_Version` and *Setup/config.yml* for you.
+The repository root **`config.yml`** holds `Container_Properties` used by *Build_Remix.sh* / *Verify_Build_Remix.sh*. You do *not* have to edit this file by hand: **`./Update_Remix_Config.sh`** (Step 3) prompts for `SSH_Key_Location`, `Fedora_Remix_Location`, `GitHub_Registry_Owner`, `Fedora_Version`, and `include_pxeboot_files` (PXE), writing values back to YAML safely.
+
+*When to edit here first:* copy in a `config.yml` from another machine, or set paths/registry before running the script — those values become the *[bracket]* defaults at each prompt. You *may* still set `Fedora_Version` temporarily; Step 3 aligns `Fedora_Version`, `fedora_version` (*Setup/config.yml*), and PXE whenever you run it.
 
 [source,bash]
 ----
@@ -133,7 +150,7 @@ Container_Properties:
 |Where the ISO and build artifacts will be saved
 
 |`GitHub_Registry_Owner`
-|GitHub username/org that hosts the container image
+|Used in `ghcr.io/{owner}/fedora-remix-builder:{tag}`. If you pull the *published* `ghcr.io/tmichett/...` image, keep this `tmichett` (the script reminds you before this prompt).
 |===
 
 .Example Configuration
@@ -146,17 +163,23 @@ Container_Properties:
   GitHub_Registry_Owner: "tmichett"
 ----
 
-=== Step 3: Fedora release and PXE (*Update_Remix_Config.sh* — recommended)
+=== Step 3: Paths, registry, Fedora release, and PXE (*Update_Remix_Config.sh* — recommended)
 
-Instead of manually editing `Fedora_Version` in `config.yml` and `fedora_version` / `include_pxeboot_files` in *Setup/config.yml*, run from the repository root:
+Instead of manually editing *Container_Properties* in `config.yml` and `fedora_version` / `include_pxeboot_files` in *Setup/config.yml*, run from the repository root:
 
 [source,bash]
 ----
-chmod +x Update_Remix_Config.sh
+chmod +x Update_Remix_Config.sh   # once (if needed)
 ./Update_Remix_Config.sh
 ----
 
-The script prompts for the Fedora release and whether to download **PXE Linux** boot artifacts into the web prepare step (*include_pxeboot_files*). When *true*, container prepare stages `vmlinuz` and `initrd.img` for optional **network (PXE/HTTP) boot** tooling on the Remix. If you answer *no*, PXE assets are skipped.
+*Prompts (in order)* — *Enter* keeps the *[bracket]* default (from `config.yml` if present):
+
+. `SSH_Key_Location` — SSH key path for git operations in the container workflow
+. `Fedora_Remix_Location` — host directory for ISO output and build artifacts
+. `GitHub_Registry_Owner` — used to build `ghcr.io/{owner}/fedora-remix-builder:{tag}`; the script prints a reminder that if you use the *published* image under `ghcr.io/tmichett/...`, this value should stay `tmichett`
+. **Fedora release** — sets `Fedora_Version` and `fedora_version` together
+. **PXE/Linux boot images** — whether to download **PXE Linux** artifacts into the web prepare step (*include_pxeboot_files*). When *true*, container prepare stages `vmlinuz` and `initrd.img` for optional **network (PXE/HTTP) boot** tooling on the Remix. If you answer *no*, PXE assets are skipped.
 
 [IMPORTANT]
 ====
@@ -193,10 +216,11 @@ Run the verification script to check your configuration:
 ----
 
 .What it checks
-* ✅ Fedora versions match between both config files
-* ✅ Container image availability
-* ✅ Configuration summary
-* ✅ Confirms before building
+* ✅ `Fedora_Version` (`config.yml`) matches `fedora_version` (`Setup/config.yml`)
+* ✅ Prints **`include_pxeboot_files`** in the remix summary panel (PXE payloads for web prepare)
+* ✅ If **`include_pxeboot_files`** is missing from **`Setup/config.yml`**, prompts once and persists the answer (unless **`REMIX_INCLUDE_PXEBOOT`**=`true`|`false` is set in the environment)
+* ✅ Resolves **`ghcr.io/{owner}/fedora-remix-builder:{tag}`**, confirms or pulls image
+* ✅ Confirms before handing off to `./Build_Remix.sh` — passes **`REMIX_INCLUDE_PXEBOOT`** through so container prepare honors your PXE choice
 
 .Sample Output
 ----
@@ -216,24 +240,51 @@ Do you want to proceed with the build? [y/N]: y
 
 === Step 5: Build the ISO
 
-If you used the verification script and confirmed, the build starts automatically.
+If you confirmed at the end of *Step 4*, the build starts automatically (`Verify_Build_Remix.sh` invokes `./Build_Remix.sh`).
 
-Otherwise, run the build script directly:
+Otherwise:
 
 [source,bash]
 ----
 ./Build_Remix.sh
 ----
 
-.Build Process
-. Container starts with systemd
-. Prepares build environment
-. Downloads and installs packages (~15-20 minutes)
-. Runs post-installation scripts
-. Creates the ISO image (~5-10 minutes)
-. ISO saved to your configured output directory
+==== Default detached mode / log streaming
 
-.Expected Output Location
+Unless you pass `--attach` or set `REMIX_BUILD_ATTACH=1`, `./Build_Remix.sh` keeps the builder container detached and streams output by following `/tmp/entrypoint.log` in your current terminal (no separate `podman logs` pane required).
+
+==== Stop container after ISO work
+
+When the log follow ends:
+
+[source,bash]
+----
+podman stop remix-builder
+----
+
+Match **`sudo`** to how invoked on your machine (`sudo podman stop remix-builder`, etc.).
+
+==== Attach-old-behavior toggle
+
+Pass `--attach` (or **`REMIX_BUILD_ATTACH=1`**) only if you want the shell attached directly to the container PID 1 stream instead of the host-followed `/tmp/entrypoint.log`.
+
+==== `REMIX_INCLUDE_PXEBOOT` (PXE payloads)
+
+`Verify_Build_Remix.sh` exports **`REMIX_INCLUDE_PXEBOOT`** consistently with **`include_pxeboot_files`**. Driving builds directly:
+
+[source,bash]
+----
+REMIX_INCLUDE_PXEBOOT=false ./Build_Remix.sh
+----
+
+==== Typical entrypoint milestones
+. systemd + hydration (patches bind-mounted from repo)
+. `dnf` installs (~15–25 minutes wall clock)
+. Kickstart `%post`, squashfs assemble, xorriso (**~5–15 minutes**)
+
+.ISO path (GNOME spin default kickstart)
+
+[source,text]
 ----
 /home/travis/Remix_Builder/FedoraRemix/FedoraRemix.iso
 ----
@@ -694,8 +745,9 @@ done
 
 === Documentation
 
+* *AsciiDoctor index:* link:docs/README.adoc[docs/README.adoc]
 * *Physical/quickstart (ADOC/PDF):* link:README_Physical.adoc[README_Physical.adoc]
-* *Config helper:* link:Update_Remix_Config.sh[Update_Remix_Config.sh] — align `Fedora_Version`, `fedora_version`, PXE (`include_pxeboot_files`)
+* *Config helper:* link:Update_Remix_Config.sh[Update_Remix_Config.sh] — align `SSH_Key_Location`, `Fedora_Remix_Location`, `GitHub_Registry_Owner`, `Fedora_Version`, `fedora_version`, PXE (`include_pxeboot_files`)
 * *Main README:* link:README.md[README.md] - Project overview
 * *Build Fixes:* link:LINUX_BUILD_FIX.md[LINUX_BUILD_FIX.md] - Known issues and solutions
 * *SELinux Fix:* link:SELINUX_RELABEL_FIX.md[SELINUX_RELABEL_FIX.md] - SELinux relabeling fix details
@@ -717,14 +769,13 @@ done
 
 == Summary
 
-.Minimum Steps to Build
+.Minimum steps to build
 
-. Clone repository: `git clone https://github.com/tmichett/Fedora_Remix.git`
-. Edit root `config.yml` — SSH key, ISO output directory, registry owner
-. Run `./Update_Remix_Config.sh` — Fedora release plus PXE/Linux assets (**no** recommended unless you need PXE)
-. Run `./Verify_Build_Remix.sh` — Verify and build
-. Wait 30-45 minutes
-. Find ISO at `/home/travis/Remix_Builder/FedoraRemix/FedoraRemix.iso`
+. `git clone …/Fedora_Remix.git && cd Fedora_Remix`
+. `./Update_Remix_Config.sh` — **`SSH_Key_Location`**, **`Fedora_Remix_Location`**, **`GitHub_Registry_Owner`** (keep **`tmichett`** if using **`ghcr.io/tmichett/fedora-remix-builder`**), **`Fedora_Version`**, PXE (**no** unless serving PXE); optional pre-edit **`config.yml`** for defaults
+. `./Verify_Build_Remix.sh` (or `./Build_Remix.sh`)
+. `podman stop remix-builder` when finished inspecting logs
+. ISO beside `${Fedora_Remix_Location}/FedoraRemix/` (`/home/travis/Remix_Builder/...` in examples)
 
 .Optional Customization
 
@@ -736,4 +787,4 @@ done
 *That's it!* You now have a custom Fedora Remix ISO ready to use.
 
 [.text-center]
-_Last Updated: April 28, 2026 | Version: 1.1_
+_Last Updated: April 28, 2026 | Version: 1.4_

@@ -15,6 +15,17 @@ A customized Fedora Linux live ISO with pre-configured packages, themes, and uti
 - At least 20GB free disk space
 - SSH key for GitHub access (optional)
 
+### Configuration (before your first build)
+
+From the **repository root**, align the container tag and remix web settings in one step (recommended instead of hand-editing YAML):
+
+```bash
+chmod +x Update_Remix_Config.sh   # once
+./Update_Remix_Config.sh
+```
+
+This interactively sets **`SSH_Key_Location`**, **`Fedora_Remix_Location`**, **`GitHub_Registry_Owner`**, **`Fedora_Version`** (root `config.yml`), plus **`fedora_version`** and **`include_pxeboot_files`** (`Setup/config.yml`). PXE boot artifacts are optional; answer **no** if you only need an ISO ([Quickstart_Container.md](Quickstart_Container.md) explains when PXE can fail on old or very new Fedora versions). If you pull the **published** image from **`ghcr.io/tmichett/fedora-remix-builder`**, keep **`GitHub_Registry_Owner`** as **`tmichett`**. You can still edit **`config.yml`** by hand first so the script’s defaults match your host (Enter at each prompt keeps the shown value).
+
 ### Building the ISO (Containerized Method - Recommended)
 
 1. **Verify and configure** (Recommended):
@@ -26,15 +37,15 @@ A customized Fedora Linux live ISO with pre-configured packages, themes, and uti
    The verification script will:
    - ✅ Check Fedora versions match between config files
    - ✅ Verify container image availability
+   - ✅ Optionally confirm **PXE/web boot file** preference (`include_pxeboot_files`) if unset
    - ✅ Display configuration summary
    - ✅ Confirm before building
    - ✅ Automatically launch the build if approved
 
 2. **Or configure and build manually**:
    ```bash
-   # Edit config.yml with your settings
-   vim config.yml
-   vim Setup/config.yml  # Ensure fedora_version matches!
+   ./Update_Remix_Config.sh           # preferred: paths, registry owner, Fedora + PXE in sync
+   # optional: vim config.yml first so script defaults match your machine
    
    # Run the build
    ./Build_Remix.sh
@@ -75,7 +86,9 @@ If you're building on Linux and encounter `/sys` unmount errors, the issue has b
 
 ### Getting Started
 - **[Quickstart_Container.md](Quickstart_Container.md)** - 🚀 Complete quickstart guide for containerized builds
-- **[VERIFY_BUILD_REMIX_USAGE.md](VERIFY_BUILD_REMIX_USAGE.md)** - Verification script usage guide
+- **[Quickstart_Physical.md](Quickstart_Physical.md)** - Native (physical/VM) build with `Build_Remix_Physical.sh`
+- **[VERIFY_BUILD_REMIX_USAGE.md](VERIFY_BUILD_REMIX_USAGE.md)** — `Verify_Build_Remix.sh` walkthrough
+- **[Notes/Fedora_Remix_Quickstart.md](Notes/Fedora_Remix_Quickstart.md)** - Long-form notes (RemixBuilder + kickstarts)
 
 ### Build Methods
 - **Containerized (Recommended)** - Use `./Verify_Build_Remix.sh` or `./Build_Remix.sh`
@@ -86,14 +99,15 @@ If you're building on Linux and encounter `/sys` unmount errors, the issue has b
 - **[SELINUX_RELABEL_FIX.md](SELINUX_RELABEL_FIX.md)** - SELinux relabeling error fix (April 2026)
 
 ### Reference
-- **[README_Scripts_Usage.md](README_Scripts_Usage.md)** - Complete script documentation
-- **[README.adoc](README.adoc)** - Extended documentation and detailed information
+- **[README_Scripts_Usage.md](README_Scripts_Usage.md)** - Prepare scripts, web setup, Python workflow
+- **[docs/README.adoc](docs/README.adoc)** - Short AsciiDoc readme (docs folder)
 
 ## Project Structure
 
 ```
 Fedora_Remix/
 ├── Build_Remix.sh              # Main build script (runs container, kickstart selection)
+├── Update_Remix_Config.sh      # Interactive: SSH path, remix dir, registry owner, Fedora + PXE (config.yml + Setup/config.yml)
 ├── config.yml                  # Build configuration
 ├── Setup/                      # Build preparation scripts
 │   ├── Enhanced_Remix_Build_Script.sh

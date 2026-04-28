@@ -1,1 +1,9 @@
-= README File
+= Fedora Remix documentation (AsciiDoctor)
+
+AsciiDoctor / PDF-friendly guides in this repository:
+
+* link:../README_Physical.adoc[*README_Physical.adoc*] — Physical / virtual-machine install narrative and workflow (historically paired with `./Build_Remix_Physical.sh`).
+* link:../Quickstart_Container.adoc[*Quickstart_Container.adoc*] — Podman/container build quickstart (`Update_Remix_Config.sh` aligns SSH path, remix output dir, `GitHub_Registry_Owner`, Fedora release, PXE; **`Verify_Build_Remix.sh`**, **`Build_Remix.sh`**).
+* link:../YAD/README.adoc[*YAD/README.adoc*] — Remix desktop tooling umbrella (where present).
+
+Portable Markdown equivalents live alongside these files (**`Quickstart_Physical.md`**, **`Quickstart_Container.md`**) for GitHub-centric reading.

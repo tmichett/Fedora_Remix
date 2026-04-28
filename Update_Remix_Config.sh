@@ -1,7 +1,7 @@
 #!/bin/bash
 #
-# Update_Remix_Config.sh — Interactive update of Fedora version and PXE boot options
-# in config.yml (container) and Setup/config.yml (remix / web prepare).
+# Update_Remix_Config.sh — Interactive update of Fedora version, PXE options, and container
+# properties in config.yml plus Setup/config.yml remix settings.
 #
 
 set -e
@@ -13,17 +13,56 @@ readonly SETUP_CONFIG="$SCRIPT_DIR/Setup/config.yml"
 show_usage() {
     echo "Usage: $0 [-h|--help]"
     echo ""
-    echo "Prompts for Fedora release number and whether to include PXE boot files,"
-    echo "then updates:"
-    echo "  - config.yml              → Container_Properties.Fedora_Version"
+    echo "Interactively updates:"
+    echo "  - config.yml              → Fedora_Version, SSH_Key_Location, Fedora_Remix_Location,"
+    echo "                              GitHub_Registry_Owner (under Container_Properties)"
     echo "  - Setup/config.yml        → fedora_version, include_pxeboot_files"
+    echo ""
+    echo "Press Enter at any prompt to keep the current file value shown in [brackets]."
 }
 
-get_container_fedora_version() {
+# Rewrite one Container_Properties scalar line (YAML double-quoted value). Uses Python so
+# paths and registry names are substituted safely without sed delimiter issues.
+_yaml_set_container_field() {
+    local key="$1" value="$2"
+    python3 - "$CONTAINER_CONFIG" "$key" "$value" <<'PY'
+import pathlib, re, sys
+
+path = pathlib.Path(sys.argv[1])
+key = sys.argv[2]
+value = sys.argv[3]
+
+
+def dq(s: str) -> str:
+    return '"' + s.replace("\\", "\\\\").replace('"', '\\"') + '"'
+
+
+text = path.read_text(encoding="utf-8")
+pat = rf"(^[\t ]*){re.escape(key)}:[^\n]*"
+
+def repl(m: re.Match) -> str:
+    indent = m.group(1)
+    return indent + key + ": " + dq(value)
+
+
+after, count = re.subn(pat, repl, text, count=1, flags=re.MULTILINE)
+if count != 1:
+    sys.stderr.write(f"Error: Expected exactly one '{key}' under Container_Properties in {path}\n")
+    sys.exit(1)
+path.write_text(after, encoding="utf-8")
+PY
+}
+
+get_container_field() {
+    local key="$1"
     if [ ! -f "$CONTAINER_CONFIG" ]; then
         return 1
     fi
-    grep -A 20 "Container_Properties:" "$CONTAINER_CONFIG" | grep "Fedora_Version:" | awk '{print $2}' | tr -d '"'
+    grep -A 30 "Container_Properties:" "$CONTAINER_CONFIG" | grep "^[[:space:]]*${key}:" | head -1 | sed 's/^[^:]*:[[:space:]]*//' | tr -d '"'
+}
+
+get_container_fedora_version() {
+    get_container_field Fedora_Version || true
 }
 
 get_setup_fedora_version() {
@@ -71,12 +110,7 @@ validate_fedora_version() {
 }
 
 write_container_fedora_version() {
-    local v="$1"
-    if ! grep -q '^[[:space:]]*Fedora_Version:' "$CONTAINER_CONFIG"; then
-        echo "Error: No Fedora_Version: line found in $CONTAINER_CONFIG" >&2
-        return 1
-    fi
-    sed -i "s/^\([[:space:]]*Fedora_Version:[[:space:]]*\).*/\1\"${v}\"/" "$CONTAINER_CONFIG"
+    _yaml_set_container_field Fedora_Version "$1"
 }
 
 write_setup_fedora_version() {
@@ -95,6 +129,20 @@ write_setup_include_pxeboot() {
     else
         printf '\ninclude_pxeboot_files: %s\n' "$value" >> "$SETUP_CONFIG"
     fi
+}
+
+prompt_with_default() {
+    local label="$1" default="$2"
+    local input=""
+    while true; do
+        read -r -p "${label} [${default}]: " input
+        if [ -z "$input" ]; then
+            echo "$default"
+            return
+        fi
+        echo "$input"
+        return
+    done
 }
 
 prompt_fedora_version() {
@@ -151,7 +199,21 @@ main() {
         exit 1
     fi
 
-    local cv sv default_ver pxe_default
+    local ssh_def remix_def owner_def cv sv default_ver pxe_default
+    ssh_def=$(get_container_field SSH_Key_Location || true)
+    remix_def=$(get_container_field Fedora_Remix_Location || true)
+    owner_def=$(get_container_field GitHub_Registry_Owner || true)
+
+    if [ -z "$ssh_def" ]; then
+        ssh_def='~/.ssh/github_id'
+    fi
+    if [ -z "$remix_def" ]; then
+        remix_def="/home/travis/Remix_Builder"
+    fi
+    if [ -z "$owner_def" ]; then
+        owner_def="tmichett"
+    fi
+
     cv=$(get_container_fedora_version || true)
     sv=$(get_setup_fedora_version || true)
 
@@ -166,7 +228,7 @@ main() {
 
     if [ -n "$cv" ] && [ -n "$sv" ] && [ "$cv" != "$sv" ]; then
         echo "Note: config.yml has Fedora_Version ${cv}, Setup/config.yml has fedora_version ${sv}."
-        echo "      This update will set both to the same value."
+        echo "      Fedora version prompts below set both to the same value."
         echo ""
     fi
 
@@ -180,18 +242,36 @@ main() {
     echo "Update remix configuration (container + Setup)."
     echo ""
 
-    local target_ver pxe_bool
+    echo "Container properties (saved in config.yml)."
+    echo ""
+    local ssh_val remix_val owner_val target_ver pxe_bool
+    ssh_val=$(prompt_with_default "SSH_Key_Location (git/SSH mount for the builder)" "$ssh_def")
+    remix_val=$(prompt_with_default "Fedora_Remix_Location (host path for ISO/workspace bind)" "$remix_def")
+    echo ""
+    echo "If you use the publisher images from ghcr.io/tmichett/fedora-remix-builder,"
+    echo "leave GitHub_Registry_Owner as tmichett so pulls match the published registry."
+    echo ""
+    owner_val=$(prompt_with_default "GitHub_Registry_Owner (GHCR namespace for the builder image)" "$owner_def")
+    echo ""
+
     target_ver=$(prompt_fedora_version "$default_ver")
     pxe_bool=$(prompt_pxe_boot "$pxe_default")
 
+    _yaml_set_container_field SSH_Key_Location "$ssh_val"
+    _yaml_set_container_field Fedora_Remix_Location "$remix_val"
+    _yaml_set_container_field GitHub_Registry_Owner "$owner_val"
     write_container_fedora_version "$target_ver"
     write_setup_fedora_version "$target_ver"
     write_setup_include_pxeboot "$pxe_bool"
 
     echo ""
     echo "Updated:"
-    echo "  $CONTAINER_CONFIG  → Fedora_Version \"${target_ver}\""
-    echo "  $SETUP_CONFIG      → fedora_version: ${target_ver}, include_pxeboot_files: ${pxe_bool}"
+    echo "  $CONTAINER_CONFIG"
+    echo "    → Fedora_Version \"${target_ver}\""
+    echo "    → SSH_Key_Location \"${ssh_val}\""
+    echo "    → Fedora_Remix_Location \"${remix_val}\""
+    echo "    → GitHub_Registry_Owner \"${owner_val}\""
+    echo "  $SETUP_CONFIG → fedora_version: ${target_ver}, include_pxeboot_files: ${pxe_bool}"
 }
 
 main "$@"
