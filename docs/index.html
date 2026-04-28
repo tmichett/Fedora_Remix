@@ -1653,6 +1653,9 @@ done</code></pre>
 <div class="paragraph">
 <p>This quickstart will provide a quick method to download a pre-built Fedora Remix as well as creating your own Fedora Remix Building system. The <a href="https://github.com/tmichett/Fedora_Remix" class="bare">https://github.com/tmichett/Fedora_Remix</a> has been created with Python automation scripts that will setup a Fedora Remix Building system using the Fedora Remix installed from the liveCD provided (<a href="https://drive.google.com/drive/folders/1UAT07AJIrTdMk3ke_QE6S6vz-qn6qGtR" class="bare">https://drive.google.com/drive/folders/1UAT07AJIrTdMk3ke_QE6S6vz-qn6qGtR</a>). The requirements are relatively simply to build and the system has Fedora Remix customization scripts and self-launching menu to assist with the initial setup. The quickstart and documentation are also available at the following link: <a href="https://tmichett.github.io/Fedora_Remix/" class="bare">https://tmichett.github.io/Fedora_Remix/</a>.</p>
 </div>
+<div class="paragraph">
+<p>For a Markdown walkthrough that tracks the same flow as <strong>Build_Remix_Physical.sh</strong>, see <a href="Quickstart_Physical.md">Quickstart_Physical.md</a> in the repository.</p>
+</div>
 <div class="olist arabic">
 <div class="title"><strong>Building your own Fedora Remix - Overview</strong></div>
 <ol class="arabic">
@@ -1673,33 +1676,33 @@ done</code></pre>
 <p>Clone <a href="https://github.com/tmichett/Fedora_Remix" class="bare">https://github.com/tmichett/Fedora_Remix</a></p>
 </li>
 <li>
-<p>Run the Python automation scripts with the "sudo" command</p>
+<p>Either run <strong>Build_Remix_Physical.sh</strong> from the repository root (recommended), or run the Python automation scripts manually with <code>sudo</code> from the <strong>Setup</strong> directory in this order:</p>
 <div class="olist loweralpha">
 <ol class="loweralpha" type="a">
 <li>
-<p>Prepare_Web_Files.py</p>
+<p><strong>Prepare_Fedora_Remix_Build.py</strong> (creates <code>/livecd-creator/FedoraRemix</code> and copies assets)</p>
 </li>
 <li>
-<p>Prepare_Fedora_Remix_Build.py</p>
+<p><strong>Prepare_Web_Files.py</strong> (HTTPd, web assets, and imgcreate <code>kickstart.py</code> / <code>fs.py</code> fixes under <code>/var/www/html/</code>)</p>
 </li>
 </ol>
 </div>
 </li>
 <li>
-<p>Modify the Kickstart files in <strong>/livecd-creator/FedoraRemix</strong></p>
+<p>Optionally modify the kickstart files in <strong>/livecd-creator/FedoraRemix</strong> after the prepare step (or edit under <strong>Setup/Kickstarts/</strong> before building)</p>
 <div class="olist loweralpha">
 <ol class="loweralpha" type="a">
 <li>
-<p>FedoraRemix.ks - To control various setup components and run commands</p>
+<p><strong>FedoraRemix.ks</strong> - Control various setup components and run commands</p>
 </li>
 <li>
-<p>FedoraRemixPackages.ks - To control RPM packages that are installed as part of your Remix</p>
+<p><strong>FedoraRemixPackages.ks</strong> - Control RPM packages installed in your Remix</p>
 </li>
 </ol>
 </div>
 </li>
 <li>
-<p>Run the <strong>Remix_Build_Script.sh</strong></p>
+<p>Run the enhanced build: <strong>Enhanced_Remix_Build_Script.sh</strong> in <code>/livecd-creator/FedoraRemix</code> (invoked for you by <strong>Build_Remix_Physical.sh</strong>). <strong>Remix_Build_Script.sh</strong> remains available as a legacy wrapper</p>
 <div class="admonitionblock warning">
 <table>
 <tr>
@@ -1847,7 +1850,7 @@ done</code></pre>
 </div>
 </li>
 <li>
-<p>Clone the Fedora Remix Repository</p>
+<p>Clone the Fedora Remix repository</p>
 <div class="listingblock">
 <div class="content">
 <pre class="highlight"><code class="language-bash" data-lang="bash">travis@localhost-fedoraremix-live [~] | (05/09/25 @ 15:55)
@@ -1862,24 +1865,37 @@ Resolving deltas: 100% (1042/1042), done.</code></pre>
 </div>
 </li>
 <li>
-<p>Prepare the Fedora Remix build environment by running the Python scripts from the <strong>Setup</strong> directory as the root user.</p>
+<p><strong>Recommended:</strong> from the repository root, run <strong>Build_Remix_Physical.sh</strong>. It prompts for the Fedora release (written to <strong>Setup/config.yml</strong> as <code>fedora_version</code>), offers a kickstart choice, then runs <strong>Prepare_Fedora_Remix_Build.py</strong>, <strong>Prepare_Web_Files.py</strong>, and <strong>Enhanced_Remix_Build_Script.sh</strong> in <code>/livecd-creator/FedoraRemix</code>. Use <code>./Build_Remix_Physical.sh -h</code> for options (<code>-v</code>, <code>-k</code>, <code>-l</code>).</p>
 <div class="listingblock">
-<div class="title">Listing 29. Create <strong>/livecd-creator/FedoraRemix</strong> Assets</div>
+<div class="title">Listing 29. Run <strong>Build_Remix_Physical.sh</strong> (native / physical build driver)</div>
+<div class="content">
+<pre class="highlight"><code class="language-bash" data-lang="bash">travis@localhost-fedoraremix-live [~/Fedora_Remix] | main ✓ |
+$ chmod +x Build_Remix_Physical.sh
+$ ./Build_Remix_Physical.sh
+
+... prompts for version, kickstart, confirmation; then prepare + enhanced build ...</code></pre>
+</div>
+</div>
+</li>
+<li>
+<p><strong>Alternative — manual prepare:</strong> run the Python scripts from the <strong>Setup</strong> directory as <strong>root</strong>, in this order (same as <strong>Build_Remix_Physical.sh</strong>):</p>
+<div class="listingblock">
+<div class="title">Listing 30. Create <strong>/livecd-creator/FedoraRemix</strong> assets</div>
 <div class="content">
 <pre class="highlight"><code class="language-bash" data-lang="bash">travis@localhost-fedoraremix-live [~/Fedora_Remix/Setup] | (05/09/25 @ 15:57)  | main ✓ |
-$ sudo python Prepare_Fedora_Remix_Build.py
+$ sudo python3 Prepare_Fedora_Remix_Build.py
 
 ... OUTPUT OMITTED ...
 
-Copying ../Remix_Buid_Script.sh to /livecd-creator/FedoraRemix/Remix_Buid_Script.sh
+Copying ../Remix_Build_Script.sh to /livecd-creator/FedoraRemix/Remix_Build_Script.sh
 Setup complete!</code></pre>
 </div>
 </div>
 <div class="listingblock">
-<div class="title">Listing 30. Create httpd server and repository assets</div>
+<div class="title">Listing 31. Create httpd server and repository assets</div>
 <div class="content">
 <pre class="highlight"><code class="language-bash" data-lang="bash">travis@localhost-fedoraremix-live [~/Fedora_Remix/Setup] | (05/09/25 @ 15:59)  | main ✓ |
-$ sudo python Prepare_Web_Files.py
+$ sudo python3 Prepare_Web_Files.py
 Installing packages: httpd
 Running command: dnf install -y httpd
 
@@ -1890,13 +1906,13 @@ Setup complete!</code></pre>
 </div>
 </li>
 <li>
-<p>Perform System and Package customizations by modifying the <strong>FedoraRemix.ks</strong> kickstart file and the <strong>FedoraRemixPackages.ks</strong> file.</p>
+<p>Perform system and package customizations by modifying the <strong>FedoraRemix.ks</strong> kickstart file and the <strong>FedoraRemixPackages.ks</strong> file (under <strong>/livecd-creator/FedoraRemix</strong> after the prepare step). The default <strong>Setup/config.yml</strong> <code>fedora_version</code> is updated for you if you use <strong>Build_Remix_Physical.sh</strong>; otherwise set it before or between prepare steps.</p>
 <div class="olist loweralpha">
 <ol class="loweralpha" type="a">
 <li>
-<p>The setup scripts or playbooks created <strong>/livecd-creator/FedoraRemix</strong> directory. This is where the kickstart files live that you will modify as well as the directory where the FedoraRemix.iso will reside once built.</p>
+<p>The setup scripts create the <strong>/livecd-creator/FedoraRemix</strong> directory. That is where you edit kickstarts and where the ISO (e.g. <strong>FedoraRemix.iso</strong>) is written after a successful build.</p>
 <div class="listingblock">
-<div class="title">Listing 31. FedoraRemix.ks</div>
+<div class="title">Listing 32. FedoraRemix.ks</div>
 <div class="content">
 <pre class="highlight"><code class="language-bash" data-lang="bash">... OUTPUT OMITTED ...
 
@@ -1918,7 +1934,7 @@ git clone https://github.com/tmichett/bash-git-prompt.git /opt/bash-git-prompt -
 </div>
 </div>
 <div class="listingblock">
-<div class="title">Listing 32. FedoraPackages.ks</div>
+<div class="title">Listing 33. FedoraPackages.ks</div>
 <div class="content">
 <pre class="highlight"><code class="language-bash" data-lang="bash">... OUTPUT OMITTED ...
 
@@ -1945,12 +1961,12 @@ podman-machine
 </div>
 </li>
 <li>
-<p>Execute the <strong>Remix_Build_Script.sh</strong> file to kick off the build. Depending on system and Internet connection speed and customizations to the kickstart file, this process could take up to an hour.</p>
+<p>Execute <strong>Enhanced_Remix_Build_Script.sh</strong> in <strong>/livecd-creator/FedoraRemix</strong> to start the build (or rely on the last step of <strong>Build_Remix_Physical.sh</strong>). For a non-default kickstart, set <strong>REMIX_KICKSTART</strong> (e.g. <code>sudo env REMIX_KICKSTART=FedoraRemixCosmic ./Enhanced_Remix_Build_Script.sh</code>). Depending on system and network speed and kickstart changes, the process can take on the order of an hour.</p>
 <div class="listingblock">
-<div class="title">Listing 33. Launching the Script</div>
+<div class="title">Listing 34. Launch the enhanced build script</div>
 <div class="content">
 <pre class="highlight"><code class="language-bash" data-lang="bash">travis@localhost-fedoraremix-live [/livecd-creator/FedoraRemix] | (05/09/25 @ 16:09)
-$ time ./Remix_Buid_Script.sh
+$ time sudo ./Enhanced_Remix_Build_Script.sh
 /usr/lib/python3.13/site-packages/pykickstart/commands/partition.py:461: KickstartParseWarning: A partition with the mountpoint / has already been defined.
   warnings.warn(_("A partition with the mountpoint %s has already been defined.") % pd.mountpoint, KickstartParseWarning)
 fedora                                           19 MB/s |  35 MB     00:01
@@ -1987,7 +2003,7 @@ sys	    5m11.054s</code></pre>
 <p>With newer Fedora releases, there is an error with the <strong>kickstart.py</strong> package and URLGrabber. Located on the "FedoraRemixTools" application, I&#8217;ve included a button to "FIX" the issue with the <strong>kickstart.py</strong> package. After completing the fix, you will no longer get the issue.</p>
 </div>
 <div class="listingblock">
-<div class="title">Listing 34. Python <strong>kickstart.py</strong> Errors</div>
+<div class="title">Listing 35. Python <strong>kickstart.py</strong> Errors</div>
 <div class="content">
 <pre class="highlight"><code class="language-bash" data-lang="bash">Traceback (most recent call last):
   File "/usr/sbin/livecd-creator", line 265, in &lt;module&gt;
