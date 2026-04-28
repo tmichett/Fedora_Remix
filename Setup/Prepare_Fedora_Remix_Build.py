@@ -30,6 +30,19 @@ def ensure_root():
         print("This script must be run as root. Please use sudo.")
         sys.exit(1)
 
+def fedora_major_version():
+    """Return Fedora major version id from /etc/os-release, or None if unknown."""
+    try:
+        with open("/etc/os-release", encoding="utf-8") as f:
+            for line in f:
+                line = line.strip()
+                if line.startswith("VERSION_ID="):
+                    raw = line.split("=", 1)[1].strip().strip('"')
+                    return int(float(raw))
+    except (OSError, ValueError):
+        pass
+    return None
+
 def install_packages(packages):
     """Install packages using dnf/yum"""
     print(f"Installing packages: {', '.join(packages)}")
@@ -76,8 +89,13 @@ def main():
     # Ensure we're running as root
     ensure_root()
     
-    # Variables
-    remix_packages = ["vim", "livecd-tools", "sshfs", "util-linux-script"]
+    # util-linux-script is a separate RPM from Fedora 42 onwards (script/live tools
+    # moved out of util-linux). On Fedora 41 and older, script(1) is in util-linux,
+    # which base installs typically already satisfy.
+    remix_packages = ["vim", "livecd-tools", "sshfs"]
+    major = fedora_major_version()
+    if major is not None and major >= 42:
+        remix_packages.append("util-linux-script")
     remix_directories = [
         "/livecd-creator/FedoraRemix",
         "/livecd-creator/package-cache"

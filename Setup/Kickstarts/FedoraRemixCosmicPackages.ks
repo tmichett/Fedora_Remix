@@ -1,5 +1,6 @@
 ## Travis's Custom Packages for COSMIC Desktop Remix
-%packages
+## --ignoremissing: util-linux-script exists only on Fedora 42+ (script ships in util-linux on F41)
+%packages --ignoremissing
 
 # Remove GNOME-related groups (the '-' prefix excludes them)
 -@gnome-desktop
@@ -165,7 +166,7 @@ util-linux-script
 
 ## Artur's CLI Utils
 zoxide
-eza ## Needs repo
+eza
 btop
 bat
 yazi  ## Needs repo

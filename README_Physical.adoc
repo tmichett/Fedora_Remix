@@ -23,12 +23,30 @@ This quickstart will provide a quick method to download a pre-built Fedora Remix
 
 For a Markdown walkthrough that tracks the same flow as *Build_Remix_Physical.sh*, see link:Quickstart_Physical.md[Quickstart_Physical.md] in the repository.
 
+== Fedora release and PXE (*Update_Remix_Config.sh*)
+
+After you clone the repository, run *Update_Remix_Config.sh* from the repository root (recommended) instead of manually editing *config.yml* and *Setup/config.yml*.
+
+[source,bash]
+----
+chmod +x Update_Remix_Config.sh
+./Update_Remix_Config.sh
+----
+
+The script asks for the Fedora release and whether to download **PXE Linux** boot images for the web tree. It updates *config.yml* (*Container_Properties.Fedora_Version*), *Setup/config.yml* *fedora_version*, and *include_pxeboot_files*. When *include_pxeboot_files* is *true*, *Prepare_Web_Files.py* fetches `vmlinuz` and `initrd.img` so you can optionally use the build host (HTTPd) as part of a **PXE** / network-install layout for your Fedora Remix.
+
+[IMPORTANT]
+====
+For some **older** releases, EOL composes, or **very new** Fedora versions, those kernel and initrd artifacts may be **missing** or not at the expected mirror paths; including PXE assets can make *Prepare_Web_Files.py* or later steps **fail**. If you are **not** planning to serve PXE/network-boot content from this system, answer *no* and keep `include_pxeboot_files: false`.
+====
+
 .*Building your own Fedora Remix - Overview*
 
 . Download the Fedora Remix ISO and install locally to hard drive
 .. Setup a local user and ensure it is in the SUDOERS file
 .. Run some the Fedora Remix customize scripts to create SSH keys and SUDO with no password
 . Clone https://github.com/tmichett/Fedora_Remix
+. Run *Update_Remix_Config.sh* from the repository root (recommended) to align *Fedora_Version*, *fedora_version*, and PXE-related *include_pxeboot_files*; or set those values by hand in *config.yml* and *Setup/config.yml*
 . Either run *Build_Remix_Physical.sh* from the repository root (recommended), or run the Python automation scripts manually with `sudo` from the *Setup* directory in this order:
 .. *Prepare_Fedora_Remix_Build.py* (creates `/livecd-creator/FedoraRemix` and copies assets)
 .. *Prepare_Web_Files.py* (HTTPd, web assets, and imgcreate `kickstart.py` / `fs.py` fixes under `/var/www/html/`)
@@ -113,7 +131,7 @@ remote: Enumerating objects: 1949, done
 Resolving deltas: 100% (1042/1042), done.
 ----
 
-. *Recommended:* from the repository root, run *Build_Remix_Physical.sh*. It prompts for the Fedora release (written to *Setup/config.yml* as `fedora_version`), offers a kickstart choice, then runs *Prepare_Fedora_Remix_Build.py*, *Prepare_Web_Files.py*, and *Enhanced_Remix_Build_Script.sh* in `/livecd-creator/FedoraRemix`. Use `./Build_Remix_Physical.sh -h` for options (`-v`, `-k`, `-l`).
+. *Recommended:* from the repository root, run *Build_Remix_Physical.sh*. It prompts for the Fedora release (written to *Setup/config.yml* as `fedora_version`; or pre-set Fedora and PXE preferences with *Update_Remix_Config.sh*), offers a kickstart choice, then runs *Prepare_Fedora_Remix_Build.py*, *Prepare_Web_Files.py*, and *Enhanced_Remix_Build_Script.sh* in `/livecd-creator/FedoraRemix`. Use `./Build_Remix_Physical.sh -h` for options (`-v`, `-k`, `-l`).
 +
 [source,bash]
 .Run *Build_Remix_Physical.sh* (native / physical build driver)
@@ -153,7 +171,7 @@ Setup complete!
 ----
 
 
-. Perform system and package customizations by modifying the *FedoraRemix.ks* kickstart file and the *FedoraRemixPackages.ks* file (under */livecd-creator/FedoraRemix* after the prepare step). The default *Setup/config.yml* `fedora_version` is updated for you if you use *Build_Remix_Physical.sh*; otherwise set it before or between prepare steps.
+. Perform system and package customizations by modifying the *FedoraRemix.ks* kickstart file and the *FedoraRemixPackages.ks* file (under */livecd-creator/FedoraRemix* after the prepare step). The default *Setup/config.yml* `fedora_version` is updated for you if you use *Build_Remix_Physical.sh*; otherwise use *Update_Remix_Config.sh* or set `fedora_version` (and PXE settings) before or between prepare steps.
 .. The setup scripts create the */livecd-creator/FedoraRemix* directory. That is where you edit kickstarts and where the ISO (e.g. *FedoraRemix.iso*) is written after a successful build.
 +
 [source,bash]
