@@ -14,7 +14,7 @@ wget
 
 
 ## GNOME Desktop Environment
-@Gnome-desktop
+@gnome-desktop
 
 ## Remove Tour
 -gnome-tour

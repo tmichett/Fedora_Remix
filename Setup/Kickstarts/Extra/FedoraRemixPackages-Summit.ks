@@ -58,7 +58,7 @@ wireguard-tools
 firefox
 
 ## Added packages that were removed in FC40 from default
-@Gnome-desktop
+@gnome-desktop
 
 ## Added for Ansible and JSON Filtering
 python-jmespath

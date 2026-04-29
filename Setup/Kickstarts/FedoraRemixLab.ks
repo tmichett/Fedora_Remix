@@ -277,7 +277,7 @@ echo "=== Configuring dracut for live boot support ==="
 mkdir -p /etc/dracut.conf.d
 cat > /etc/dracut.conf.d/02-livenet.conf << 'EOF'
 # Ensure livenet and related modules are included for live boot
-add_dracutmodules+=" livenet network-legacy dmsquash-live url-lib "
+add_dracutmodules+=" livenet network dmsquash-live url-lib "
 install_items+=" /usr/bin/curl /usr/bin/wget /usr/bin/getopt "
 # Force include networking tools and dependencies
 install_optional_items+=" /usr/bin/ping /usr/bin/dig /lib*/libnss_dns.so.* "
@@ -338,7 +338,7 @@ if [ -f /boot/vmlinuz-$(uname -r) ]; then
         echo "SUCCESS: Livenet modules successfully included in initramfs"
     else
         echo "WARNING: Livenet modules may not be included - trying alternative approach"
-        dracut -f -a "livenet network-legacy dmsquash-live" --install "curl wget" /boot/initramfs-$(uname -r).img $(uname -r)
+        dracut -f -a "livenet network dmsquash-live" --install "curl wget" /boot/initramfs-$(uname -r).img $(uname -r)
     fi
 else
     echo "WARNING: Kernel not found, regenerating all initramfs images"

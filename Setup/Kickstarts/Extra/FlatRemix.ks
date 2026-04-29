@@ -689,7 +689,7 @@ dnf update -y
 
 %packages
 @Development Tools
-@Gnome-desktop
+@gnome-desktop
 @RPM Development Tools
 @Virtualization
 @anaconda-tools

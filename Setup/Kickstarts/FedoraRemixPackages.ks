@@ -131,7 +131,7 @@ firefox
 chromium
 
 ## Added packages that were removed in FC40 from default
-@Gnome-desktop
+@gnome-desktop
 libreoffice
 
 ## Added for Ansible and JSON Filtering
