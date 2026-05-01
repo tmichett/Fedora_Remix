@@ -96,6 +96,14 @@ normalize_yes_no_input() {
     esac
 }
 
+sed_i() {
+    if [[ "$OSTYPE" == darwin* ]]; then
+        sed -i '' "$@"
+    else
+        sed -i "$@"
+    fi
+}
+
 validate_fedora_version() {
     local v="$1"
     if [[ ! "$v" =~ ^[0-9]+$ ]]; then
@@ -119,13 +127,13 @@ write_setup_fedora_version() {
         echo "Error: No fedora_version: line found in $SETUP_CONFIG" >&2
         return 1
     fi
-    sed -i "s/^fedora_version:.*/fedora_version: ${v}/" "$SETUP_CONFIG"
+    sed_i "s/^fedora_version:.*/fedora_version: ${v}/" "$SETUP_CONFIG"
 }
 
 write_setup_include_pxeboot() {
     local value="$1"
     if grep -q '^include_pxeboot_files:' "$SETUP_CONFIG"; then
-        sed -i "s/^include_pxeboot_files:.*/include_pxeboot_files: ${value}/" "$SETUP_CONFIG"
+        sed_i "s/^include_pxeboot_files:.*/include_pxeboot_files: ${value}/" "$SETUP_CONFIG"
     else
         printf '\ninclude_pxeboot_files: %s\n' "$value" >> "$SETUP_CONFIG"
     fi
