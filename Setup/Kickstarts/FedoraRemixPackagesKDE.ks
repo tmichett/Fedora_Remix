@@ -166,7 +166,7 @@ eza
 btop
 bat
 yazi  ## Needs repo
-dust  ## Needs repo
+du-dust
 
 ## Networking and Diagnostic Utilities
 nmap 

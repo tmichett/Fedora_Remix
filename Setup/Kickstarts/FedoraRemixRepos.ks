@@ -6,8 +6,7 @@ repo --name="rpmfusion-nonfree" --mirrorlist=https://mirrors.rpmfusion.org/metal
 repo --name="google-chrome" --baseurl=http://dl.google.com/linux/chrome/rpm/stable/x86_64
 repo --name="vscode" --baseurl=https://packages.microsoft.com/yumrepos/vscode
 repo --name="GithubCLITools" --baseurl=https://cli.github.com/packages/rpm
-repo --name="DUST-COPR" --baseurl=https://download.copr.fedorainfracloud.org/results/gourlaysama/dust/fedora-$releasever-$basearch/
+# dust (du-dust) and eza are now in official Fedora repos — COPRs removed
 repo --name="YAZI-COPR" --baseurl=https://download.copr.fedorainfracloud.org/results/lihaohong/yazi/fedora-$releasever-$basearch/
-# eza: ship from Fedora rust-eza (do not use alternateved/eza COPR — no F41 chroot; repodata 404).
 repo --name="FedoraRemix-COPR" --baseurl=https://download.copr.fedorainfracloud.org/results/tmichett/FedoraRemix/fedora-$releasever-$basearch/ --install --cost=100
 

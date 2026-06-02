@@ -113,7 +113,7 @@ btop
 bat
 fzf
 yazi  ## Needs repo
-dust  ## Needs repo
+du-dust
 
 ## Networking and Diagnostic Utilities
 nmap 
