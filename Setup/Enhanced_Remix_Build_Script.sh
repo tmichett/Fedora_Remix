@@ -178,6 +178,55 @@ check_prerequisites() {
     print_message "SUCCESS" "All prerequisites satisfied"
 }
 
+# Copy the GPG helper next to imgcreate and call it from dnfinst.runInstall.
+# The installed dnfinst.py is from the livecd-tools RPM; this edits the copy
+# inside the running container only.
+install_installroot_gpg_hook() {
+    local imgcreate_path="$1"
+    local helper=""
+    local candidate
+    for candidate in \
+        /root/workspace/Setup/files/Fixes/import_installroot_keys.py \
+        /var/www/html/files/Fixes/import_installroot_keys.py \
+        /var/www/html/import_installroot_keys.py
+    do
+        if [ -f "$candidate" ]; then
+            helper="$candidate"
+            break
+        fi
+    done
+
+    if [ -z "$helper" ]; then
+        print_message "ERROR" "import_installroot_keys.py not found"
+        exit 1
+    fi
+
+    cp "$helper" "$imgcreate_path/import_installroot_keys.py"
+    print_message "INFO" "  Installed import_installroot_keys.py from $helper"
+
+    python3 - "$imgcreate_path/dnfinst.py" <<'PY'
+import sys
+from pathlib import Path
+
+path = Path(sys.argv[1])
+text = path.read_text()
+if "import_installroot_keys" in text:
+    raise SystemExit(0)
+
+old = "        # FIXME: sigcheck?\n\n        ret = self.do_transaction(TransactionProgress())\n"
+new = """        # FIXME: sigcheck?
+        # Fedora 45 enforces signatures. Import keys into the empty install root first.
+        from imgcreate.import_installroot_keys import import_installroot_keys
+        import_installroot_keys(self.conf.installroot, self.releasever)
+
+        ret = self.do_transaction(TransactionProgress())
+"""
+if old not in text:
+    raise SystemExit("dnfinst.py does not contain the expected sigcheck hook")
+path.write_text(text.replace(old, new, 1))
+PY
+}
+
 # Function to prepare build environment
 prepare_environment() {
     print_message "STAGE" "Preparing Build Environment"
@@ -206,6 +255,11 @@ prepare_environment() {
         cp /var/www/html/fs.py "$PYTHON_IMGCREATE_PATH/fs.py" 2>/dev/null || true
         print_message "INFO" "  Installed fs.py patch (systemd /sys unmount fix)"
     fi
+
+    # Fedora 45 rpm rejects packages whose key is not in the install-root
+    # keyring. livecd-tools never imports repo keys, so stage them and hook
+    # dnfinst.py to import before the transaction.
+    install_installroot_gpg_hook "$PYTHON_IMGCREATE_PATH"
     
     # Clear Python bytecode cache to force reimport of patched modules
     print_message "INFO" "  Clearing Python cache..."
@@ -229,6 +283,20 @@ prepare_environment() {
         print_message "ERROR" "  Expected location: $PYTHON_IMGCREATE_PATH/kickstart.py"
         exit 1
     fi
+
+    if grep -q "import_installroot_keys" "$PYTHON_IMGCREATE_PATH/dnfinst.py" 2>/dev/null; then
+        print_message "SUCCESS" "  ✓ Verified: dnfinst.py install-root GPG import hook active"
+    else
+        print_message "ERROR" "  ✗ WARNING: dnfinst.py GPG import hook NOT found!"
+        exit 1
+    fi
+
+    print_message "INFO" "${WRENCH} Staging repository OpenPGP keys for Fedora ${FEDORA_VERSION}..."
+    if ! python3 "$PYTHON_IMGCREATE_PATH/import_installroot_keys.py" --stage "$FEDORA_VERSION"; then
+        print_message "ERROR" "Failed to stage repository OpenPGP keys"
+        exit 1
+    fi
+    print_message "SUCCESS" "Repository OpenPGP keys staged"
     
     print_message "INFO" "${PACKAGE} Creating cache directory..."
     mkdir -p "$CACHE_DIR"

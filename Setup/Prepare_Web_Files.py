@@ -274,6 +274,13 @@ def main():
         rsync(fs_file, f"{web_root}/")
     else:
         print(f"Warning: {fs_file} not found")
+
+    # Copy install-root GPG import helper (Fedora 45 rpm signature enforcement)
+    gpg_file = "files/Fixes/import_installroot_keys.py"
+    if os.path.exists(gpg_file):
+        rsync(gpg_file, f"{web_root}/")
+    else:
+        print(f"Warning: {gpg_file} not found")
     
     # Enable HTTPD Service
     enable_service("httpd")

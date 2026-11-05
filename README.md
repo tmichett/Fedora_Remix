@@ -95,7 +95,8 @@ If you're building on Linux and encounter `/sys` unmount errors, the issue has b
 - **Physical/Virtual** - See **[README_Physical.adoc](README_Physical.adoc)** for building on physical or virtual machines without containers
 
 ### Troubleshooting & Fixes
-- **[LINUX_BUILD_FIX.md](LINUX_BUILD_FIX.md)** - Detailed fixes for Linux build issues (3 major fixes)
+- **[LINUX_BUILD_FIX.md](LINUX_BUILD_FIX.md)** - Detailed fixes for Linux build issues (4 major fixes)
+- **[Notes/Fedora45_GPG_Key_Import.md](Notes/Fedora45_GPG_Key_Import.md)** - Fedora 45 `NOKEY` signature failure and the keys that must be imported
 - **[SELINUX_RELABEL_FIX.md](SELINUX_RELABEL_FIX.md)** - SELinux relabeling error fix (April 2026)
 
 ### Reference
@@ -125,7 +126,8 @@ Fedora_Remix/
 │   └── files/
 │       └── Fixes/             # Python patches for livecd-tools
 │           ├── fs.py          # Systemd /sys unmount fix
-│           └── kickstart.py   # Kickstart compatibility fix
+│           ├── kickstart.py   # Kickstart compatibility fix
+│           └── import_installroot_keys.py  # Fedora 45 install-root GPG import
 └── Files/                     # Customization files (themes, configs)
 ```
 
@@ -167,6 +169,10 @@ Edit these files to customize your Fedora Remix:
 - **`Files/`** - Custom files, themes, and configurations
 
 ## Troubleshooting
+
+### Build fails with `NOKEY` / `does not verify` on Fedora 45
+
+rpm in Fedora 45 refuses packages whose key is not in the **install root**. The fix imports the Fedora 45 key and the third-party repo keys before `livecd-creator` runs the transaction. Details and the exact key ids: [Notes/Fedora45_GPG_Key_Import.md](Notes/Fedora45_GPG_Key_Import.md).
 
 ### Build fails with unmount errors
 See [LINUX_BUILD_FIX.md](LINUX_BUILD_FIX.md) - Python version detection fix required

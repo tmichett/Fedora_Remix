@@ -1032,6 +1032,14 @@ podman images | grep fedora-remix-builder
 cat config.yml
 ```
 
+### Build Fails with `NOKEY` on Fedora 45
+
+Fedora 45 rpm uses `%_pkgverify_level all`. `livecd-creator` installs into an empty RPM database, so every package fails with `does not verify … NOKEY` unless the repo keys are imported first. The build script does that import. Full analysis: [Fedora45_GPG_Key_Import.md](Fedora45_GPG_Key_Import.md).
+
+```text
+package libgcc-16.2.1-3.fc45.x86_64 does not verify: Header OpenPGP V4 RSA/SHA256 signature, key ID 655a4b02f577861e: NOKEY
+```
+
 ### Build Fails with `/sys` Unmount Errors
 
 This is a known issue fixed in the latest version. The `fs.py` patch is automatically applied:
@@ -1133,9 +1141,10 @@ dnf info <package-name>
 
 - [Kickstarts README](../Setup/Kickstarts/README.md) - Detailed kickstart documentation
 - [Linux Build Fix](../LINUX_BUILD_FIX.md) - Solutions for Linux-specific build issues
+- [Fedora 45 GPG key import](Fedora45_GPG_Key_Import.md) - Why `NOKEY` fails the Fedora 45 live build, and which keys are imported
 - [RemixBuilder README](../../RemixBuilder/README.md) - Container build details
 
 ---
 
-*Last updated: December 2025*
+*Last updated: November 5, 2026*
 
