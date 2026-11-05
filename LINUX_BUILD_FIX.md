@@ -1,9 +1,39 @@
 # Fedora Remix Builder - Linux Compatibility Fixes
 
-**Last Updated:** April 22, 2026
+**Last Updated:** November 5, 2026
 **Status:** RESOLVED
 
 ## Fix History
+
+### Fix #4: Fedora 45 RPM signature enforcement (`NOKEY`) (November 5, 2026)
+
+**Issue:** `livecd-creator` fails in about 20 seconds, before any package is installed, on every package in the transaction.
+
+**Error message:**
+
+```text
+Error creating Live CD : Unable to install: Transaction test error:
+  package libgcc-16.2.1-3.fc45.x86_64 does not verify: Header OpenPGP V4 RSA/SHA256 signature, key ID 655a4b02f577861e: NOKEY
+```
+
+The same log also rejects RPM Fusion, Google Chrome, VS Code, GitHub CLI, COPR `tmichett/FedoraRemix`, and COPR `lihaohong/yazi` packages with their own key ids. Full table, URLs, and the `rpmkeys -K` proof: [Notes/Fedora45_GPG_Key_Import.md](Notes/Fedora45_GPG_Key_Import.md).
+
+**Root cause:**
+
+- Fedora 45 rpm evaluates `%_pkgverify_level` to `all`. Fedora 44 stopped at `digest`, so a missing key was a warning.
+- The builder image already has the Fedora 45 public key in its own RPM database (`gpg-pubkey-…655a4b02f577861e`, summary `Fedora (45)`).
+- `livecd-creator` installs into an empty install root (`/var/tmp/imgcreate-*/install_root`). Signature checks use that database.
+- `imgcreate/dnfinst.py` (`livecd-tools-31.0-23.fc45`) never sets `gpgkey=` and calls `do_transaction()` under a `# FIXME: sigcheck?` comment.
+
+**Fix (runtime patch, image rebuild not required):**
+
+- `Setup/files/Fixes/import_installroot_keys.py` stages third-party keys and imports them, plus the matching Fedora release keys, into the install root before the transaction.
+- `Setup/Enhanced_Remix_Build_Script.sh` copies that module next to `imgcreate` and inserts the call immediately before `do_transaction`.
+- `Setup/Prepare_Web_Files.py` publishes the helper with the other imgcreate patches.
+
+RPM Fusion no longer serves `RPM-GPG-KEY-rpmfusion-*-fedora-45` (HTTP 404). The helper extracts the key from `rpmfusion-*-release-45.noarch.rpm`, where the Fedora 45 filename is a symlink to the 2020 key.
+
+**Result:** Default `FedoraRemix.ks` build on 2026-11-05 produced `FedoraRemix.iso` (8.4 GB) in 16m 5s. Log line: `Importing 8 OpenPGP keys into …/install_root (Fedora 45)`.
 
 ### Fix #3: SELinux Relabeling Errors During ISO Creation (April 13, 2026)
 

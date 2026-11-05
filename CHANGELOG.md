@@ -9,6 +9,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [Unreleased]
 
 ### Fixed
+- **2026-11-05**: Fedora 45 `livecd-creator` transaction failed with `NOKEY` (key id `655a4b02f577861e` and the third-party repo keys)
+  - Cause: rpm `%_pkgverify_level all` checks the empty install root; `imgcreate/dnfinst.py` never imports repo keys
+  - Fix: `Setup/files/Fixes/import_installroot_keys.py`, hooked from `Setup/Enhanced_Remix_Build_Script.sh` before `do_transaction`
+  - RPM Fusion keys are extracted from the release RPM; the standalone key URLs 404
+  - Container image was not rebuilt
+  - Write-up: [Notes/Fedora45_GPG_Key_Import.md](Notes/Fedora45_GPG_Key_Import.md)
+  - Result: `FedoraRemix.iso` 8.4 GB in 16m 5s
+
 - **2026-02-22**: SELinux permission denied error on `/tmp/remix_kickstart.txt`
   - Removed temp file bind mount that caused SELinux conflicts
   - Container now creates kickstart file in its own tmpfs
